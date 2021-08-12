@@ -1,9 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-
+import "./index.scss";
+import axios from "axios";
+import config from "./config";
+axios.defaults.baseURL=config.backendUrl;
 ReactDOM.render(
   <React.StrictMode>
     <App />

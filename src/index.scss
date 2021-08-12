@@ -1,0 +1,40 @@
+@import "globals";
+
+* {
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+body {
+    background: $background;
+    color: $primary-text-col;
+    font-family: $font-family;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: $primary-col;
+}
+
+::-moz-selection {
+    color: $secondary-text-col;
+    background: $primary-col;
+}
+
+::selection {
+    color: $secondary-text-col;
+    background: $primary-col;
+}
