@@ -1,0 +1,150 @@
+@import "../../globals";
+
+.fs_header{
+    position:absolute;
+    z-index: 500;
+    border-bottom: 1px solid #fff;
+    padding: 10px;
+    background: #0005;
+    color:#fff;
+    .fs_search{
+        background: #fff;
+        color:black;
+        display: flex;
+        justify-content: space-between;
+        padding: 0px 4px;
+        border-radius: 5px;
+        align-items: center;
+        transition-duration: 500ms;
+        .fs_search_btn{
+            cursor: pointer;
+        }
+        input{
+            width: 100%;
+            outline: none;
+            border: none;
+            padding: 2px;
+        }
+        &:hover{
+            transform: scale(105%);
+        }
+    }
+    .fs_avatar{
+        cursor: pointer;
+        transition-duration: 100ms;
+        color:#fff;
+        background: $secondary-col;
+        margin: 0px 5px;
+        &:hover{
+            transform: scale(115%);
+        }
+    }
+    .fs_menu{
+        padding: 0px 40px;
+        border-right: 2px solid #fff;
+        div{
+            margin: 0px 10px;
+            cursor: pointer;
+            div:hover{
+                color:$secondary-col;
+            }
+        }
+    }
+    .fs_menu_btn{
+        display: none;
+        .fs_menu_avatar{
+            background-color: $secondary-col;
+            transform: scale(80%);
+        }
+    }
+    .fs_dropdown{
+        position: relative;
+        .fs_dropdown_list{
+            position: absolute;
+            top:100%;
+            left: 0%;
+            list-style: none;
+            background-color: $primary-col-light;
+            margin: 0px;
+            padding: 0px;
+            text-align: center;
+            visibility: hidden;
+            width: 150%;
+            opacity: 0%;
+            height: 0px;
+            transition-duration: 300ms;
+            transform: translate(100%,100%);
+            li{
+                margin: 4px 0px;
+                cursor: pointer;
+                color:#fff;
+                &:hover{
+                    color:#fff;
+                    background-color: $secondary-col;
+                }
+            }
+        }
+        &:hover .fs_dropdown_list{
+            height: unset;
+            display: block;
+            opacity: 100%;
+            visibility: visible;
+            transform: translate(0%,0%);
+        }
+    }
+}
+
+// Customising Bootstrap
+.fs_sidebar_menu{
+    background-color: $primary-col !important;
+    color:$secondary-col;
+    .fs_sidebar_nav_item{
+        color: #fff;
+        cursor: pointer;
+        &:hover{
+            color:$secondary-col;
+        }
+    }
+}
+.offcanvas-start{
+    max-width: 250px !important;
+    background: $primary-col !important;
+}
+.offcanvas-end{
+    max-width: 250px !important;
+}
+.fs_header.fs_header_sticky{
+    position:fixed;
+    background-color: $primary-col;
+    border: none;
+}
+@media screen and (max-width:770px) {
+    .fs_header{
+        .fs_menu{
+            display: none;
+        }
+        .fs_menu_btn{
+            display: block;
+        }
+        .fs_avatar{
+            transform: scale(80%);
+            margin: 0px 2px;
+        }
+        .fs_logo{
+            width: 50px;
+            height: 50px;
+            position: relative;
+            left: 5px;
+        }
+    }
+}
+@media screen and (max-width:290px) {
+    .fs_header{
+        .fs_menu_btn{
+            margin-right: 30px;
+        }
+        .fs_search{
+            margin-left: 20px;
+        }
+    }
+}

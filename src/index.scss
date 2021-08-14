@@ -13,6 +13,9 @@ a {
 
 body {
     background: $background;
+    // background: url("./images/banner/banner3.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
     color: $primary-text-col;
     font-family: $font-family;
 }
@@ -22,11 +25,11 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: transparent;
+    background: $primary-col;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: $primary-col;
+    background: $secondary-col;
 }
 
 ::-moz-selection {
