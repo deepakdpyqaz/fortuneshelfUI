@@ -43,7 +43,7 @@ const Header = () => {
                         </Avatar>
                     </Col>
                     <Col md={1} sm={3} xs={3} className="text-center">
-                        <img className="fs_logo" src={logo} alt="FortuneShelf" height="60" width="60" />
+                        <img className="fs_logo" src={logo} alt="FortuneShelf" height="55" width="55" />
                     </Col>
                     <Col md={2} sm={5} xs={4} className="fs_search justify-content-stretch">
                         <SearchIcon className="fs_search_btn" />
