@@ -1,0 +1,14 @@
+@import "../../_globals.scss";
+
+.fs_book{
+    background-color: $card-background !important;
+    cursor: pointer;
+    
+    &:hover{
+        box-shadow: 0px 0px 10px 1px $primary-col;
+        border: none;
+    }
+    h5{
+        font-family: $secondary-font-family;
+    }
+}

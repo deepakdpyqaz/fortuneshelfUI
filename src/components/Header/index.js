@@ -29,8 +29,6 @@ const Header = () => {
             else{
                 headerRef.current.classList.remove("fs_header_sticky");
             }
-            console.log(height)
-            console.log(window.scrollY);
         }
     })
     return (

@@ -1,0 +1,55 @@
+@import "../../globals";
+.fs_button{
+    outline: none;
+    border: none;
+    font-family: $secondary-font-family;
+    padding: 5px 10px;
+    font-size: 1rem;
+    transition-duration: 100ms;
+    margin: 0px 10px;
+    border-radius: 10px;
+    &:hover{
+        cursor: pointer;
+    }
+}
+.fs_button.primary.filled{
+    background-color: $primary-col;
+    color:$secondary-text-col;
+    box-shadow: 0px 0px 3px 1px $primary-col;
+    &:hover{
+        color:$primary-col;
+        background-color: transparent;
+        border: 2px solid $primary-col;
+    }
+}
+.fs_button.primary.outlined{
+    border: 2px solid $primary-col;
+    box-shadow: 0px 0px 3px 1px $primary-col;
+    background-color: transparent;
+    color:$primary-col;
+    &:hover{
+        background-color: $primary-col;
+        color:$secondary-text-col;
+    }
+}
+
+.fs_button.secondary.filled{
+    background-color: $secondary-col;
+    color:$secondary-text-col;
+    box-shadow: 0px 0px 3px 1px $secondary-col;
+    &:hover{
+        color:$secondary-col;
+        background-color: transparent;
+        border: 2px solid $secondary-col;
+    }
+}
+.fs_button.secondary.outlined{
+    background-color: transparent;
+    color:$secondary-col;
+    box-shadow: 0px 0px 3px 1px $secondary-col;
+    border: 2px solid $secondary-col;
+    &:hover{
+        background-color: $secondary-col;
+        color:$secondary-text-col;
+    }
+}
