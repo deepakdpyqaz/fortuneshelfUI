@@ -10,11 +10,12 @@ import NearMeIcon from '@material-ui/icons/NearMe';
 const Book = () => {
     return (
         <>
-            <Card style={{ width: '16rem' }} className="fs_book m-2">
+            <Card style={{ width: '16rem' }} className="fs_book m-3">
                 <Card.Body className="text-center">
                     <img src={BookImage} alt="" height="200" />
                     <Card.Text className="border-top border-secondary my-3 py-1">
-                        <h5>Title of book</h5> 
+                        <h5>Title of book</h5>
+                        <h6>Hindi</h6>
                         <strong>&#8377; 5000</strong> <small><strike>6000</strike></small>
                     </Card.Text>
                     <ButtonGroup>
