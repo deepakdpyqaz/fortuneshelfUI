@@ -1,3 +1,3 @@
 import Button from "./Button";
-
-export {Button}
+import TextContainer from "./TextContainer";
+export {Button,TextContainer}

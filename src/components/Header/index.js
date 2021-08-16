@@ -11,6 +11,8 @@ import ShoppingCart from "@material-ui/icons/ShoppingCart";
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Nav from "react-bootstrap/Nav";
+import { reactLocalStorage } from 'reactjs-localstorage';
+import {CartBook} from "../ViewBook";
 import "./header.scss";
 const Header = () => {
     const [show, setShow] = useState(false);
@@ -88,10 +90,12 @@ const Header = () => {
             </Offcanvas>
             <Offcanvas show={cartVisibility} onHide={hideCart} scroll={true} backdrop={false} placement="end">
                 <Offcanvas.Header closeButton>
-                    <Offcanvas.Title className="text-center">Cart</Offcanvas.Title>
+                    <Offcanvas.Title className="text-center">My Cart</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
-                    Cart data will come here
+                    {(Object.entries(reactLocalStorage.getObject('cart'))).map(elem=>{
+                        return <CartBook key={elem[1].bookId} title={elem[1].title} language={elem[1].language} price={elem[1].price} discount={elem[1].discount} qty={elem[1].stock}/>;
+                    })}
                 </Offcanvas.Body>
             </Offcanvas>
         </>
