@@ -8,7 +8,10 @@
 
 a {
     text-decoration: none;
-    color: inherit;
+    color: inherit !important;
+    a:hover{
+        color:inherit;
+    }
 }
 
 body {
@@ -19,7 +22,9 @@ body {
     color: $primary-text-col;
     font-family: $font-family;
 }
-
+h1,h2,h3,h4{
+    font-family: $secondary-font-family;
+}
 ::-webkit-scrollbar {
     width: 10px;
 }

@@ -5,10 +5,15 @@ import reportWebVitals from './reportWebVitals';
 import "./index.scss";
 import axios from "axios";
 import config from "./config";
+import { Provider } from 'react-redux'
+import store from './store'
 axios.defaults.baseURL=config.backendUrl;
 ReactDOM.render(
+
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );
