@@ -13,7 +13,7 @@ import { useSelector,useDispatch } from "react-redux";
 import { setCartItems } from "../../reducers/cart";
 import CancelIcon from '@material-ui/icons/Cancel';
 import {Link} from "react-router-dom";
-
+import axios from "axios";
 
 const CartBook = (props) => {
     const dispatch = useDispatch();
@@ -89,7 +89,7 @@ const Book = (props) => {
                     <div className="fs_delivery_free">Delivery Free</div>:null
                 }
                 <Card.Body className="text-center">
-                    <img src={BookImage} alt="" height="200" />
+                    <img src={axios.defaults.baseURL + props.photo} alt="" height="200" />
                     <Card.Text as="div" className="border-top border-secondary my-3 py-1">
                         <h5>{props.title}</h5>
                         <h6>Language: {props.language}</h6>
@@ -112,7 +112,7 @@ const BookContainer = (props) => {
             <Row xs={1} md={2} className="g-0 justify-content-center">
                 {(props.books.map((elem) => {
                     return (
-                        <Book key={elem.id} max_stock={elem.max_stock} title={elem.title} language={elem.language} price={elem.price} discount={elem.discount} weight={elem.weight} bookId={elem.book_id} delivery_factor={elem.delivery_factor} />
+                        <Book key={elem.id} max_stock={elem.max_stock} title={elem.title} language={elem.language} price={elem.price} discount={elem.discount}  photo={elem.picture} weight={elem.weight} bookId={elem.book_id} delivery_factor={elem.delivery_factor} />
                     )
                 }))}
             </Row>

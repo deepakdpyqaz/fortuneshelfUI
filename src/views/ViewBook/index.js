@@ -56,7 +56,7 @@ const ViewBook = () => {
                         <Form.Select aria-label="Sort By" onChange={handleChange} name="order_by">
                             <option>Sort By</option>
                             <option value="price">Price</option>
-                            <option value="name">Name</option>
+                            <option value="title">Name</option>
                         </Form.Select>
                     </Col>
                     <Col>

@@ -51,7 +51,7 @@ const ViewFullBook = (props) => {
                             </Row>
                             <Row>
                                 <Col>
-                                    <img src={axios.defaults.baseURL + bookData.picture.substring(1)} alt={bookData.title} />
+                                    <img src={axios.defaults.baseURL + bookData.picture} alt={bookData.title} />
                                 </Col>
                                 <Col>
                                     <Table borderless striped hover>

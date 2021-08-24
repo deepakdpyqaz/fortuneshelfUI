@@ -1,5 +1,5 @@
 import React,{useState} from "react";
-import { useSelector, connect } from "react-redux";
+import { useSelector,useDispatch, connect } from "react-redux";
 import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
 import SectionTitle from "../../components/SectionTitle";
@@ -7,8 +7,15 @@ import Input from "@material-ui/core/Input";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Button } from "../../components/Utilities";
+import axios from "axios";
+import { reactLocalStorage } from 'reactjs-localstorage';
+import { setCartItems } from "../../reducers/cart";
+import { useHistory } from "react-router-dom";
+
 const Checkout = (props) => {
     const [shippingDetails,setShippingDetails] = useState({});
+    const dispatch = useDispatch();
+    const history = useHistory();
     const handleChange=(e)=>{
         setShippingDetails((prevData)=>{
             return {...prevData,[e.target.name]:e.target.value};
@@ -20,7 +27,14 @@ const Checkout = (props) => {
         (Object.entries(props.cartItems != null ? props.cartItems : {})).map((elem)=>{
             books[elem[0]]=elem[1].stock;
         })
-        console.log(shippingDetails,books);
+        axios.put("/order/make_order",{...shippingDetails,details:books,amount:props.totalPrice,delivery_charges:props.deliveryCharge}).then((res)=>{
+            alert(res.data.orderId);
+            reactLocalStorage.setObject("cart",{});
+            dispatch(setCartItems({}));
+            setShippingDetails({});
+        }).catch((err)=>{
+            alert(err.message);
+        })
     }
     return (
         <div style={{ paddingTop: "10vh" }}>
@@ -139,7 +153,7 @@ const Checkout = (props) => {
                     <br />
                     <Row>
                         <Col>
-                            Payment Method: &nbsp;  COD <input required type="radio" name="paymentMethod" value={"COD"} checked={shippingDetails.paymentMethod=="COD"} onChange={handleChange}   />   &nbsp; Online <input required type="radio" checked={shippingDetails.paymentMethod=="ONLINE"} value={"ONLINE"} onChange={handleChange} name="paymentMethod"  />
+                            Payment Method: &nbsp;  COD <input required type="radio" name="paymentMode" value={"C"} checked={shippingDetails.paymentMode=="C"} onChange={handleChange}   />   &nbsp; Online <input required type="radio" checked={shippingDetails.paymentMode=="O"} value={"O"} onChange={handleChange} name="paymentMode"  />
                             <br />
                             <small><strong>**Cash On Delivery</strong> is available for registered users Only</small>
                         </Col>
