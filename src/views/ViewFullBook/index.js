@@ -39,7 +39,7 @@ const ViewFullBook = (props) => {
         })
     }, [])
     return (
-        <div style={{ paddingTop: "10vh" }}>
+        <div className="view_page">
             {
                 !isLoading ?
                     bookData.found && bookData.found == false

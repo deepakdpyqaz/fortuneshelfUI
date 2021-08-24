@@ -24,7 +24,7 @@ const SearchBook = () => {
         })
     },[location.search])
     return (
-        <div className="searchBook" style={{ paddingTop: "10vh" }}>
+        <div className="searchBook view_page" >
             <h3 className="text-center my-3">Search results for <em>"{query.get("searchQuery")}"</em></h3>
             {(!isLoading?
                 (

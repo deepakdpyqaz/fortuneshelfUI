@@ -7,11 +7,14 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
+import Alert from "react-bootstrap/Alert";
 const ViewBook = () => {
     const [books, setBooks] = useState([]);
     const [pageNo, setPageNo] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [queryParams,setQueryParams] = useState({});
+    const [show,setShow] = useState(false);
+    const [error,setError] = useState("");
     const getBooks = () => {
         axios.get("/book", { params: { page_number: pageNo, per_page: 25,...queryParams } }).then((res) => {
             if (res.data.length == 0) {
@@ -22,7 +25,14 @@ const ViewBook = () => {
                 return [...prevState, res.data]
             });
         }).catch(err => {
-            alert(err.message);
+            setHasMore(false);
+            setShow(true)
+            if (err.response.data && err.response.data.message) {
+                setError(err.response.data.message);
+            }
+            else {
+                setError(err.message);
+            }
         }).finally(() => {
             setPageNo(pageNo + 1);
         })
@@ -39,7 +49,10 @@ const ViewBook = () => {
 
     }
     return (
-        <div className="viewbook" style={{ paddingTop: "10vh" }}>
+        <div className="viewbook view_page">
+            <Alert variant="danger" show={show} onClose={() => setShow(false)} dismissible>
+                <Alert.Heading>{error}</Alert.Heading>
+            </Alert>
             <Container fluid className="my-3">
                 <Row>
                     <Col>

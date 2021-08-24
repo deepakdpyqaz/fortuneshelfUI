@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -19,9 +19,10 @@ import { setCartItems } from "../../reducers/cart";
 import { Button } from "../Utilities";
 import Overlay from "react-bootstrap/Overlay";
 import Tooltip from "react-bootstrap/Tooltip";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 import "./header.scss";
 const Header = (props) => {
-    const userDetails = useSelector((state) => state.auth.userDetails);
     const [show, setShow] = useState(false);
     const [cartVisibility, setCartVisibility] = useState(false);
     const showCart = () => setCartVisibility(true);
@@ -32,7 +33,15 @@ const Header = (props) => {
     const dispatch = useDispatch();
     const history = useHistory();
     const target = useRef();
-    const [showSearchTip,setShowSearchTip] = useState(false);
+    const [showSearchTip, setShowSearchTip] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const handleUserClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    
+    const handleUserClose = () => {
+    setAnchorEl(null);
+    };
     window.addEventListener("scroll", function (e) {
         if (headerRef.current && props.stickyMode) {
             let height = headerRef.current.getBoundingClientRect().height;
@@ -50,7 +59,7 @@ const Header = (props) => {
         setSearchQuery(e.target.value);
     }
     const makeSearch = (e) => {
-        if(searchQuery.length<3){
+        if (searchQuery.length < 3) {
             setShowSearchTip(true);
             return;
         }
@@ -77,7 +86,7 @@ const Header = (props) => {
                         <img className="fs_logo" src={logo} alt="FortuneShelf" height="55" width="55" />
                     </Col>
                     <Col md={2} sm={5} xs={4} className="fs_search justify-content-stretch">
-                        <SearchIcon ref={target}  className="fs_search_btn" onClick={makeSearch} />
+                        <SearchIcon ref={target} className="fs_search_btn" onClick={makeSearch} />
                         <Overlay target={target.current} show={showSearchTip} placement="bottom">
                             {(props) => (
                                 <Tooltip id="overlay-example" {...props}>
@@ -102,7 +111,7 @@ const Header = (props) => {
                             <div>Track Order</div>
                             {
                                 (
-                                    userDetails.userId == null ?
+                                    props.userDetails && props.userDetails.id != null ?
                                         <div className="fs_dropdown">My Activities <ArrowDropDownIcon />
                                             <ul className="fs_dropdown_list">
                                                 <li>My Orders</li>
@@ -115,9 +124,28 @@ const Header = (props) => {
                         </div>
                     </Col>
                     <Col md={2} sm={2} xs={4} className="d-flex justify-content-start align-items-center">
-                        <Avatar className="fs_avatar">
-                            <Person />
+
+                        <Avatar className="fs_avatar" onClick={handleUserClick}>
+                            {props.userDetails && props.userDetails.id!=null?
+                                props.userDetails.name[0]:<Person />
+                            }
                         </Avatar>
+                        <Menu
+                            id="user-menu"
+                            anchorEl={anchorEl}
+                            keepMounted
+                            open={Boolean(anchorEl)}
+                            onClose={handleUserClose}
+                        >
+                            {
+                                props.userDetails && props.userDetails.id != null ?
+                                <MenuItem onClick={handleUserClose}>Logout</MenuItem>:
+                                [
+                                    <Link key="1" to="/login"><MenuItem onClick={handleUserClose}>Login</MenuItem></Link>,
+                                    <Link key="2" to="/signup"><MenuItem onClick={handleUserClose}>Sign Up</MenuItem></Link>
+                                ]
+                            }
+                        </Menu>
                         <Avatar className="fs_avatar">
                             <ShoppingCart onClick={showCart} />
                         </Avatar>
@@ -129,12 +157,11 @@ const Header = (props) => {
                     <Offcanvas.Title>FortuneShelf</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
-                    <Nav defaultActiveKey="/home" className="fs_sidebar_nav flex-column">
-                        <Nav.Link className="fs_sidebar_nav_item" href="/home">Home</Nav.Link>
-                        <Nav.Link className="fs_sidebar_nav_item" eventKey="link-1">About</Nav.Link>
-                        <Nav.Link className="fs_sidebar_nav_item" eventKey="link-2">View Books</Nav.Link>
-                        <Nav.Link className="fs_sidebar_nav_item" eventKey="link-2">Track Order</Nav.Link>
-                        <Nav.Link className="fs_sidebar_nav_item" eventKey="link-2">My Orders</Nav.Link>
+                    <Nav defaultActiveKey="/" className="fs_sidebar_nav flex-column">
+                        <Link className="fs_sidebar_nav_item" to="/">Home</Link>
+                        <Link className="fs_sidebar_nav_item" to="/viewbook">View Books</Link>
+                        <Link className="fs_sidebar_nav_item" to="/trackorder">Track Order</Link>
+                        <Link className="fs_sidebar_nav_item" >My Orders</Link>
                     </Nav>
                 </Offcanvas.Body>
             </Offcanvas>
@@ -148,7 +175,7 @@ const Header = (props) => {
                     })}
                     <Container className="justify-content-center text-center">
                         <h3>Total: {props.totalPrice}</h3>
-                        <Link to={props.totalPrice?"/checkout":"#"}><Button variant="filled" color="primary" disabled={!(props.totalPrice)}>Proceed &gt;&gt;</Button></Link>
+                        <Link to={props.totalPrice ? "/checkout" : "#"}><Button variant="filled" color="primary" disabled={!(props.totalPrice)}>Proceed &gt;&gt;</Button></Link>
                     </Container>
                 </Offcanvas.Body>
             </Offcanvas>
@@ -156,11 +183,11 @@ const Header = (props) => {
     )
 }
 function mapStateToProps(state) {
-    const { cart } = state;
+    const { cart,auth } = state;
     let tempPrice = 0;
     for (let i in cart.cartItems) {
         tempPrice += cart.cartItems[i].price * cart.cartItems[i].stock
     }
-    return { cartItems: cart.cartItems, totalPrice: tempPrice }
+    return { cartItems: cart.cartItems, totalPrice: tempPrice,userDetails:auth.userDetails }
 }
 export default connect(mapStateToProps)(Header);

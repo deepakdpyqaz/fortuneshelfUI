@@ -1,0 +1,15 @@
+@import "../../globals";
+.fs_footer{
+    background-color: #171717;
+    color:$secondary-text-col;
+    padding: 10px;
+    .fs_footer_cols{
+        text-align: center;
+        li{
+            list-style: none;
+            cursor: pointer;
+        }
+        margin:3px 0px;
+
+    }
+}

@@ -1,5 +1,5 @@
-import React,{useState} from "react";
-import { useSelector,useDispatch, connect } from "react-redux";
+import React, { useState } from "react";
+import { useSelector, useDispatch, connect } from "react-redux";
 import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
 import SectionTitle from "../../components/SectionTitle";
@@ -11,33 +11,91 @@ import axios from "axios";
 import { reactLocalStorage } from 'reactjs-localstorage';
 import { setCartItems } from "../../reducers/cart";
 import { useHistory } from "react-router-dom";
+import { makeStyles } from '@material-ui/core/styles';
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
+
+const useStyles = makeStyles((theme) => ({
+    modal: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    paper: {
+        backgroundColor: theme.palette.background.paper,
+        border: '2px solid #031F30',
+        boxShadow: theme.shadows[5],
+        padding: theme.spacing(2, 4, 3),
+    },
+}));
+
 
 const Checkout = (props) => {
-    const [shippingDetails,setShippingDetails] = useState({});
+    const [shippingDetails, setShippingDetails] = useState({});
     const dispatch = useDispatch();
     const history = useHistory();
-    const handleChange=(e)=>{
-        setShippingDetails((prevData)=>{
-            return {...prevData,[e.target.name]:e.target.value};
+    const classes = useStyles();
+    const [orderId,setOrderId]=useState("");
+    const [open, setOpen] = React.useState(false);
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleChange = (e) => {
+        setShippingDetails((prevData) => {
+            return { ...prevData, [e.target.name]: e.target.value };
         })
     }
     const handleSubmit = (e) => {
         e.preventDefault();
         const books = {};
-        (Object.entries(props.cartItems != null ? props.cartItems : {})).map((elem)=>{
-            books[elem[0]]=elem[1].stock;
+        (Object.entries(props.cartItems != null ? props.cartItems : {})).map((elem) => {
+            books[elem[0]] = elem[1].stock;
         })
-        axios.put("/order/make_order",{...shippingDetails,details:books,amount:props.totalPrice,delivery_charges:props.deliveryCharge}).then((res)=>{
-            alert(res.data.orderId);
-            reactLocalStorage.setObject("cart",{});
+        if(Object.entries(books).length==0){
+            alert("No book added");
+            return;
+        }
+        axios.put("/order/make_order", { ...shippingDetails, details: books, amount: props.totalPrice, delivery_charges: props.deliveryCharge }).then((res) => {
+            setOrderId(res.data.orderId);
+            reactLocalStorage.setObject("cart", {});
             dispatch(setCartItems({}));
             setShippingDetails({});
-        }).catch((err)=>{
+            handleOpen();
+        }).catch((err) => {
             alert(err.message);
         })
     }
     return (
-        <div style={{ paddingTop: "10vh" }}>
+        <div className="view_page">
+            <div>
+                <Modal
+                    aria-labelledby="transition-modal-title"
+                    aria-describedby="transition-modal-description"
+                    className={classes.modal}
+                    open={open}
+                    onClose={handleClose}
+                    closeAfterTransition
+                    BackdropComponent={Backdrop}
+                    BackdropProps={{
+                        timeout: 500,
+                    }}
+                >
+                    <Fade in={open}>
+                        <div className={classes.paper}>
+                            <h2 id="transition-modal-title">Your Order is placed Succesfully</h2>
+                            <p>Your order Id is:</p>
+                            <p id="transition-modal-description">{orderId}</p>
+                        </div>
+                    </Fade>
+                </Modal>
+            </div>
             <Container fluid className="my-3 px-3">
                 <SectionTitle title="Order Summary" />
                 <Table bordered bordered-dark striped hover responsive>
@@ -106,20 +164,20 @@ const Checkout = (props) => {
             </Container>
 
             <Container>
-                <SectionTitle title="Shipping Details"/>
+                <SectionTitle title="Shipping Details" />
                 <form onSubmit={handleSubmit}>
                     <Row>
                         <Col>
-                            <Input name="name" placeholder="Name.." fullWidth required value={shippingDetails.name} onChange={handleChange}/>
+                            <Input name="name" placeholder="Name.." fullWidth required value={shippingDetails.name} onChange={handleChange} />
                         </Col>
                         <Col>
-                            <Input placeholder="Mobile.."  name="mobile" fullWidth required value={shippingDetails.mobile} onChange={handleChange}/>
+                            <Input placeholder="Mobile.." name="mobile" fullWidth required value={shippingDetails.mobile} onChange={handleChange} />
                         </Col>
                     </Row>
                     <br />
                     <Row>
                         <Col>
-                            <Input placeholder="Email.." name="email" type="email" fullWidth required value={shippingDetails.email} onChange={handleChange}/>
+                            <Input placeholder="Email.." name="email" type="email" fullWidth required value={shippingDetails.email} onChange={handleChange} />
                         </Col>
                     </Row>
                     <br />
@@ -138,31 +196,31 @@ const Checkout = (props) => {
                     <br />
                     <Row>
                         <Col>
-                            <Input fullWidth placeholder="Pincode" name="pincode" value={shippingDetails.pincode} onChange={handleChange} required/>
+                            <Input fullWidth placeholder="Pincode" name="pincode" value={shippingDetails.pincode} onChange={handleChange} required />
                         </Col>
                         <Col>
                             <Input fullWidth name="city" placeholder="City" required value={shippingDetails.city} onChange={handleChange} />
                         </Col>
                         <Col>
-                            <Input fullWidth name="district" placeholder="District" required value={shippingDetails.district} onChange={handleChange}/>
+                            <Input fullWidth name="district" placeholder="District" required value={shippingDetails.district} onChange={handleChange} />
                         </Col>
                         <Col>
-                            <Input fullWidth name="state" placeholder="State" required value={shippingDetails.state} onChange={handleChange}/>
+                            <Input fullWidth name="state" placeholder="State" required value={shippingDetails.state} onChange={handleChange} />
                         </Col>
                     </Row>
                     <br />
                     <Row>
                         <Col>
-                            Payment Method: &nbsp;  COD <input required type="radio" name="paymentMode" value={"C"} checked={shippingDetails.paymentMode=="C"} onChange={handleChange}   />   &nbsp; Online <input required type="radio" checked={shippingDetails.paymentMode=="O"} value={"O"} onChange={handleChange} name="paymentMode"  />
+                            Payment Method: &nbsp;  COD <input required type="radio" name="paymentMode" value={"C"} checked={shippingDetails.paymentMode == "C"} onChange={handleChange} />   &nbsp; Online <input required type="radio" checked={shippingDetails.paymentMode == "O"} value={"O"} onChange={handleChange} name="paymentMode" />
                             <br />
                             <small><strong>**Cash On Delivery</strong> is available for registered users Only</small>
                         </Col>
                     </Row>
-                    <br/>
+                    <br />
                     <br />
                     <Row className="justify-content-center">
                         <Col className="justify-content-center text-center">
-                            <Button variant="filled"  color="primary">Submit</Button>
+                            <Button variant="filled" color="primary">Submit</Button>
                         </Col>
                     </Row>
                 </form>

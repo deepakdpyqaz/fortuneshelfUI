@@ -16,11 +16,11 @@ a {
 
 body {
     background: $background;
-    // background: url("./images/banner/banner3.jpg");
     background-repeat: no-repeat;
     background-size: cover;
     color: $primary-text-col;
     font-family: $font-family;
+    overflow-x: hidden;
 }
 h1,h2,h3,h4{
     font-family: $secondary-font-family;
@@ -45,4 +45,13 @@ h1,h2,h3,h4{
 ::selection {
     color: $secondary-col;
     background: $primary-col;
+}
+
+.view_page{
+    padding-top: 10vh;
+}
+@media screen and (max-height:500px){
+    .view_page{
+        padding-top: 20vh;
+    }
 }

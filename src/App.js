@@ -8,6 +8,9 @@ import ViewBook from "./views/ViewBook";
 import SearchBook from "./views/SearchBook";
 import ViewFullBook from "./views/ViewFullBook";
 import Checkout from "./views/Checkout";
+import Signup from "./views/Signup";
+import Login from "./views/Login";
+import About from "./views/About";
 import axios from "axios";
 function App() {
   return (
@@ -34,6 +37,18 @@ function App() {
       <Route  path="/checkout">
         <Header stickyMode={false}/>
         <Checkout/>
+      </Route>
+      <Route  path="/signup">
+        <Header stickyMode={false}/>
+        <Signup/>
+      </Route>
+      <Route  path="/login">
+        <Header stickyMode={false}/>
+        <Login/>
+      </Route>
+      <Route  path="/about">
+        <Header stickyMode={false}/>
+        <About/>
       </Route>
       </Switch>
     </div>
