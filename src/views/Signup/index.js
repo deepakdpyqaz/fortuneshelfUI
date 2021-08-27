@@ -114,13 +114,18 @@ const Signup = () => {
                 <SectionTitle title="Create New Account" />
                 <form onSubmit={handleSubmit}>
                     <Row>
-                        <Col>
-                            <Input name="name" placeholder="Name.." fullWidth required value={userDetails.name} onChange={handleChange} />
+                        <Col md="6" className="my-2">
+                            <Input name="first_name" placeholder="First Name.." fullWidth required value={userDetails.first_name} onChange={handleChange} />
                         </Col>
-                        <Col>
+                        <Col md="6" className="my-2">
+                            <Input name="last_name" placeholder="Last Name.." fullWidth required value={userDetails.last_name} onChange={handleChange} />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md="6" className="my-2">
                             <Input name="age" placeholder="Age.." fullWidth required value={userDetails.age} type="number" onChange={handleChange} />
                         </Col>
-                        <Col>
+                        <Col md="6" className="my-2">
                             <Form.Select required placeholder="Gender" name="gender" onChange={handleChange} value={userDetails.gender} aria-label="Gender" style={{ "border": "none", "borderBottom": "1px solid black", "borderRadius": "0px" }}>
                                 <option>Gender</option>
                                 <option value="M">Male</option>
@@ -129,12 +134,11 @@ const Signup = () => {
                             </Form.Select>
                         </Col>
                     </Row>
-                    <br />
                     <Row>
-                        <Col>
+                        <Col md="6" className="my-2">
                             <Input placeholder="Mobile.." name="mobile" fullWidth required value={userDetails.mobile} onChange={handleChange} />
                         </Col>
-                        <Col>
+                        <Col md="6" className="my-2">
                             <Input placeholder="Email.." name="email" type="email" fullWidth required value={userDetails.email} onChange={handleChange} />
                         </Col>
                     </Row>
@@ -153,16 +157,16 @@ const Signup = () => {
                     </Row>
                     <br />
                     <Row>
-                        <Col>
+                        <Col md="3" className="my-2">
                             <Input fullWidth placeholder="Pincode" name="pincode" value={userDetails.pincode} onChange={handleChange} required />
                         </Col>
-                        <Col>
+                        <Col md="3" className="my-2">
                             <Input fullWidth name="city" placeholder="City" required value={userDetails.city} onChange={handleChange} />
                         </Col>
-                        <Col>
+                        <Col md="3" className="my-2">
                             <Input fullWidth name="district" placeholder="District" required value={userDetails.district} onChange={handleChange} />
                         </Col>
-                        <Col>
+                        <Col md="3" className="my-2">
                             <Input fullWidth name="state" placeholder="State" required value={userDetails.state} onChange={handleChange} />
                         </Col>
                     </Row>

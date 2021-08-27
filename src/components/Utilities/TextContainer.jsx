@@ -1,7 +1,7 @@
 import Container from "react-bootstrap/Container";
 const TextContainer = (props)=>{
     return(
-        <Container>
+        <Container className={props.textCenter==true?"text-center":""}>
             {props.children}
         </Container>
     )

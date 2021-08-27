@@ -83,9 +83,9 @@ const Header = (props) => {
                         </Avatar>
                     </Col>
                     <Col md={1} sm={3} xs={3} className="text-center">
-                        <img className="fs_logo" src={logo} alt="FortuneShelf" height="55" width="55" />
+                       <Link to="/"> <img className="fs_logo" src={logo} alt="FortuneShelf" height="55" width="55" /></Link>
                     </Col>
-                    <Col md={2} sm={5} xs={4} className="fs_search justify-content-stretch">
+                    <Col md={3} sm={5} xs={4} className="fs_search justify-content-stretch">
                         <SearchIcon ref={target} className="fs_search_btn" onClick={makeSearch} />
                         <Overlay target={target.current} show={showSearchTip} placement="bottom">
                             {(props) => (
@@ -94,7 +94,7 @@ const Header = (props) => {
                                 </Tooltip>
                             )}
                         </Overlay>
-                        <input type="text" placeholder="Search..." value={searchQuery} onChange={handleSearchQueryChange} />
+                        <input type="text" placeholder="Search your book directly here..." value={searchQuery} onChange={handleSearchQueryChange} />
                     </Col>
                     <Col className="fs_menu text-right">
                         <div className="d-flex justify-content-end align-items-center">
@@ -165,13 +165,14 @@ const Header = (props) => {
                     </Nav>
                 </Offcanvas.Body>
             </Offcanvas>
-            <Offcanvas show={cartVisibility} onHide={hideCart} scroll={true} backdrop={false} placement="end">
+            <Offcanvas show={cartVisibility} onHide={hideCart} scroll={true} backdrop={true} placement="end">
                 <Offcanvas.Header closeButton>
                     <Offcanvas.Title className="text-center">My Cart</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
+                    <Offcanvas.Title className="text-center">{Object.keys(props.cartItems).length} {Object.keys(props.cartItems).length==1?"Item":"Items"} Added</Offcanvas.Title>
                     {(Object.entries(props.cartItems != null ? props.cartItems : {})).map(elem => {
-                        return <CartBook key={elem[1].bookId} max_stock={elem[1].max_stock} bookId={elem[1].bookId} title={elem[1].title} language={elem[1].language} price={elem[1].price} discount={elem[1].discount} qty={elem[1].stock} />;
+                        return <CartBook key={elem[1].bookId} max_stock={elem[1].max_stock} bookId={elem[1].bookId} title={elem[1].title} language={elem[1].language} price={elem[1].price} photo={elem[1].photo} discount={elem[1].discount} qty={elem[1].stock} />;
                     })}
                     <Container className="justify-content-center text-center">
                         <h3>Total: {props.totalPrice}</h3>
@@ -186,7 +187,7 @@ function mapStateToProps(state) {
     const { cart,auth } = state;
     let tempPrice = 0;
     for (let i in cart.cartItems) {
-        tempPrice += cart.cartItems[i].price * cart.cartItems[i].stock
+        tempPrice += (Math.ceil(cart.cartItems[i].price-cart.cartItems[i].price*cart.cartItems[i].discount/100)) * cart.cartItems[i].stock;
     }
     return { cartItems: cart.cartItems, totalPrice: tempPrice,userDetails:auth.userDetails }
 }

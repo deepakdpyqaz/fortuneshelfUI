@@ -10,29 +10,25 @@ import Alert from "react-bootstrap/Alert";
 import { useSelector,useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { login } from "../../reducers/auth";
+import { useAlert } from "react-alert";
+
 const Login = () => {
     const user = useSelector((state)=>state.auth.userDetails);
+    const alert = useAlert();
     const dispatch = useDispatch();
     const history = useHistory();
-    // if(user && user.userId){
-    //     history.push("/");
-    // }
-    const [userDetails, setUserDetails] = useState({});
-    const [show, setShow] = useState(false);
-    const [error, setError] = useState("");
-    const [alertType,setAlertType]=useState("danger");
+    const [userDetails, setUserDetails] = useState({username:"",password:""});
     const handleSubmit = (e) => {
         e.preventDefault()
         axios.post("/user/login", userDetails).then((res) => {
             dispatch(login(res.data));
             history.push("/");
         }).catch((err) => {
-            setShow(true);
             if (err.response && err.response.data && err.response.data.message) {
-                setError(err.response.data.message);
+                alert.error(err.response.data.message);
             }
             else {
-                setError(err.message);
+                alert.error("bahut bada message hai ye to sama hi nhi sakta ek line me line ki to phategi hi");
             }
         })
     }
@@ -44,11 +40,8 @@ const Login = () => {
 
     return (
         <div style={{ "paddingTop": "10vh" }}>
-            <Alert variant={alertType} show={show} onClose={() => setShow(false)} dismissible>
-                <Alert.Heading>{error}</Alert.Heading>
-            </Alert>
 
-            <Container className="w-50">
+            <Container style={{"maxWidth":"600px"}} className="my-3 py-3" fluid="sm">
                 <SectionTitle title="Login to your account" />
                 <form onSubmit={handleSubmit}>
                     <Row>

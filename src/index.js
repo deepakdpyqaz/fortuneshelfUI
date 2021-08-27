@@ -5,14 +5,28 @@ import reportWebVitals from './reportWebVitals';
 import "./index.scss";
 import axios from "axios";
 import config from "./config";
-import { Provider } from 'react-redux'
-import store from './store'
+import { Provider } from 'react-redux';
+import store from './store';
+import { positions, Provider as AlertProvider } from "react-alert";
+import AlertTemplate from "react-alert-template-basic";
+
+const options = {
+  timeout: 100000,
+  position: positions.TOP_CENTER,
+  offset:"10vh",
+  containerStyle:{
+    justifyContent:"stretch"
+  }
+};
+
 axios.defaults.baseURL=config.backendUrl;
 ReactDOM.render(
 
   <React.StrictMode>
     <Provider store={store}>
-      <App />
+      <AlertProvider template={AlertTemplate} {...options}>
+        <App />
+      </AlertProvider>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')

@@ -12,6 +12,7 @@ import { reactLocalStorage } from 'reactjs-localstorage';
 import { useSelector,useDispatch } from "react-redux";
 import { setCartItems } from "../../reducers/cart";
 import CancelIcon from '@material-ui/icons/Cancel';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import {Link} from "react-router-dom";
 import axios from "axios";
 
@@ -42,11 +43,11 @@ const CartBook = (props) => {
         <Card style={{ width: '200px'}} className="fs_book fs_cart m-3">
             <CancelIcon style={{position:"absolute",right:"2px",color:"#031F30"}} onClick={()=> removeFromCart(props.bookId)}/>
             <Card.Body className="text-center">
-                <img src={BookImage} alt="" height="100" />
+                <img src={axios.defaults.baseURL+ props.photo} alt="" height="100" />
                 <Card.Text as="div" className="border-top border-secondary my-3 py-1">
                     <h6>{props.title}</h6>
                     <h6>Language: {props.language}</h6>
-                    <strong>Price: &#8377; {props.price-props.price*props.discount/100}</strong>
+                    <strong>Price: &#8377; {Math.ceil(props.price-props.price*props.discount/100)}</strong>
                     <ButtonGroup>
                         <Button variant="outlined" color="primary" onClick={()=>{
                             if(qty<props.max_stock){
@@ -72,7 +73,12 @@ const CartBook = (props) => {
 }
 const Book = (props) => {
     const dispatch = useDispatch();
+    const [iconVisible,setIconVisible] = useState("hidden");
     const AddToCart = (data) => {
+        setIconVisible("visible");
+        setTimeout(()=>{
+            setIconVisible("hidden");
+        },3000);
         let previousCart = reactLocalStorage.getObject('cart');
         if (!previousCart[data.bookId]) {
             reactLocalStorage.setObject('cart', { ...previousCart, [data.bookId]: { ...data, "stock": 1 } });
@@ -88,13 +94,23 @@ const Book = (props) => {
                 {   props.delivery_factor==0?  
                     <div className="fs_delivery_free">Delivery Free</div>:null
                 }
+                <div className={`fs_added ${iconVisible}`}>
+                    <CheckCircleOutlineIcon  className="fs_added_icon"/>
+                </div>
                 <Card.Body className="text-center">
+                    <Link to={"/viewBook/"+props.bookId}>
                     <img src={axios.defaults.baseURL + props.photo} alt="" height="200" />
                     <Card.Text as="div" className="border-top border-secondary my-3 py-1">
                         <h5>{props.title}</h5>
                         <h6>Language: {props.language}</h6>
-                        <strong>Price: &#8377; {props.price - props.price * props.discount / 100}</strong> <small><strike>{props.price + 10}</strike></small>
+                        <strong>Price: &#8377; {Math.ceil(props.price - props.price * props.discount / 100)}</strong> 
+                        {   props.discount?
+                            <small><strike>{props.price}</strike></small>:
+                            null
+                        }
+
                     </Card.Text>
+                    </Link>
                     <ButtonGroup>
                         <Link to={"/viewBook/"+props.bookId}><Button color="primary" variant="filled">VIEW <NearMeIcon /> </Button></Link>
                         <Button color="primary" variant="filled" onClick={() => { AddToCart(props) }}>ADD <AddShoppingCartIcon /></Button>

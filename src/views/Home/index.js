@@ -18,7 +18,7 @@ const Home = () => {
     <>
       <Banner />
       <SectionTitle title="About Us" />
-      <TextContainer>
+      <TextContainer textCenter={true}>
         Every country has something unique to offer to the whole world. What does India has?
         It is the Knowledge of Spirituality which India can offer to the whole world to become a true Vishva Guru and lead the world towards the highest goal of humanity.
 

@@ -237,7 +237,7 @@ function mapStateToProps(state) {
     let tempPrice = 0;
     let weight = 0;
     for (let i in cart.cartItems) {
-        tempPrice += cart.cartItems[i].price * cart.cartItems[i].stock;
+        tempPrice += (Math.ceil(cart.cartItems[i].price-cart.cartItems[i].price*cart.cartItems[i].discount/100)) * cart.cartItems[i].stock;
         weight += cart.cartItems[i].weight * cart.cartItems[i].stock;
     }
     return { cartItems: cart.cartItems, totalPrice: tempPrice, deliveryCharge: Math.ceil(weight / 1000) * 70 }
