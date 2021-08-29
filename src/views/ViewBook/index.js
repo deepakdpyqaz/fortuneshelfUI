@@ -7,16 +7,18 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
-import Alert from "react-bootstrap/Alert";
+import Footer from "../../components/Footer";
+import Slide from 'react-reveal/Slide';
+import { useAlert } from "react-alert";
 const ViewBook = () => {
     const [books, setBooks] = useState([]);
     const [pageNo, setPageNo] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [queryParams,setQueryParams] = useState({});
-    const [show,setShow] = useState(false);
-    const [error,setError] = useState("");
-    const getBooks = () => {
-        axios.get("/book", { params: { page_number: pageNo, per_page: 25,...queryParams } }).then((res) => {
+    const alert = useAlert();
+    const getBooks = (data) => {
+        if(!pageNo || !data) return;
+        axios.get("/book", { params: { page_number: pageNo, per_page: 25,...data } }).then((res) => {
             if (res.data.length == 0) {
                 setHasMore(false);
                 return;
@@ -26,12 +28,11 @@ const ViewBook = () => {
             });
         }).catch(err => {
             setHasMore(false);
-            setShow(true)
             if (err.response.data && err.response.data.message) {
-                setError(err.response.data.message);
+                alert.error(err.response.data.message);
             }
             else {
-                setError(err.message);
+                alert.error(err.message);
             }
         }).finally(() => {
             setPageNo(pageNo + 1);
@@ -39,25 +40,22 @@ const ViewBook = () => {
     }
     const handleChange=(e)=>{
         setQueryParams((prevData)=>{
-            return {...prevData,[e.target.name]:e.target.value}
+            let newData = {...prevData,[e.target.name]:e.target.value};
+            getBooks(newData);
+            return newData;
         });
         setBooks([]);
         setPageNo(1);
         setHasMore(true);
-        while(!setHasMore){}
-        getBooks();
 
     }
     return (
         <div className="viewbook view_page">
-            <Alert variant="danger" show={show} onClose={() => setShow(false)} dismissible>
-                <Alert.Heading>{error}</Alert.Heading>
-            </Alert>
             <Container fluid className="my-3">
                 <Row>
                     <Col>
                         <Form.Select aria-label="Language" onChange={handleChange} name="language">
-                            <option>Language</option>
+                            <option value="">Language</option>
                             <option value="english">English</option>
                             <option value="bengali">Bengali</option>
                             <option value="marathi">Marathi</option>
@@ -67,14 +65,14 @@ const ViewBook = () => {
                     </Col>
                     <Col>
                         <Form.Select aria-label="Sort By" onChange={handleChange} name="order_by">
-                            <option>Sort By</option>
+                            <option value="">Sort By</option>
                             <option value="price">Price</option>
                             <option value="title">Name</option>
                         </Form.Select>
                     </Col>
                     <Col>
                         <Form.Select aria-label="Sort Order" onChange={handleChange} name="isDescending">
-                            <option>Sort Order</option>
+                            <option value="">Sort Order</option>
                             <option value={false}>Ascending</option>
                             <option value={true}>Descending</option>
                         </Form.Select>
@@ -90,11 +88,14 @@ const ViewBook = () => {
                 {
                     books.map((elem, ind) => {
                         return (
-                            <BookContainer books={elem} key={ind} />
+                            <Slide left>
+                                <BookContainer books={elem} key={ind} />
+                            </Slide>
                         )
                     })
                 }
             </InfiniteScroll>
+            {!hasMore?<Footer/>:null}
         </div>
     )
 }

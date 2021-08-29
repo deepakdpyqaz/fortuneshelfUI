@@ -3,7 +3,6 @@ import TermsAndConditions from "./TermsAndConditions";
 import ShippingPolicy from "./ShippingPolicy";
 import CancellationPolicy from "./CancellationPolicy";
 import { Switch, Route, BrowserRouter } from "react-router-dom";
-import Footer from "../../components/Footer";
 const About = () => {
     return (
         <div className="view_page">
@@ -24,7 +23,6 @@ const About = () => {
                     </Route>
                 </Switch>
             </BrowserRouter>
-            <Footer />
         </div>
     )
 }

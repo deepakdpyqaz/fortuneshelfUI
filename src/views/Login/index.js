@@ -11,6 +11,7 @@ import { useSelector,useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { login } from "../../reducers/auth";
 import { useAlert } from "react-alert";
+import { reactLocalStorage } from "reactjs-localstorage";
 
 const Login = () => {
     const user = useSelector((state)=>state.auth.userDetails);
@@ -18,28 +19,41 @@ const Login = () => {
     const dispatch = useDispatch();
     const history = useHistory();
     const [userDetails, setUserDetails] = useState({username:"",password:""});
+    const [disabled,setDisabled] = useState(true);
     const handleSubmit = (e) => {
         e.preventDefault()
         axios.post("/user/login", userDetails).then((res) => {
             dispatch(login(res.data));
+            reactLocalStorage.set("token",res.data.token);
+            axios.defaults.headers.authorization = res.data.token;
             history.push("/");
         }).catch((err) => {
             if (err.response && err.response.data && err.response.data.message) {
                 alert.error(err.response.data.message);
             }
             else {
-                alert.error("bahut bada message hai ye to sama hi nhi sakta ek line me line ki to phategi hi");
+                alert.error(err.message);
             }
         })
     }
+    const validate = (data) =>{
+        if(data.username && data.password && data.password.length>4){
+            setDisabled(false);
+        }
+        else{
+            setDisabled(true);
+        }
+    }
     const handleChange = (e) => {
         setUserDetails((prevData) => {
-            return { ...prevData, [e.target.name]: e.target.value };
+            let newData = {...prevData,[e.target.name]:e.target.value};
+            validate(newData);
+            return newData;
         })
     }
 
     return (
-        <div style={{ "paddingTop": "10vh" }}>
+        <div className="view_page">
 
             <Container style={{"maxWidth":"600px"}} className="my-3 py-3" fluid="sm">
                 <SectionTitle title="Login to your account" />
@@ -52,7 +66,7 @@ const Login = () => {
                     <br />
                     <Row>
                         <Col>
-                            <Input name="password" placeholder="Password.." fullWidth required value={userDetails.password} type="password" onChange={handleChange} />
+                            <Input name="password" placeholder="Password.." fullWidth required value={userDetails.password}  type="password" onChange={handleChange} />
                         </Col>
                     </Row>
                     <br />
@@ -60,7 +74,7 @@ const Login = () => {
                     <br />
                     <Row className="justify-content-center">
                         <Col className="justify-content-center text-center">
-                            <Button variant="filled" color="primary"><h3>Submit</h3></Button>
+                            <Button variant="filled" disabled={disabled} color="primary"><h3>Login</h3></Button>
                         </Col>
                     </Row>
                 </form>

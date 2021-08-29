@@ -7,19 +7,16 @@ import { Button } from "../../components/Utilities";
 import SectionTitle from "../../components/SectionTitle";
 import Form from "react-bootstrap/Form";
 import axios from "axios";
-import Alert from "react-bootstrap/Alert";
+import { useAlert } from "react-alert";
 import Modal from "react-bootstrap/Modal";
 import {useHistory} from "react-router-dom";
 const Signup = () => {
     const [userDetails, setUserDetails] = useState({});
+    const alert = useAlert();
     const [show, setShow] = useState(false);
-    const [error, setError] = useState("");
     const [showModal, setShowModal] = useState(false);
     const [userVerificationDetails,setUserVerificationDetails] = useState({});
     const handleClose = () => setShow(false);
-    const handleCloseModal = () => setShowModal(false);
-    const handleShow = () => setShow(true);
-    const [alertType,setAlertType]=useState("danger");
     const history = useHistory();
     const handleUserVerificationChange = (e) =>{
         setUserVerificationDetails((prevData)=>{
@@ -33,17 +30,16 @@ const Signup = () => {
         e.preventDefault();
         axios.post("/user/reset_password",userVerificationDetails).then((res)=>{
             setShowModal(false);
-            setAlertType("success");
-            setError("Account Created Successfully");
+            alert.success("Account Created Succesfully")
             history.push("/login");
 
         }).catch((err)=>{
             setShow(true);
             if (err.response && err.response.data && err.response.data.message) {
-                setError(err.response.data.message);
+                alert.error(err.response.data.message);
             }
             else {
-                setError(err.message);
+                alert.error(err.message)
             }
         })
     }
@@ -55,12 +51,11 @@ const Signup = () => {
             })
             setShowModal(true);
         }).catch((err) => {
-            setShow(true)
-            if (err.response.data && err.response.data.message) {
-                setError(err.response.data.message);
+            if (err.response && err.response.data && err.response.data.message) {
+                alert.error(err.response.data.message);
             }
             else {
-                setError(err.message);
+                alert.error(err.message);
             }
         })
     }
@@ -70,10 +65,7 @@ const Signup = () => {
         })
     }
     return (
-        <div style={{ "paddingTop": "10vh" }}>
-            <Alert variant={alertType} show={show} onClose={() => setShow(false)} dismissible>
-                <Alert.Heading>{error}</Alert.Heading>
-            </Alert>
+        <div className="view_page">
 
             <Modal show={showModal}>
                 <Modal.Header>
@@ -84,13 +76,13 @@ const Signup = () => {
                         <Container>
                             <Row>
                                 <Col>
-                                    <Input type="password" error={userVerificationDetails.password!=userVerificationDetails.confirm} fullWidth placeholder="Password" name="password" onChange={handleUserVerificationChange} value={userVerificationDetails.password} required />
+                                    <Input type="password" error={userVerificationDetails.password!=userVerificationDetails.confirm_password} minlength="5" fullWidth placeholder="Password" name="password" onChange={handleUserVerificationChange} value={userVerificationDetails.password} required />
                                 </Col>
                             </Row>
                             <br/>
                             <Row>
                                 <Col>
-                                    <Input type="password" error={userVerificationDetails.password!=userVerificationDetails.confirm} fullWidth placeholder="Confirm Password" name="confirm_password" onChange={handleUserVerificationChange} value={userVerificationDetails.confirm} required />
+                                    <Input type="password" error={userVerificationDetails.password!=userVerificationDetails.confirm_password} fullWidth placeholder="Confirm Password" name="confirm_password" onChange={handleUserVerificationChange} value={userVerificationDetails.confirm} required />
                                 </Col>
                             </Row>
                             <br/>
@@ -102,7 +94,7 @@ const Signup = () => {
                         </Container>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="filled" color="primary" type="submit" onClick={handleClose}>
+                    <Button variant="filled" disabled={!(userVerificationDetails.password && userVerificationDetails.password.length>4 && userVerificationDetails.password==userVerificationDetails.confirm_password && userVerificationDetails.otp)} color="primary" type="submit" onClick={handleClose}>
                         Verify
                     </Button>
                 </Modal.Footer>
@@ -113,7 +105,7 @@ const Signup = () => {
             <Container className="w-75">
                 <SectionTitle title="Create New Account" />
                 <form onSubmit={handleSubmit}>
-                    <Row>
+                    <Row className="my-2">
                         <Col md="6" className="my-2">
                             <Input name="first_name" placeholder="First Name.." fullWidth required value={userDetails.first_name} onChange={handleChange} />
                         </Col>
@@ -121,20 +113,7 @@ const Signup = () => {
                             <Input name="last_name" placeholder="Last Name.." fullWidth required value={userDetails.last_name} onChange={handleChange} />
                         </Col>
                     </Row>
-                    <Row>
-                        <Col md="6" className="my-2">
-                            <Input name="age" placeholder="Age.." fullWidth required value={userDetails.age} type="number" onChange={handleChange} />
-                        </Col>
-                        <Col md="6" className="my-2">
-                            <Form.Select required placeholder="Gender" name="gender" onChange={handleChange} value={userDetails.gender} aria-label="Gender" style={{ "border": "none", "borderBottom": "1px solid black", "borderRadius": "0px" }}>
-                                <option>Gender</option>
-                                <option value="M">Male</option>
-                                <option value="F">Female</option>
-                                <option value="O">Other</option>
-                            </Form.Select>
-                        </Col>
-                    </Row>
-                    <Row>
+                    <Row className="my-2">
                         <Col md="6" className="my-2">
                             <Input placeholder="Mobile.." name="mobile" fullWidth required value={userDetails.mobile} onChange={handleChange} />
                         </Col>
@@ -142,32 +121,17 @@ const Signup = () => {
                             <Input placeholder="Email.." name="email" type="email" fullWidth required value={userDetails.email} onChange={handleChange} />
                         </Col>
                     </Row>
-                    <br />
-                    <Row>
-                        <Col>
-                            <Input fullWidth
-                                multiline
-                                rows={4}
-                                placeholder="Address"
-                                required
-                                name="address"
-                                value={userDetails.address} onChange={handleChange}
-                            />
+                    <Row className="my-2">
+                        <Col className="my-2">
+                            <Input name="age" placeholder="Age.." fullWidth required value={userDetails.age} type="number" onChange={handleChange} />
                         </Col>
-                    </Row>
-                    <br />
-                    <Row>
-                        <Col md="3" className="my-2">
-                            <Input fullWidth placeholder="Pincode" name="pincode" value={userDetails.pincode} onChange={handleChange} required />
-                        </Col>
-                        <Col md="3" className="my-2">
-                            <Input fullWidth name="city" placeholder="City" required value={userDetails.city} onChange={handleChange} />
-                        </Col>
-                        <Col md="3" className="my-2">
-                            <Input fullWidth name="district" placeholder="District" required value={userDetails.district} onChange={handleChange} />
-                        </Col>
-                        <Col md="3" className="my-2">
-                            <Input fullWidth name="state" placeholder="State" required value={userDetails.state} onChange={handleChange} />
+                        <Col className="my-2">
+                            <Form.Select required placeholder="Gender" name="gender" onChange={handleChange} value={userDetails.gender} aria-label="Gender" style={{ "border": "none", "borderBottom": "1px solid black", "borderRadius": "0px" }}>
+                                <option>Gender</option>
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                                <option value="O">Other</option>
+                            </Form.Select>
                         </Col>
                     </Row>
                     <br />

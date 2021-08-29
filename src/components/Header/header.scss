@@ -97,10 +97,13 @@
 // Customising Bootstrap
 .fs_sidebar_menu{
     background-color: $primary-col !important;
-    color:$secondary-col;
+    color:$secondary-text-col !important;
     .fs_sidebar_nav_item{
-        color: #fff;
+        color: #fff !important;
         cursor: pointer;
+        min-height: 35px;
+        padding: 10px 2px;
+        border-bottom: 2px solid $secondary-col;
         &:hover{
             color:$secondary-col;
         }

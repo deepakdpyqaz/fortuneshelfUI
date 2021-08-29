@@ -10,13 +10,34 @@ import SectionTitle from "../../components/SectionTitle";
 import { Button } from "../../components/Utilities";
 import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
 import { reactLocalStorage } from 'reactjs-localstorage';
-import { useSelector,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { setCartItems } from "../../reducers/cart";
+import Backdrop from '@material-ui/core/Backdrop';
+import { makeStyles } from '@material-ui/core/styles';
+import "./viewfullbook.scss";
+
+const useStyles = makeStyles((theme) => ({
+    backdrop: {
+      zIndex: 1000,
+      color: '#333',
+      opacity:0.6,
+    },
+  }));
+  
 const ViewFullBook = (props) => {
     const { bookId } = useParams();
     const [bookData, setBookData] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const dispatch = useDispatch();
+    const classes = useStyles();
+    const [open, setOpen] = React.useState(false);
+    const handleClose = () => {
+      setOpen(false);
+    };
+    const handleToggle = () => {
+      setOpen(!open);
+    };
+  
     const AddToCart = (data) => {
         let previousCart = reactLocalStorage.getObject('cart');
         if (!previousCart[data.bookId]) {
@@ -39,21 +60,28 @@ const ViewFullBook = (props) => {
         })
     }, [])
     return (
-        <div className="view_page">
+        <div className="view_page fs_full_book">
             {
-                !isLoading ?
+                bookData.picture?
+                <Backdrop className={classes.backdrop} open={open} onClick={handleClose}>
+                    <img className="fs_book_image" src={axios.defaults.baseURL + bookData.picture} alt={bookData.title} />
+                </Backdrop>:null
+            }
+
+            {
+                !isLoading && !open ?
                     bookData.found && bookData.found == false
                         ? "Book Not found"
                         :
                         <Container className="my-3 py-3">
                             <Row>
-                                <SectionTitle title={bookData.title}/>
+                                <SectionTitle title={bookData.title} />
                             </Row>
-                            <Row>
-                                <Col>
-                                    <img src={axios.defaults.baseURL + bookData.picture} alt={bookData.title} />
+                            <Row className="align-items-center">
+                                <Col className="text-center my-3 p-3">
+                                    <img onMouseEnter={handleToggle}  className="fs_book_image" width="250px" src={axios.defaults.baseURL + bookData.picture} alt={bookData.title} />
                                 </Col>
-                                <Col>
+                                <Col className="align-items-center">
                                     <Table borderless striped hover>
                                         <tbody>
                                             <tr>
@@ -77,7 +105,7 @@ const ViewFullBook = (props) => {
                                                 <td>{bookData.dimension}</td>
                                             </tr>
                                             <tr>
-                                                <td colSpan="2">
+                                                <td colSpan="2" className="text-center py-3">
                                                     <Button color="primary" variant="filled" onClick={() => { AddToCart(bookData) }}>ADD <AddShoppingCartIcon /></Button>
                                                 </td>
                                             </tr>
@@ -86,13 +114,13 @@ const ViewFullBook = (props) => {
                                 </Col>
                             </Row>
                             <Row>
-                                <h2 className="text-center text-decoration-underline my-3" style={{color:"#031F30"}}>Description</h2>
-                                <Col style={{fontSize:"1.2rem"}} className="px-3">
+                                <h2 className="text-center text-decoration-underline my-3" style={{ color: "#031F30" }}>Description</h2>
+                                <Col style={{ fontSize: "1.2rem" }} className="px-3">
                                     {bookData.description}
                                 </Col>
                             </Row>
                         </Container>
-                    : <ViewBookLoader />
+                    : !open?<ViewBookLoader />:null
             }
         </div>
     )
