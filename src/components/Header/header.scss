@@ -71,7 +71,6 @@
             visibility: hidden;
             width: 150%;
             opacity: 0%;
-            height: 0px;
             transition-duration: 300ms;
             transform: translate(100%,100%);
             li{
@@ -84,6 +83,13 @@
                 }
             }
         }
+        .fs_dropdown_list.fs_dropdown_visible{
+            height: unset;
+            display: block;
+            opacity: 100%;
+            visibility: visible;
+            transform: translate(0%,0%);
+        }
         &:hover .fs_dropdown_list{
             height: unset;
             display: block;
@@ -91,6 +97,13 @@
             visibility: visible;
             transform: translate(0%,0%);
         }
+    }
+    .fs_dropdown:hover .fs_dropdown_list{
+        height: unset;
+        display: block;
+        opacity: 100%;
+        visibility: visible;
+        transform: translate(0%,0%);
     }
 }
 

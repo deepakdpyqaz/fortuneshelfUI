@@ -22,13 +22,13 @@ const options = {
 axios.defaults.baseURL=config.backendUrl;
 ReactDOM.render(
 
-  <React.StrictMode>
+  <>
     <Provider store={store}>
       <AlertProvider template={AlertTemplate} {...options}>
         <App />
       </AlertProvider>
     </Provider>
-  </React.StrictMode>,
+  </>,
   document.getElementById('root')
 );
 

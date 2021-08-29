@@ -46,6 +46,7 @@ const Header = (props) => {
     const handleUserClose = () => {
         setAnchorEl(null);
     };
+    const dropdownref=useRef();
     const logoutUser = () =>{
         if(props.userDetails.token){
             axios.post("/user/logout",{token:props.userDetails.token}).then(()=>{
@@ -82,6 +83,12 @@ const Header = (props) => {
         }
         setSearchQuery("");
         history.push("/search?searchQuery=" + searchQuery);
+    }
+    const toggleDropDown = (e) => {
+        if(dropdownref.current){
+                dropdownref.current.classList.toggle("fs_dropdown_visible");
+            
+        }
     }
     useEffect(() => {
         if (location.pathname!="/") {
@@ -136,8 +143,8 @@ const Header = (props) => {
                             {
                                 (
                                     props.userDetails && props.userDetails.id != null ?
-                                        <div className="fs_dropdown">My Activities <ArrowDropDownIcon />
-                                            <ul className="fs_dropdown_list">
+                                        <div className="fs_dropdown" onClick={toggleDropDown}>My Activities <ArrowDropDownIcon />
+                                            <ul className="fs_dropdown_list" ref={dropdownref}>
                                                 <Link to="/myorder"><li>My Orders</li></Link>
                                                 <Link to="/profile"><li>Profile</li></Link>
                                                 <li onClick={logoutUser}>Logout</li>

@@ -99,9 +99,11 @@ const Book = (props) => {
                     <div className="fs_delivery_free">Delivery Free</div> : null
                 }
                 <ReactTransitionGroup
-                    transitionName="fs_book_transition"
-                    transitionEnterTimeout={500}
-                    transitionLeaveTimeout={300}>
+                    transitionname="fs_book_transition"
+                    transitionentertimeout={500}
+                    transitionleavetimeout={300}
+                    timeout={300}
+                    >
 
                     <div className={`fs_added ${iconVisible}`}>
                         <CheckCircleOutlineIcon className="fs_added_icon" />
