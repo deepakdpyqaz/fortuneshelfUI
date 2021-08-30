@@ -14,12 +14,15 @@ import { useAlert } from "react-alert";
 import { reactLocalStorage } from "reactjs-localstorage";
 
 const Login = () => {
+    const history = useHistory();
     const user = useSelector((state)=>state.auth.userDetails);
+    if(user && user.id){
+        history.push("/")
+    }
     const alert = useAlert();
     const dispatch = useDispatch();
-    const history = useHistory();
     const [userDetails, setUserDetails] = useState({username:"",password:""});
-    const [disabled,setDisabled] = useState(true);
+    const [validation,setValidation] = useState({"username":false,"password":false})
     const handleSubmit = (e) => {
         e.preventDefault()
         axios.post("/user/login", userDetails).then((res) => {
@@ -37,11 +40,9 @@ const Login = () => {
         })
     }
     const validate = (data) =>{
-        if(data.username && data.password && data.password.length>4){
-            setDisabled(false);
-        }
-        else{
-            setDisabled(true);
+        if(data){
+            const usernameRe = /(^[0-9]{10}$)|(^(\w|.)+@[a-zA-Z_.]+?\.[a-zA-Z.]{2,3}$)/;
+            setValidation({"username":!(usernameRe.test(data.username)),"password":data.password.length<=4});
         }
     }
     const handleChange = (e) => {
@@ -60,13 +61,15 @@ const Login = () => {
                 <form onSubmit={handleSubmit}>
                     <Row>
                         <Col>
-                            <Input name="username" placeholder="Mobile or Email" fullWidth required value={userDetails.username} onChange={handleChange} />
+                            <Input error={validation.username} name="username" placeholder="Mobile or Email" fullWidth required value={userDetails.username} onChange={handleChange} />
+                            {validation.username?<span className="text-danger">Enter a valid 10 digit moibile number or a valid Email</span>:null}
                         </Col>
                     </Row>
                     <br />
                     <Row>
                         <Col>
-                            <Input name="password" placeholder="Password.." fullWidth required value={userDetails.password}  type="password" onChange={handleChange} />
+                            <Input error={validation.password} name="password" placeholder="Password.." fullWidth required value={userDetails.password}  type="password" onChange={handleChange} />
+                            {validation.password?<span className="text-danger">Password must be atleast 4 letters</span>:null}
                         </Col>
                     </Row>
                     <br />
@@ -74,7 +77,7 @@ const Login = () => {
                     <br />
                     <Row className="justify-content-center">
                         <Col className="justify-content-center text-center">
-                            <Button variant="filled" disabled={disabled} color="primary"><h3>Login</h3></Button>
+                            <Button variant="filled" disabled={(validation.username || validation.password) && validation.username && validation.password} color="primary"><h3>Login</h3></Button>
                         </Col>
                     </Row>
                 </form>

@@ -86,14 +86,14 @@
         .fs_dropdown_list.fs_dropdown_visible{
             height: unset;
             display: block;
-            opacity: 100%;
+            opacity: 1;
             visibility: visible;
             transform: translate(0%,0%);
         }
         &:hover .fs_dropdown_list{
             height: unset;
             display: block;
-            opacity: 100%;
+            opacity: 1;
             visibility: visible;
             transform: translate(0%,0%);
         }
@@ -101,7 +101,7 @@
     .fs_dropdown:hover .fs_dropdown_list{
         height: unset;
         display: block;
-        opacity: 100%;
+        opacity: 1;
         visibility: visible;
         transform: translate(0%,0%);
     }

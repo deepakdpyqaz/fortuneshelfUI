@@ -44,6 +44,21 @@ const Checkout = (props) => {
     const [copied,setCopied] = useState(false);
     const alert = useAlert();
     const [billingProfiles,setBillingProfiles] = useState([]);
+    const [validation,setValidation] = useState({first_name:false,last_name:false,mobile:false,email:false,pincode:false});
+    const validate = (data) => {
+        const nameRe = /[a-zA-z]{2,45}/;
+        const phoneRe = /^[0-9]{10}$/;
+        const emailRe = /^(\w|.)+@[a-zA-Z_.]+?\.[a-zA-Z.]{2,3}$/;
+        const pincodeRe = /^[0-9]{6}$/;
+        setValidation({
+            first_name:!nameRe.test(data.first_name) && data.first_name,
+            last_name:!(nameRe.test(data.last_name)) && data.last_name,
+            mobile:!phoneRe.test(data.mobile) && data.mobile,
+            email:!(emailRe.test(data.email)) && data.email,
+            pincode:!(pincodeRe.test(data.pincode)&& data.pincode)
+        })
+
+    }
     const handleOpen = () => {
         setOpen(true);
     };
@@ -54,7 +69,9 @@ const Checkout = (props) => {
 
     const handleChange = (e) => {
         setShippingDetails((prevData) => {
-            return { ...prevData, [e.target.name]: e.target.value };
+            let newData = { ...prevData, [e.target.name]: e.target.value };
+            validate(newData);
+            return newData;
         })
     }
     const handleSubmit = (e) => {
@@ -236,18 +253,22 @@ const Checkout = (props) => {
                     <Row>
                         <Col md="6" sm="6">
                             <Input name="first_name" placeholder="First Name.." fullWidth required value={shippingDetails.first_name} onChange={handleChange} />
+                            {validation && validation.first_name?<span className="text-danger">Enter a valid first name</span>:null}
                         </Col>
                         <Col md="6" sm="6">
                             <Input name="last_name" placeholder="Last Name.." fullWidth required value={shippingDetails.last_name} onChange={handleChange} />
+                             {validation && validation.last_name?<span className="text-danger">Enter a valid last name</span>:null}
                         </Col>
                     </Row>
                     <br />
                     <Row>
                         <Col  md="6" sm="6">
                             <Input placeholder="Mobile.." name="mobile" fullWidth required value={shippingDetails.mobile} onChange={handleChange} />
+                            {validation.mobile?<span className="text-danger">Enter a valid 10 digit mobile number</span>:null}
                         </Col>
                         <Col  md="6" sm="6">
                             <Input placeholder="Email.." name="email" type="email" fullWidth required value={shippingDetails.email} onChange={handleChange} />
+                            {validation.email?<span className="text-danger">Enter a valid email</span>:null}
                         </Col>
                     </Row>
                     <br />
@@ -267,6 +288,7 @@ const Checkout = (props) => {
                     <Row>
                         <Col  md="3" sm="6">
                             <Input fullWidth placeholder="Pincode" name="pincode" value={shippingDetails.pincode} onChange={handleChange} required />
+                            {validation.pincode?<span className="text-danger">Enter a valid pincode</span>:null}
                         </Col>
                         <Col  md="3" sm="6">
                             <Input fullWidth name="city" placeholder="City" required value={shippingDetails.city} onChange={handleChange} />
