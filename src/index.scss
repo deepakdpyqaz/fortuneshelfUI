@@ -13,6 +13,11 @@ a {
         color:inherit;
     }
 }
+a.link{
+    text-decoration: underline !important;
+    color: $primary-col !important;
+
+}
 
 body {
     background: $background;
@@ -52,6 +57,7 @@ h1,h2,h3,h4{
 .view_page{
     padding-top: 10vh;
     min-height: 90vh;
+    position: relative;
 }
 @media screen and (max-height:500px){
     .view_page{

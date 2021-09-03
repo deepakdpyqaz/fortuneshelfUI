@@ -6,7 +6,7 @@ import SectionTitle from "../../components/SectionTitle";
 import Input from "@material-ui/core/Input";
 import axios from "axios";
 import { Button } from "../../components/Utilities";
-import Alert from "react-bootstrap/Alert";
+import {Link} from "react-router-dom";
 import { useSelector,useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { login } from "../../reducers/auth";
@@ -71,6 +71,10 @@ const Login = () => {
                             <Input error={validation.password} name="password" placeholder="Password.." fullWidth required value={userDetails.password}  type="password" onChange={handleChange} />
                             {validation.password?<span className="text-danger">Password must be atleast 4 letters</span>:null}
                         </Col>
+                    </Row>
+                    <br/>
+                    <Row>
+                        <Link className="link" to="/reset_password">Forgot password</Link>
                     </Row>
                     <br />
                     <br />
