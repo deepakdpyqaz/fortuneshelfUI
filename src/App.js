@@ -104,9 +104,6 @@ function AnimationApp() {
               <Route path="/reset_password">
                 <ResetPassword />
               </Route>
-              <Route path="/fallback">
-                <FallbackLoader />
-              </Route>
             </Switch>
           </Suspense>
         </CSSTransition>
