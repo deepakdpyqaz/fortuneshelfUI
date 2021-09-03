@@ -77,7 +77,7 @@ const Login = () => {
                     <br />
                     <Row className="justify-content-center">
                         <Col className="justify-content-center text-center">
-                            <Button variant="filled" disabled={(validation.username || validation.password) && validation.username && validation.password} color="primary"><h3>Login</h3></Button>
+                            <Button variant="filled" disabled={Boolean(validation.username || validation.password) && validation.username && validation.password} color="primary"><h3>Login</h3></Button>
                         </Col>
                     </Row>
                 </form>

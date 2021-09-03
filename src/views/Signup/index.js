@@ -20,10 +20,10 @@ const Signup = () => {
     const history = useHistory();
     const [validation,setValidation] = useState({});
     const isUserFormDisabled = () => {
-        return (validation.first_name || validation.last_name || validation.mobile || validation.gender || validation.age || validation.gender)
+        return Boolean(validation.first_name || validation.last_name || validation.mobile || validation.gender || validation.age || validation.gender)
     }
     const isVerificationDisabled = () => {
-        return (validation.password || validation.confirm_password || validation.otp)
+        return Boolean(validation.password || validation.confirm_password || validation.otp)
     }
     const validate = (data)=>{
         if(data.password){

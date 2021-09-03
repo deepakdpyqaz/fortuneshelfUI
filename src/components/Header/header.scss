@@ -45,6 +45,7 @@
         div{
             margin: 0px 10px;
             cursor: pointer;
+            transition: 500ms linear;
             div:hover{
                 color:$secondary-col;
             }

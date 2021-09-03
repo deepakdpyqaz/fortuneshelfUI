@@ -7,7 +7,6 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
-import Footer from "../../components/Footer";
 import Slide from 'react-reveal/Slide';
 import { useAlert } from "react-alert";
 const ViewBook = () => {
@@ -95,7 +94,6 @@ const ViewBook = () => {
                     })
                 }
             </InfiniteScroll>
-            {!hasMore?<Footer/>:null}
         </div>
     )
 }

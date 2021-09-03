@@ -1,29 +1,29 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route, useLocation } from "react-router-dom";
 import Header from "./components/Header";
-import Home from "./views/Home";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import ViewBook from "./views/ViewBook";
-import SearchBook from "./views/SearchBook";
-import ViewFullBook from "./views/ViewFullBook";
-import Checkout from "./views/Checkout";
-import Signup from "./views/Signup";
-import Login from "./views/Login";
-import About from "./views/About";
 import Footer from "./components/Footer";
-import MyOrder from "./views/MyOrder";
-import Profile from "./views/Profile";
+import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from "axios";
-import TrackOrder from "./views/TrackOrder";
 import { reactLocalStorage } from "reactjs-localstorage";
 import { login, logout } from "./reducers/auth";
 import { useDispatch } from "react-redux";
-import ResetPassword from "./views/ResetPassword";
 import ScrollToTop from "./ScrollToTop";
 import {
   TransitionGroup,
   CSSTransition
 } from "react-transition-group";
+const Home = React.lazy(() => import('./views/Home'));
+const ViewBook = React.lazy(()=>import("./views/ViewBook"));
+const SearchBook = React.lazy(()=>import("./views/SearchBook"));
+const ViewFullBook = React.lazy(()=>import("./views/ViewFullBook"));
+const Checkout = React.lazy(()=>import("./views/Checkout"));
+const Signup = React.lazy(()=>import("./views/Signup"));
+const Login = React.lazy(()=>import("./views/Login"));
+const About = React.lazy(()=>import("./views/About"));
+const MyOrder = React.lazy(()=>import("./views/MyOrder"));
+const Profile = React.lazy(()=>import("./views/Profile"));
+const ResetPassword = React.lazy(()=>import("./views/ResetPassword"));
+const TrackOrder = React.lazy(()=> import ("./views/TrackOrder"));
 
 function App() {
   return (
@@ -68,54 +68,44 @@ function AnimationApp() {
           <Switch>
             <Route exact path="/">
               <Home />
-              <Footer />
             </Route>
             <Route exact path="/viewbook">
               <ViewBook />
             </Route>
             <Route path="/search">
               <SearchBook />
-              <Footer />
             </Route>
             <Route path="/viewbook/:bookId">
               <ViewFullBook />
-              <Footer />
             </Route>
             <Route path="/checkout">
               <Checkout />
-              <Footer />
             </Route>
             <Route path="/signup">
               <Signup />
-              <Footer />
             </Route>
             <Route path="/login">
               <Login />
-              <Footer />
             </Route>
             <Route path="/trackorder">
               <TrackOrder />
-              <Footer />
             </Route>
             <Route path="/about">
               <About />
-              <Footer />
             </Route>
             <Route path="/myorder">
               <MyOrder />
-              <Footer />
             </Route>
             <Route path="/profile">
               <Profile />
-              <Footer />
             </Route>
             <Route path="/reset_password">
               <ResetPassword />
-              <Footer />
             </Route>
           </Switch>
         </CSSTransition>
       </TransitionGroup>
+        <Footer />
     </div>
   );
 }
