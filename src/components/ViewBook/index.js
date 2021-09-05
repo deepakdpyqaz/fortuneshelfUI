@@ -46,7 +46,7 @@ const CartBook = (props) => {
             <CancelIcon style={{ position: "absolute", right: "2px", color: "#031F30" }} onClick={() => removeFromCart(props.bookId)} />
             <Card.Body className="text-center">
                 <img src={axios.defaults.baseURL + props.photo} alt="" height="100" />
-                <Card.Text as="div" className="border-top border-secondary my-3 py-1">
+                <Card.Text as="div" className="border-top border-secondary my-1 py-1">
                     <h6>{props.title}</h6>
                     <h6>Language: {props.language}</h6>
                     <strong>Price: &#8377; {Math.ceil(props.price - props.price * props.discount / 100)}</strong>
@@ -112,7 +112,7 @@ const Book = (props) => {
                 <Card.Body className="text-center">
                     <Link to={"/viewBook/" + props.bookId}>
                         <img src={axios.defaults.baseURL + props.photo} alt="" height="200" />
-                        <Card.Text as="div" className="border-top border-secondary my-3 py-1">
+                        <Card.Text as="div" className="border-top border-secondary my-1 py-1">
                             <h5>{props.title}</h5>
                             <h6>Language: {props.language}</h6>
                             <strong>Price: &#8377; {Math.ceil(props.price - props.price * props.discount / 100)}</strong>

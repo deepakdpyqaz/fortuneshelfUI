@@ -64,7 +64,7 @@ const ViewFullBook = (props) => {
             {
                 bookData.picture?
                 <Backdrop className={classes.backdrop} open={open} onClick={handleClose}>
-                    <img className="fs_book_image" src={axios.defaults.baseURL + bookData.picture} alt={bookData.title} />
+                    <img className="fs_book_image fs_full_page" src={axios.defaults.baseURL + bookData.picture} alt={bookData.title} />
                 </Backdrop>:null
             }
 

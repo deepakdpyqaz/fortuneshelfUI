@@ -9,11 +9,16 @@
     overflow: hidden;
     .fs_footer_cols{
         text-align: center;
+    
+        h3{
+            border-bottom: 2px solid #fff;
+            padding-bottom: 2px;
+        }
         li{
             list-style: none;
             cursor: pointer;
         }
-        margin:3px 0px;
+        margin:3px 2px;
 
     }
 }

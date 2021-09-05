@@ -5,6 +5,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import axios from "axios";
 import { Button } from "../../components/Utilities";
+import ResendOtp from "../../components/ResendOtp";
 import Input from "@material-ui/core/Input";
 import SectionTitle from "../../components/SectionTitle";
 import { useAlert } from "react-alert";
@@ -95,6 +96,11 @@ const ResetPassword = () => {
                         <Row>
                             <Col>
                                 <Input fullWidth name="otp" minlength="4" required onChange={handleChange} value={resetDetails.otp} placeholder="Enter OTP.."/>
+                            </Col>
+                        </Row>
+                        <Row className="my-1">
+                            <Col>
+                                <ResendOtp userId={resetDetails.userId} isVerified={true}/>
                             </Col>
                         </Row>
                         </>

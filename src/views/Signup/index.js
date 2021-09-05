@@ -10,6 +10,7 @@ import axios from "axios";
 import { useAlert } from "react-alert";
 import Modal from "react-bootstrap/Modal";
 import {useHistory} from "react-router-dom";
+import ResendOtp from "../../components/ResendOtp";
 const Signup = () => {
     const [userDetails, setUserDetails] = useState({});
     const alert = useAlert();
@@ -123,6 +124,12 @@ const Signup = () => {
                                 <Col>
                                     <Input type="text" error={validation.otp} fullWidth placeholder="Enter Otp received on mobile/Email" name="otp" onChange={handleUserVerificationChange} value={userVerificationDetails.otp} required />
                                     {validation.otp?<span className="text-danger">Enter a valid otp</span>:null}
+                                </Col>
+                            </Row>
+                            <br/>
+                            <Row className="my-1">
+                                <Col>
+                                    <ResendOtp email={userDetails.email} mobile={userDetails.mobile} isVerified={false}/>
                                 </Col>
                             </Row>
                         </Container>

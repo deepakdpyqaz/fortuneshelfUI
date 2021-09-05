@@ -4,4 +4,8 @@
         object-fit: contain;
         transition: all 300ms linear;
     }
+    .fs_book_image.fs_full_page{
+        width: 95vw;
+        height: 95vh;
+    }
 }
