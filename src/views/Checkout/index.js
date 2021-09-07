@@ -19,53 +19,30 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useAlert } from "react-alert";
 import Label from "@material-ui/core/FormLabel";
 
-const useStyles = makeStyles((theme) => ({
-    modal: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    paper: {
-        backgroundColor: theme.palette.background.paper,
-        border: '2px solid #031F30',
-        boxShadow: theme.shadows[5],
-        padding: theme.spacing(2, 4, 3),
-    },
-}));
 
 
 const Checkout = (props) => {
     const [shippingDetails, setShippingDetails] = useState({});
     const dispatch = useDispatch();
     const history = useHistory();
-    const classes = useStyles();
-    const [orderId, setOrderId] = useState("");
-    const [open, setOpen] = useState(false);
-    const [copied,setCopied] = useState(false);
     const alert = useAlert();
-    const [billingProfiles,setBillingProfiles] = useState([]);
-    const [validation,setValidation] = useState({first_name:false,last_name:false,mobile:false,email:false,pincode:false});
+    const [billingProfiles, setBillingProfiles] = useState([]);
+    const [validation, setValidation] = useState({ first_name: false, last_name: false, mobile: false, email: false, pincode: false });
     const validate = (data) => {
         const nameRe = /[a-zA-z]{2,45}/;
         const phoneRe = /^[0-9]{10}$/;
         const emailRe = /^(\w|.)+@[a-zA-Z_.]+?\.[a-zA-Z.]{2,3}$/;
         const pincodeRe = /^[0-9]{6}$/;
         setValidation({
-            first_name:!nameRe.test(data.first_name) && data.first_name,
-            last_name:!(nameRe.test(data.last_name)) && data.last_name,
-            mobile:!phoneRe.test(data.mobile) && data.mobile,
-            email:!(emailRe.test(data.email)) && data.email,
-            pincode:!(pincodeRe.test(data.pincode)&& data.pincode)
+            first_name: !nameRe.test(data.first_name) && data.first_name,
+            last_name: !(nameRe.test(data.last_name)) && data.last_name,
+            mobile: !phoneRe.test(data.mobile) && data.mobile,
+            email: !(emailRe.test(data.email)) && data.email,
+            pincode: !(pincodeRe.test(data.pincode) && data.pincode)
         })
 
     }
-    const handleOpen = () => {
-        setOpen(true);
-    };
 
-    const handleClose = () => {
-        setOpen(false);
-    };
 
     const handleChange = (e) => {
         setShippingDetails((prevData) => {
@@ -85,85 +62,62 @@ const Checkout = (props) => {
             return;
         }
         axios.put("/order/make_order", { ...shippingDetails, details: books, amount: props.totalPrice, delivery_charges: props.deliveryCharge }).then((res) => {
-            setOrderId(res.data.orderId);
-            reactLocalStorage.setObject("cart", {});
-            dispatch(setCartItems({}));
-            setShippingDetails({});
-            handleOpen();
-        }).catch((err) => {
-            if(err.response && err.response.data && err.response.data.message){
-                alert.error(err.response.data.message);
+            if(shippingDetails.paymentMode=='C'){
+                reactLocalStorage.setObject("cart", {});
+                dispatch(setCartItems({}));
+                setShippingDetails({});
+                history.push(`/order/status?orderId=${res.data.orderId}`);
             }
             else{
+                history.push("/confirm_order",{...shippingDetails,orderId:res.data.orderId,details:books,amount:props.totalPrice,delivery_charges:props.deliveryCharge})
+            }
+        }).catch((err) => {
+            if (err.response && err.response.data && err.response.data.message) {
+                alert.error(err.response.data.message);
+            }
+            else {
                 alert.error(err.message);
             }
         })
     }
-    const handleProfileChange = (profile)=>{
-        if(profile){
-            setShippingDetails((prevData)=>{
-                return {...prevData,
-                    address:profile.address,
-                    pincode:profile.pincode,
-                    city : profile.city,
+    const handleProfileChange = (profile) => {
+        if (profile) {
+            setShippingDetails((prevData) => {
+                return {
+                    ...prevData,
+                    address: profile.address,
+                    pincode: profile.pincode,
+                    city: profile.city,
                     state: profile.state,
-                    district : profile.district
+                    district: profile.district
                 }
             })
         }
     }
-    useEffect(()=>{
-        if(props.userDetails && props.userDetails.id){
-            setShippingDetails((prevData)=>{
-                return {...prevData,
-                    first_name:props.userDetails.first_name,
+    useEffect(() => {
+        if (props.userDetails && props.userDetails.id) {
+            setShippingDetails((prevData) => {
+                return {
+                    ...prevData,
+                    first_name: props.userDetails.first_name,
                     last_name: props.userDetails.last_name,
-                    mobile:props.userDetails.mobile,
-                    email:props.userDetails.email
+                    mobile: props.userDetails.mobile,
+                    email: props.userDetails.email
                 }
             })
-            axios.get("/user/billing_profile").then((res)=>{
+            axios.get("/user/billing_profile").then((res) => {
                 setBillingProfiles(res.data);
-                if(res.data.length){
+                if (res.data.length) {
                     handleProfileChange(res.data[0]);
                 }
-            }).catch((err)=>{
+            }).catch((err) => {
                 alert.error(err.message);
             })
         }
-    },[])
+    }, [])
     return (
         <div className="view_page">
-            <div>
-                <Modal
-                    aria-labelledby="transition-modal-title"
-                    aria-describedby="transition-modal-description"
-                    className={classes.modal}
-                    open={open}
-                    onClose={handleClose}
-                    closeAfterTransition
-                    onBackdropClick="false"
-                    BackdropComponent={Backdrop}
-                    BackdropProps={{
-                        timeout: 500,
-                    }}
-                >
-                    <Fade in={open}>
-                        <div className={classes.paper}>
-                            <h2 id="transition-modal-title">Your Order is placed Succesfully</h2>
-                            <p>Your order Id is:</p>
-                            <p id="transition-modal-description">{orderId}</p>
-                            <div>
-                            <CopyToClipboard text={orderId}
-                                onCopy={() => setCopied(true)}>
-                                <Button variant="filled" color="primary">{copied?"Copied":"Copy"}</Button>
-                            </CopyToClipboard>
-                                <Button variant="filled" color="primary" onClick={handleClose}>Done</Button>
-                            </div>
-                        </div>
-                    </Fade>
-                </Modal>
-            </div>
+                
             <Container fluid className="my-3 px-3">
                 <SectionTitle title="Order Summary" />
                 <Table bordered bordered-dark striped hover responsive>
@@ -237,15 +191,15 @@ const Checkout = (props) => {
                     <Row>
                         <Col md="6" sm="8">
                             <Label><h3>Shop As: &nbsp;</h3></Label>
-                            <select onChange={(e)=>handleProfileChange(billingProfiles[Number(e.target.value)])}>
+                            <select onChange={(e) => handleProfileChange(billingProfiles[Number(e.target.value)])}>
                                 {
-                                    billingProfiles.length?
-                                    billingProfiles.map((elem,ind)=>{
-                                        return (
-                                            <option value={ind}>{elem.title}</option>
-                                        )
-                                    }):
-                                    "No Profiles Added"
+                                    billingProfiles.length ?
+                                        billingProfiles.map((elem, ind) => {
+                                            return (
+                                                <option value={ind}>{elem.title}</option>
+                                            )
+                                        }) :
+                                        "No Profiles Added"
                                 }
                             </select>
                         </Col>
@@ -253,22 +207,22 @@ const Checkout = (props) => {
                     <Row>
                         <Col md="6" sm="6">
                             <Input name="first_name" placeholder="First Name.." fullWidth required value={shippingDetails.first_name} onChange={handleChange} />
-                            {validation && validation.first_name?<span className="text-danger">Enter a valid first name</span>:null}
+                            {validation && validation.first_name ? <span className="text-danger">Enter a valid first name</span> : null}
                         </Col>
                         <Col md="6" sm="6">
                             <Input name="last_name" placeholder="Last Name.." fullWidth required value={shippingDetails.last_name} onChange={handleChange} />
-                             {validation && validation.last_name?<span className="text-danger">Enter a valid last name</span>:null}
+                            {validation && validation.last_name ? <span className="text-danger">Enter a valid last name</span> : null}
                         </Col>
                     </Row>
                     <br />
                     <Row>
-                        <Col  md="6" sm="6">
+                        <Col md="6" sm="6">
                             <Input placeholder="Mobile.." name="mobile" fullWidth required value={shippingDetails.mobile} onChange={handleChange} />
-                            {validation.mobile?<span className="text-danger">Enter a valid 10 digit mobile number</span>:null}
+                            {validation.mobile ? <span className="text-danger">Enter a valid 10 digit mobile number</span> : null}
                         </Col>
-                        <Col  md="6" sm="6">
+                        <Col md="6" sm="6">
                             <Input placeholder="Email.." name="email" type="email" fullWidth required value={shippingDetails.email} onChange={handleChange} />
-                            {validation.email?<span className="text-danger">Enter a valid email</span>:null}
+                            {validation.email ? <span className="text-danger">Enter a valid email</span> : null}
                         </Col>
                     </Row>
                     <br />
@@ -286,17 +240,17 @@ const Checkout = (props) => {
                     </Row>
                     <br />
                     <Row>
-                        <Col  md="3" sm="6">
+                        <Col md="3" sm="6">
                             <Input fullWidth placeholder="Pincode" name="pincode" value={shippingDetails.pincode} onChange={handleChange} required />
-                            {validation.pincode?<span className="text-danger">Enter a valid pincode</span>:null}
+                            {validation.pincode ? <span className="text-danger">Enter a valid pincode</span> : null}
                         </Col>
-                        <Col  md="3" sm="6">
+                        <Col md="3" sm="6">
                             <Input fullWidth name="city" placeholder="City" required value={shippingDetails.city} onChange={handleChange} />
                         </Col>
-                        <Col  md="3" sm="6">
+                        <Col md="3" sm="6">
                             <Input fullWidth name="district" placeholder="District" required value={shippingDetails.district} onChange={handleChange} />
                         </Col>
-                        <Col  md="3" sm="6">
+                        <Col md="3" sm="6">
                             <Input fullWidth name="state" placeholder="State" required value={shippingDetails.state} onChange={handleChange} />
                         </Col>
                     </Row>
