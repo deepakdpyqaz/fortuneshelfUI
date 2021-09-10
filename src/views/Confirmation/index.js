@@ -51,7 +51,7 @@ const Confirmation = (props) => {
                     <Row>
                         <Col>
                             <Label>Amount (in &#8377;):</Label>
-                            <Input name="amount" placeholder="amount" type="number" fullWidth required value={Number(location.state.amount) + Number(location.state.delivery_charges)} onChange={(e) => e.preventDefault()} readOnly />
+                            <Input name="amount" placeholder="amount" type="number" fullWidth required value={(Number(location.state.amount) + Number(location.state.delivery_charges))-Math.floor((Number(location.state.amount) + Number(location.state.delivery_charges))*Number(location.state.discount)/100)} onChange={(e) => e.preventDefault()} readOnly />
                         </Col>
                     </Row>
                     <br />

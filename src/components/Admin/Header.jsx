@@ -20,6 +20,8 @@ import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import LocalShippingIcon from '@material-ui/icons/LocalShipping';
 import CreditCardIcon from '@material-ui/icons/CreditCard';
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
+import ConfirmationNumberIcon from '@material-ui/icons/ConfirmationNumber';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import { reactLocalStorage } from 'reactjs-localstorage';
@@ -93,7 +95,7 @@ export default function AdminHeader(props) {
   const classes = useStyles();
   const theme = useTheme();
   const dispatch = useDispatch();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
   const history = useHistory();
   const alert = useAlert();
   const handleDrawerOpen = () => {
@@ -109,7 +111,7 @@ export default function AdminHeader(props) {
     dispatch(logout());
     axios.post("/manager/logout").then(() => {
       alert.success("Succesfully Logged Out");
-      history.push("/manager/login");
+      history.push("/admin/login");
     }).catch((err) => {
       alert.error("Error in logging out");
     })
@@ -136,7 +138,7 @@ export default function AdminHeader(props) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap>
-            {(admin && admin.id) ? admin.firstname : "FortuneShelf Admin"}
+            {(admin && admin.id && admin.first_name) ? admin.first_name : "FortuneShelf Admin"}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -171,7 +173,7 @@ export default function AdminHeader(props) {
           :
           <List>
             {admin.books ?
-              <Link to="/admin/book">
+              <Link to="/admin/books">
                 <ListItem button>
                   <ListItemIcon> <LibraryBooksIcon color="primary" /></ListItemIcon>
                   <ListItemText primary={"Books"} />
@@ -202,10 +204,24 @@ export default function AdminHeader(props) {
                 </ListItem>
               </Link>
               : null}
-            <ListItem button onClick={logoutAdmin}>
-              <ListItemIcon> <AccountCircleIcon color="primary" /></ListItemIcon>
-              <ListItemText primary={"Logout"} />
-            </ListItem>
+            {admin.coupon ?
+              <Link to="/admin/coupons">
+                <ListItem button>
+                  <ListItemIcon> <ConfirmationNumberIcon color="primary" /></ListItemIcon>
+                  <ListItemText primary={"Coupons"} />
+                </ListItem>
+              </Link>
+              : null}
+            <Link to={"/admin/profile/"+admin.id}>
+              <ListItem button>
+                <ListItemIcon> <AccountCircleIcon color="primary" /></ListItemIcon>
+                <ListItemText primary={"Profile"} />
+              </ListItem>
+            </Link>
+              <ListItem button  onClick={logoutAdmin}>
+                <ListItemIcon> <ExitToAppIcon color="primary" /></ListItemIcon>
+                <ListItemText primary={"Logout"} />
+              </ListItem>
           </List>
         }
       </Drawer>

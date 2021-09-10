@@ -14,24 +14,18 @@ import {
 import Header from "./components/Admin/Header";
 const Login = React.lazy(() => import("./views/Admin/Login"));
 const Book = React.lazy(()=>import("./views/Admin/Book"));
+const BookView = React.lazy(()=>import("./views/Admin/BookView"));
+const Order = React.lazy(()=>import("./views/Admin/Order"));
+const OrderView = React.lazy(()=>import("./views/Admin/OrderView"));
+const Payment = React.lazy(()=>import("./views/Admin/Payments"));
+const Profile = React.lazy(()=>import("./views/Admin/Profile"));
+const Admins = React.lazy(()=>import("./views/Admin/Admins"));
+const ResetPassword = React.lazy(()=>import("./views/Admin/ResetPassword"));
+const Coupons = React.lazy(()=>import("./views/Admin/Coupons"));
+const AddCoupon = React.lazy(()=>import("./views/Admin/AddCoupon"));
 function AdminApp() {
     const dispatch = useDispatch();
     let location = useLocation();
-    // useEffect(() => {
-    //     let token = reactLocalStorage.get("token");
-    //     if (token) {
-    //         axios.post("/user/login_token", { token }).then((res) => {
-    //             if (res.data) {
-    //                 dispatch(login(res.data));
-    //                 reactLocalStorage.set("token", res.data.token);
-    //                 axios.defaults.headers.authorization = res.data.token;
-    //             }
-    //         }).catch(() => {
-    //             reactLocalStorage.remove("token");
-    //             dispatch(logout());
-    //         })
-    //     }
-    // })
     return (
 
         <div className="App">
@@ -50,6 +44,33 @@ function AdminApp() {
                                 </Route>
                                 <Route exact path="/admin/books">
                                     <Book />
+                                </Route>
+                                <Route exact path="/admin/books/:bookId">
+                                    <BookView />
+                                </Route>
+                                <Route exact path="/admin/order">
+                                    <Order/>
+                                </Route>
+                                <Route exact path="/admin/order/:orderId">
+                                    <OrderView/>
+                                </Route>
+                                <Route exact path="/admin/payment">
+                                    <Payment/>
+                                </Route>
+                                <Route exact path="/admin/admins">
+                                    <Admins/>
+                                </Route>
+                                <Route exact path="/admin/profile/:id">
+                                    <Profile/>
+                                </Route>
+                                <Route exact path="/admin/reset_password">
+                                    <ResetPassword />
+                                </Route>
+                                <Route exact path="/admin/coupons">
+                                    <Coupons />
+                                </Route>
+                                <Route exact path="/admin/coupons/add">
+                                    <AddCoupon />
                                 </Route>
                                 <Route path="*">
                                     <Redirect to="/admin/login"></Redirect>

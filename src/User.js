@@ -1,5 +1,5 @@
 import React, { useEffect, Suspense } from "react";
-import { BrowserRouter as Router, Switch, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, useLocation,Redirect } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import FallbackLoader from "./components/FallBackLoader";
@@ -27,6 +27,7 @@ const ResetPassword = React.lazy(() => import("./views/ResetPassword"));
 const TrackOrder = React.lazy(() => import("./views/TrackOrder"));
 const Confirmation = React.lazy(()=>import("./views/Confirmation"));
 const OrderResponse = React.lazy(()=>import("./views/OrderResponse"));
+const AboutAuthor = React.lazy(()=>import("./views/AboutAuthor"));
 function UserApp() {
   const dispatch = useDispatch();
   let location = useLocation();
@@ -99,6 +100,12 @@ function UserApp() {
               </Route>
               <Route path="/order/status">
                 <OrderResponse/>
+              </Route>
+              <Route path="/about_author">
+                <AboutAuthor/>
+              </Route>
+              <Route path="*">
+                <Redirect to="/"></Redirect>
               </Route>
             </Switch>
           </Suspense>

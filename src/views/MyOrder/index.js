@@ -11,7 +11,7 @@ import { Button } from "../../components/Utilities";
 const days = ["SUN","MON","TUE","WED","THU","FRI","SAT"]
 const renderDate = (date) =>{
     const dt = new Date(date);
-    return `${days[dt.getDay()]} ${(dt.getDate()).toString().padStart(2,'0')}-${(dt.getMonth()).toString().padStart(2,'0')}-${dt.getFullYear().toString()}  ${(dt.getHours()).toString().padStart(2,'0')}:${(dt.getMinutes()).toString().padStart(2,'0')}`
+    return `${days[dt.getDay()]} ${(dt.getDate()).toString().padStart(2,'0')}-${(dt.getMonth()+1).toString().padStart(2,'0')}-${dt.getFullYear().toString()}  ${(dt.getHours()).toString().padStart(2,'0')}:${(dt.getMinutes()).toString().padStart(2,'0')}`
 }
 const MyOrder = () => {
     const history = useHistory();

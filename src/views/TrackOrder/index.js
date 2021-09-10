@@ -127,7 +127,9 @@ const TrackOrder = () => {
   const [loader, setLoader] = useState(0);
   const [orderData,setOrderData] = useState({});
   const [amount,setAmount] = useState({});
+  const [discount,setDiscount] = useState({});
   const [deliveryCharges,setDeliveryCharges] = useState({});
+
   const handleChange = (e) => {
     setOrderId(e.target.value);
   }
@@ -141,6 +143,7 @@ const TrackOrder = () => {
       setOrderData(res.data.details);
       setAmount(res.data.amount);
       setDeliveryCharges(res.data.delivery_charges);
+      setDiscount(res.data.discount);
     }).catch((err) => {
       if (err.response && err.response.data && err.response.data.message) {
         alert.error(err.response.data.message)
@@ -236,8 +239,12 @@ const TrackOrder = () => {
                     <td colSpan="5">&#8377; {deliveryCharges} /-</td>
                   </tr>
                   <tr>
+                    <td>Discount</td>
+                    <td colSpan="5">&#8377; {discount} /-</td>
+                  </tr>
+                  <tr>
                     <td>Total Amount</td>
-                    <td colSpan="5">&#8377; {deliveryCharges + amount} /-</td>
+                    <td colSpan="5">&#8377; {deliveryCharges + amount - discount} /-</td>
                   </tr>
                 </tbody>
               </Table>

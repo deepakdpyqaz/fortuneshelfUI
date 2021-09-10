@@ -133,6 +133,11 @@ const Header = (props) => {
                                 Track Order
                                 </div>
                             </Link>
+                            <Link to="/about_author">
+                                <div>
+                                About Author
+                                </div>
+                            </Link>
                             {
                                 (
                                     props.userDetails && props.userDetails.id != null ?
@@ -185,6 +190,7 @@ const Header = (props) => {
                         <Link onClick={handleClose} className="fs_sidebar_nav_item" to="/">Home</Link>
                         <Link onClick={handleClose} className="fs_sidebar_nav_item" to="/viewbook">View Books</Link>
                         <Link onClick={handleClose} className="fs_sidebar_nav_item" to="/trackorder">Track Order</Link>
+                        <Link onClick={handleClose} className="fs_sidebar_nav_item" to="/about_author">About Author</Link>
                         {
                             props.userDetails && props.userDetails.id?
                             [

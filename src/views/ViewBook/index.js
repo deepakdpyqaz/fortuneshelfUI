@@ -27,7 +27,7 @@ const ViewBook = () => {
             });
         }).catch(err => {
             setHasMore(false);
-            if (err.response.data && err.response.data.message) {
+            if (err.response && err.response.data && err.response.data.message) {
                 alert.error(err.response.data.message);
             }
             else {

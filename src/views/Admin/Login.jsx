@@ -29,7 +29,7 @@ const Login = () => {
             dispatch(login(res.data));
             reactLocalStorage.set("admin_token",res.data.token);
             axios.defaults.headers.authorization = res.data.token;
-            history.push("/admin/books");
+            history.push("/admin/profile");
         }).catch((err) => {
             if (err.response && err.response.data && err.response.data.message) {
                 alert.error(err.response.data.message);
@@ -59,7 +59,7 @@ const Login = () => {
                 dispatch(login(res.data));
                 reactLocalStorage.set("admin_token",res.data.token);
                 axios.defaults.headers.authorization = res.data.token;
-                history.push("/admin/books");
+                history.push("/admin/profile/"+res.data.id);
             }).catch((err)=>{
                 reactLocalStorage.remove("admin_token");
                 dispatch(logout());
@@ -89,7 +89,7 @@ const Login = () => {
                     <br />
                     <Row className="justify-content-center">
                         <Col className="justify-content-center text-center">
-                            <Button variant="filled" disabled={Boolean(validation.username || validation.password) && validation.username && validation.password} color="primary"><h4 className="py-0 my-0">Login</h4></Button>
+                            <Button variant="filled" disabled={Boolean(validation.username || validation.password)} color="primary"><h4 className="py-0 my-0">Login</h4></Button>
                         </Col>
                     </Row>
                 </form>
