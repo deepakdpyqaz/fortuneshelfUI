@@ -13,6 +13,8 @@ import {
   TransitionGroup,
   CSSTransition
 } from "react-transition-group";
+import {useAlert} from "react-alert";
+import { setCartItems } from "./reducers/cart";
 const Home = React.lazy(() => import('./views/Home'));
 const ViewBook = React.lazy(() => import("./views/ViewBook"));
 const SearchBook = React.lazy(() => import("./views/SearchBook"));
@@ -28,11 +30,26 @@ const TrackOrder = React.lazy(() => import("./views/TrackOrder"));
 const Confirmation = React.lazy(()=>import("./views/Confirmation"));
 const OrderResponse = React.lazy(()=>import("./views/OrderResponse"));
 const AboutAuthor = React.lazy(()=>import("./views/AboutAuthor"));
+
+
+
 function UserApp() {
   const dispatch = useDispatch();
   let location = useLocation();
+  const alert = useAlert();
   useEffect(() => {
     let token = reactLocalStorage.get("token");
+    let cart = reactLocalStorage.getObject("cart");
+    if(cart){
+      axios.post("/validate_cart",{"cart":cart}).then((res)=>{
+        reactLocalStorage.setObject("cart",res.data.cart);
+        dispatch(setCartItems(res.data.cart));
+      }).catch((err)=>{
+        reactLocalStorage.setObject("cart",{});
+        dispatch(setCartItems({}))
+        alert.error("Error in updating cart");
+      })
+    }
     if (token) {
       axios.post("/user/login_token", { token }).then((res) => {
         if (res.data) {
@@ -45,6 +62,7 @@ function UserApp() {
         dispatch(logout());
       })
     }
+
   })
   return (
 

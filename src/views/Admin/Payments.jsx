@@ -14,7 +14,6 @@ import TextField from "@material-ui/core/TextField";
 
 const getTime = (date)=>{
     let dt = new Date(date);
-    console.log(dt);
     return `${dt.getDate().toString().padStart(2,'0')}-${(dt.getMonth()+1).toString().padStart(2,'0')}-${dt.getFullYear()}`
 }
 const Order = () => {

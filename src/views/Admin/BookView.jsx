@@ -80,9 +80,6 @@ const BookView = () => {
     useEffect(() => {
         if (bookId != 0) {
             axios.get("/book/book_by_id/" + bookId).then((res) => {
-                if (res.data.picture) {
-                    res.data.picture = axios.defaults.baseURL + res.data.picture;
-                }
                 setData(res.data);
             }).catch((err) => {
                 if (err.response && err.response.data) {

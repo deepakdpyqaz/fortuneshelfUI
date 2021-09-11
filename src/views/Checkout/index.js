@@ -78,7 +78,16 @@ const Checkout = (props) => {
                 history.push("/confirm_order",{...shippingDetails,orderId:res.data.orderId,details:books,amount:props.totalPrice,delivery_charges:props.deliveryCharge,discount:(coupon.discount?Number(coupon.discount):0)})
             }
         }).catch((err) => {
-            if (err.response && err.response.data && err.response.data.message) {
+            if(err.response && err.response.status==409){
+                alert.error("Your cart data has been outdated refreshing the cart");
+                axios.post("/validate_cart",{cart:props.cartItems}).then((res)=>{
+                    reactLocalStorage.setObject("cart",res.data.cart);
+                    dispatch(setCartItems(res.data.cart));
+                }).catch((err)=>{
+                    alert.error("Error in validating cart")
+                })
+            }
+            else if (err.response && err.response.data && err.response.data.message) {
                 alert.error(err.response.data.message);
             }
             else {

@@ -210,7 +210,7 @@ const Header = (props) => {
                 <Offcanvas.Body>
                     <Offcanvas.Title className="text-center">{Object.keys(props.cartItems).length==0?"No":Object.keys(props.cartItems).length} {Object.keys(props.cartItems).length == 1 ? "Item" : "Items"} Added</Offcanvas.Title>
                     {(Object.entries(props.cartItems != null ? props.cartItems : {})).map(elem => {
-                        return <CartBook key={elem[1].bookId} max_stock={elem[1].max_stock} bookId={elem[1].bookId} title={elem[1].title} language={elem[1].language} price={elem[1].price} photo={elem[1].photo} discount={elem[1].discount} qty={elem[1].stock} />;
+                        return <CartBook key={elem[1].bookId} max_stock={elem[1].max_stock} bookId={Number(elem[1].bookId)} title={elem[1].title} language={elem[1].language} price={elem[1].price} photo={elem[1].photo} discount={elem[1].discount} qty={elem[1].stock} />;
                     })}
                     <Container className="justify-content-center text-center">
                         <h3>Total: {props.totalPrice}</h3>

@@ -86,6 +86,10 @@ const Login = () => {
                         </Col>
                     </Row>
                     <br />
+                    <Row>
+                        <Link className="link" to="/admin/reset_password">Forgot password</Link>
+                    </Row>
+                    <br />
                     <br />
                     <Row className="justify-content-center">
                         <Col className="justify-content-center text-center">

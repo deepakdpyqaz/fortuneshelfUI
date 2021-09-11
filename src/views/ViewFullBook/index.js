@@ -10,20 +10,22 @@ import SectionTitle from "../../components/SectionTitle";
 import { Button } from "../../components/Utilities";
 import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
 import { reactLocalStorage } from 'reactjs-localstorage';
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch, connect } from "react-redux";
 import { setCartItems } from "../../reducers/cart";
 import Backdrop from '@material-ui/core/Backdrop';
 import { makeStyles } from '@material-ui/core/styles';
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+
 import "./viewfullbook.scss";
 
 const useStyles = makeStyles((theme) => ({
     backdrop: {
-      zIndex: 1000,
-      color: '#333',
-      opacity:0.6,
+        zIndex: 1000,
+        color: '#333',
+        opacity: 0.6,
     },
-  }));
-  
+}));
+
 const ViewFullBook = (props) => {
     const { bookId } = useParams();
     const [bookData, setBookData] = useState("");
@@ -32,24 +34,44 @@ const ViewFullBook = (props) => {
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const handleClose = () => {
-      setOpen(false);
+        setOpen(false);
     };
     const handleToggle = () => {
-      setOpen(!open);
+        setOpen(!open);
     };
-  
+    const ChangeQuantity = (qty, bookId) => {
+        if (qty == 0) {
+            return removeFromCart(bookId);
+        }
+        let cartItems = { ...props.cartItems }
+        let cartItemsLs = reactLocalStorage.getObject('cart');
+        cartItemsLs = { ...cartItemsLs };
+        cartItems[Number(bookId)] = { ...cartItems[Number(bookId)], stock: qty };
+        cartItemsLs[Number(bookId)] = { ...cartItems[Number(bookId)], stock: qty };
+        dispatch(setCartItems(cartItems));
+        reactLocalStorage.setObject('cart', cartItemsLs);
+    }
+    const removeFromCart = (bookId) => {
+        let cartItemsLs = reactLocalStorage.getObject('cart');
+        cartItemsLs = { ...cartItemsLs };
+        let cartItems = { ...props.cartItems }
+        delete cartItemsLs[bookId];
+        delete cartItems[bookId];
+        dispatch(setCartItems(cartItems));
+        reactLocalStorage.setObject('cart', cartItemsLs);
+    }
+
     const AddToCart = (data) => {
+
         let previousCart = reactLocalStorage.getObject('cart');
         if (!previousCart[data.bookId]) {
             reactLocalStorage.setObject('cart', { ...previousCart, [data.bookId]: { ...data, "stock": 1 } });
             dispatch(setCartItems({ ...previousCart, [data.bookId]: { ...data, "stock": 1 } }))
         }
-        else {
-            alert("Book already added");
-        }
     }
     useEffect(() => {
         axios.get("/book/book_by_id/" + bookId).then((res) => {
+            res.data.bookId = res.data.book_id;
             setBookData(res.data);
         }).catch((err) => {
             if (err.response && err.response.status == 404) {
@@ -62,10 +84,12 @@ const ViewFullBook = (props) => {
     return (
         <div className="view_page fs_full_book">
             {
-                bookData.picture?
-                <Backdrop className={classes.backdrop} open={open} onClick={handleClose}>
-                    <img className="fs_book_image fs_full_page" src={axios.defaults.baseURL + bookData.picture} alt={bookData.title} />
-                </Backdrop>:null
+                bookData.picture ?
+                    <Backdrop className={classes.backdrop} open={open} onClick={handleClose}>
+                        <object data={bookData.picture} type="image/jpg" width="250px" onClick={handleToggle} className="fs_book_image fs_full_page">
+                            <img src="https://fortuneshelfimages.s3.ap-south-1.amazonaws.com/media/books/default.jpg" width="250px" alt={bookData.tilte} onMouseEnter={handleToggle} className="fs_book_image fs_full_page" />
+                        </object>
+                    </Backdrop> : null
             }
 
             {
@@ -79,7 +103,10 @@ const ViewFullBook = (props) => {
                             </Row>
                             <Row className="align-items-center">
                                 <Col className="text-center my-3 p-3">
-                                    <img onMouseEnter={handleToggle}  className="fs_book_image" width="250px" src={axios.defaults.baseURL + bookData.picture} alt={bookData.title} />
+                                    <object data={bookData.picture} type="image/jpg" width="250px" onMouseEnter={handleToggle} className="fs_book_image">
+                                        <img src="https://fortuneshelfimages.s3.ap-south-1.amazonaws.com/media/books/default.jpg" width="250px" alt={bookData.tilte} onMouseEnter={handleToggle} className="fs_book_image" />
+                                    </object>
+
                                 </Col>
                                 <Col className="align-items-center">
                                     <Table borderless striped hover>
@@ -106,7 +133,27 @@ const ViewFullBook = (props) => {
                                             </tr>
                                             <tr>
                                                 <td colSpan="2" className="text-center py-3">
-                                                    <Button color="primary" variant="filled" onClick={() => { AddToCart(bookData) }}>ADD <AddShoppingCartIcon /></Button>
+                                                    {
+                                                        props.cartItems && props.cartItems[bookId] && props.cartItems[bookId].stock > 0 ?
+                                                            <ButtonGroup>
+                                                                <Button variant="outlined" color="primary" onClick={() => {
+                                                                    if (props.cartItems[bookId].stock < props.cartItems[bookId].max_stock) {
+                                                                        ChangeQuantity(props.cartItems[bookId].stock + 1, bookData.bookId || bookData.book_id);
+                                                                    }
+                                                                }
+                                                                }>+</Button>
+                                                                <h5>{props.cartItems[bookId].stock}</h5>
+                                                                <Button variant="outlined" color="primary" disabled={(props.cartItems[bookId].stock) < 0} onClick={() => {
+                                                                    if (props.cartItems[bookId].stock - 1 >= 0) {
+                                                                        ChangeQuantity(props.cartItems[bookId].stock - 1, bookData.bookId || bookData.book_id);
+                                                                    }
+                                                                }}>-</Button>
+                                                            </ButtonGroup>
+                                                            :
+                                                            <Button color="primary" variant="filled" onClick={() => { AddToCart(bookData) }}>Add <AddShoppingCartIcon fontSize="small" /></Button>
+
+                                                    }
+
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -120,10 +167,13 @@ const ViewFullBook = (props) => {
                                 </Col>
                             </Row>
                         </Container>
-                    : !open?<ViewBookLoader />:null
+                    : !open ? <ViewBookLoader /> : null
             }
         </div>
     )
 }
-
-export default ViewFullBook;
+function mapStateToProps(state) {
+    const { cart } = state;
+    return { cartItems: cart.cartItems }
+}
+export default connect(mapStateToProps)(ViewFullBook);

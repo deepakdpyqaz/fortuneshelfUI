@@ -9,7 +9,8 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Slide from 'react-reveal/Slide';
 import { useAlert } from "react-alert";
-const ViewBook = () => {
+import { connect } from "react-redux";
+const ViewBook = (props) => {
     const [books, setBooks] = useState([]);
     const [pageNo, setPageNo] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -88,7 +89,7 @@ const ViewBook = () => {
                     books.map((elem, ind) => {
                         return (
                             <Slide left>
-                                <BookContainer books={elem} key={ind} />
+                                <BookContainer cartItems={props.cartItems} books={elem} key={ind} />
                             </Slide>
                         )
                     })
@@ -97,5 +98,8 @@ const ViewBook = () => {
         </div>
     )
 }
-
-export default ViewBook;
+function mapStateToProps(state) {
+    const { cart} = state;
+    return { cartItems: cart.cartItems}
+}
+export default connect(mapStateToProps)(ViewBook);
