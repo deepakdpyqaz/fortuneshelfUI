@@ -60,6 +60,7 @@ const Header = (props) => {
 
     }
     window.addEventListener("scroll", function (e) {
+        // return;
         if (headerRef.current && location.pathname=="/") {
             let height = headerRef.current.getBoundingClientRect().height;
             if (window.scrollY >= height) {

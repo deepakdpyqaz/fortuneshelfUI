@@ -18,7 +18,7 @@ const Home = () => {
     })
   }, [])
   return (
-    <>
+    <div>
       <Banner />
       <Slide right>
         <SectionTitle title="About Us" />
@@ -34,7 +34,7 @@ const Home = () => {
       <Slide left>
         <BookContainer books={books} />
       </Slide>
-    </>
+    </div>
 
   )
 }

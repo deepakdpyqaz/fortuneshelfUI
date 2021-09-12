@@ -16,16 +16,27 @@ const ViewBook = (props) => {
     const [hasMore, setHasMore] = useState(true);
     const [queryParams,setQueryParams] = useState({});
     const alert = useAlert();
-    const getBooks = (data) => {
+    const [loading,setLoading] = useState(false);
+    const getBooks = (data,reset=false) => {
+        if(loading) return;
         if(!pageNo || !data) return;
-        axios.get("/book", { params: { page_number: pageNo, per_page: 25,...data } }).then((res) => {
+        setLoading(true);
+        axios.get("/book", { params: { page_number: (reset?1:pageNo), per_page: 25,...data } }).then((res) => {
             if (res.data.length == 0) {
                 setHasMore(false);
                 return;
             }
-            setBooks((prevState) => {
-                return [...prevState, res.data]
-            });
+            if(reset){
+                setBooks([res.data]);
+            }
+            else{
+                setBooks((prevState) => {
+                    return [...prevState, res.data]
+                });
+                if(res.data.length<20){
+                    setHasMore(false);
+                }
+            }
         }).catch(err => {
             setHasMore(false);
             if (err.response && err.response.data && err.response.data.message) {
@@ -35,13 +46,14 @@ const ViewBook = (props) => {
                 alert.error(err.message);
             }
         }).finally(() => {
+            setLoading(false);
             setPageNo(pageNo + 1);
         })
     }
     const handleChange=(e)=>{
         setQueryParams((prevData)=>{
             let newData = {...prevData,[e.target.name]:e.target.value};
-            getBooks(newData);
+            getBooks(newData,true);
             return newData;
         });
         setBooks([]);
@@ -81,7 +93,7 @@ const ViewBook = (props) => {
             </Container>
             <InfiniteScroll
                 pageStart={pageNo}
-                loadMore={getBooks}
+                loadMore={()=>{getBooks(queryParams)}}
                 hasMore={hasMore}
                 loader={<ViewBookLoader key={0} />}
             >

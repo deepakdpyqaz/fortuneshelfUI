@@ -4,7 +4,6 @@ import Container from "react-bootstrap/Container";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Row from "react-bootstrap/Row";
 import "./view_book.scss";
-import BookImage from "../../images/book.webp";
 import { Button } from "../Utilities";
 import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
 import NearMeIcon from '@material-ui/icons/NearMe';
@@ -142,7 +141,7 @@ const Book = (props) => {
                         </object>
                         <Card.Text as="div" className="border-top border-secondary my-1 py-1">
                             <h5>{props.title}</h5>
-                            <h6>Language: {props.language}</h6>
+                            <h6 className="text-capitalize">Language: {props.language}</h6>
                             <strong>Price: &#8377; {Math.ceil(props.price - props.price * props.discount / 100)}</strong>
                             {props.discount ?
                                 <small><strike>{props.price}</strike></small> :
