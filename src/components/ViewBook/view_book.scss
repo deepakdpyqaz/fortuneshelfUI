@@ -3,19 +3,42 @@
 .fs_book {
     background-color: $card-background !important;
     cursor: pointer;
-    box-shadow: 0px 0px 1px 1px $primary-col;
+    box-shadow: 0px 0px 1px 1px #0002;
+    background: #f7f6f6 !important;
     overflow: hidden;
     border: none;
     border-radius: 5px !important;
-
+    max-width: 13rem !important;
+    min-width: 13rem !important;
     &:hover {
-        box-shadow: 0px 0px 3px 2px $primary-col;
+        box-shadow: 0px 0px 10px 1px $primary-col;
     }
 
-    h5 {
+    .fs_book_title{
         font-family: $secondary-font-family;
+        text-align: left;
+        word-break: break-word;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 600 !important;
+        display: -webkit-box;
+        line-height: 20px; /* fallback */
+        max-height: 40px; /* fallback */
+        -webkit-line-clamp: 2; /* number of lines to show */
+        -webkit-box-orient: vertical;
+        &:hover{
+            color:$secondary-col
+        }
     }
-
+    .fs_book_description{
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        .fs_book_language{
+            font-size: smaller;
+            opacity: 0.9;
+        }
+    }
     .fs_delivery_free {
         position: absolute;
         top: -100px;
@@ -77,4 +100,9 @@
     background-color: transparent;
     border-radius: 0px !important;
     border-bottom: 1px solid $primary-col;
+}
+
+
+.modal-open {
+    overflow: hidden;
 }

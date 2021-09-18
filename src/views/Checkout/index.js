@@ -36,15 +36,14 @@ const Checkout = (props) => {
         const emailRe = /^(\w|.)+@[a-zA-Z_.]+?\.[a-zA-Z.]{2,3}$/;
         const pincodeRe = /^[0-9]{6}$/;
         setValidation({
-            first_name: !nameRe.test(data.first_name) && data.first_name,
-            last_name: !(nameRe.test(data.last_name)) && data.last_name,
-            mobile: !phoneRe.test(data.mobile) && data.mobile,
-            email: !(emailRe.test(data.email)) && data.email,
-            pincode: !(pincodeRe.test(data.pincode) && data.pincode)
+            first_name: !nameRe.test(data.first_name) && Boolean(data.first_name),
+            last_name: !(nameRe.test(data.last_name)) && Boolean(data.last_name),
+            mobile: !phoneRe.test(data.mobile) && Boolean(data.mobile),
+            email: !(emailRe.test(data.email)) && Boolean(data.email),
+            pincode: !(pincodeRe.test(data.pincode) && Boolean(data.pincode))
         })
 
     }
-
 
     const handleChange = (e) => {
         setShippingDetails((prevData) => {
@@ -53,9 +52,12 @@ const Checkout = (props) => {
             return newData;
         })
     }
+    const disableSubmit = ()=>{
+        return Boolean(validation.first_name || validation.last_name || validation.email || validation.mobile || validation.pincode)
+    }
     const handleSubmit = (e) => {
         e.preventDefault();
-        if(validation.first_name || validation.last_name || validation.email || validation.phone || validation.pincode){
+        if(validation.first_name || validation.last_name || validation.email || validation.mobile || validation.pincode){
             alert.error("Please fill the details correctly");
             return;
         }
@@ -325,7 +327,7 @@ const Checkout = (props) => {
                     <br />
                     <Row className="justify-content-center">
                         <Col className="justify-content-center text-center">
-                            <Button variant="filled" color="primary">Submit</Button>
+                            <Button variant="filled" color="primary" disabled={disableSubmit()}>Submit</Button>
                         </Col>
                     </Row>
                 </form>
@@ -343,7 +345,7 @@ function mapStateToProps(state) {
     let weight = 0;
     for (let i in cart.cartItems) {
         tempPrice += (Math.ceil(cart.cartItems[i].price - cart.cartItems[i].price * cart.cartItems[i].discount / 100)) * cart.cartItems[i].stock;
-        weight += cart.cartItems[i].weight * cart.cartItems[i].stock;
+        weight += cart.cartItems[i].weight * cart.cartItems[i].stock*cart.cartItems[i].delivery_factor;
     }
     return { cartItems: cart.cartItems, totalPrice: tempPrice, deliveryCharge: Math.ceil(weight / 1000) * 70, userDetails: auth.userDetails }
 }

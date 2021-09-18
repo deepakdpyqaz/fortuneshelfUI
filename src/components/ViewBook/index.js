@@ -46,24 +46,31 @@ const CartBook = (props) => {
     return (
         <Card style={{ width: '200px' }} className="fs_book fs_cart m-3">
             <CancelIcon style={{ position: "absolute", right: "2px", color: "#031F30" }} onClick={() => removeFromCart(props.bookId)} />
-            <Card.Body className="text-center">
-                <object data={props.photo} type="image/jpg" height="100">
-                    <img src="https://fortuneshelfimages.s3.ap-south-1.amazonaws.com/media/books/default.jpg" height="100" alt={props.tilte} />
+            <Card.Body className="text-center my-0 py-0">
+                <object data={props.photo?props.photo:props.picture} type="image/jpg" height="100" style={{"objectFit":"contain","maxWidth":"8rem"}}>
+                    <img src="https://fortuneshelfimages.s3.ap-south-1.amazonaws.com/media/books/default.png" height="100" alt={props.title} />
                 </object>
-                <Card.Text as="div" className="border-top border-secondary my-1 py-1">
-                    <h6>{props.title}</h6>
-                    <h6>Language: {props.language}</h6>
-                    <strong>Price: &#8377; {Math.ceil(props.price - props.price * props.discount / 100)}</strong>
-                    <ButtonGroup>
-                        <Button variant="outlined" color="primary" onClick={() => {
+                <Card.Text as="div" className="border-top border-secondary mt-1 mb-0 pt-1 pb-0">
+                    <h6 className="fs_book_title my-0">{props.title}</h6>
+                    <div className="fs_book_description my-1">
+                        <p className="text-capitalize fs_book_language my-0 py-0">{props.language}</p>
+                        <strong style={{ "color": "#9b1c31", "fontSize": "1.2rem" }} className="text-right fs_book_price">&#8377; {Math.ceil(props.price - props.price * props.discount / 100)}
+                            {props.discount ?
+                                <small className="mx-1 text-secondary" style={{ "font-size": "0.8rem" }} ><strike>{props.price}</strike></small> :
+                                null
+                            }
+                        </strong>
+                    </div>
+                    <ButtonGroup className="mx-1 my-0 py-0">
+                        <Button variant="filled" color="primary" onClick={() => {
                             if (qty < props.max_stock) {
                                 ChangeQuantity(qty + 1, props.bookId);
                                 setQty(qty + 1)
                             }
                         }
                         }>+</Button>
-                        <h5>{qty}</h5>
-                        <Button variant="outlined" color="primary" disabled={(qty) < 1} onClick={() => {
+                        <h5 className="mx-2">{qty}</h5>
+                        <Button variant="filled" color="primary" disabled={(qty) < 1} onClick={() => {
                             if (qty - 1 >= 0) {
                                 ChangeQuantity(qty - 1, props.bookId);
                                 setQty(qty - 1)
@@ -119,7 +126,7 @@ const Book = (props) => {
     }
     return (
         <>
-            <Card style={{ width: '15rem' }} className="fs_book m-3">
+            <Card className="fs_book py-1 m-3 justify-content-center">
                 {props.delivery_factor == 0 ?
                     <div className="fs_delivery_free">Delivery Free</div> : null
                 }
@@ -134,37 +141,39 @@ const Book = (props) => {
                         <CheckCircleOutlineIcon className="fs_added_icon" />
                     </div>
                 </ReactTransitionGroup>
-                <Card.Body className="text-center">
-                    <Link to={"/viewBook/" + props.bookId}>
-                        <object data={props.photo} type="image/jpg" height="200">
-                            <img src="https://fortuneshelfimages.s3.ap-south-1.amazonaws.com/media/books/default.jpg" height="200" alt={props.tilte} />
+                <Card.Body className="text-center d-flex pb-1 pt-0 flex-column justify-content-between">
+                    <Link to={"/viewBook/" + props.bookId} className="pt-1 pb-0 my-0">
+                        <object data={props.photo} type="image/png" height="200" style={{"objectFit":"contain","maxWidth":"10rem"}}>
+                            <img src="https://fortuneshelfimages.s3.ap-south-1.amazonaws.com/media/books/default.png" height="200" style={{"objectFit":"contain","maxWidth":"10rem"}} alt={props.tilte} />
                         </object>
-                        <Card.Text as="div" className="border-top border-secondary my-1 py-1">
-                            <h5>{props.title}</h5>
-                            <h6 className="text-capitalize">Language: {props.language}</h6>
-                            <strong>Price: &#8377; {Math.ceil(props.price - props.price * props.discount / 100)}</strong>
-                            {props.discount ?
-                                <small><strike>{props.price}</strike></small> :
-                                null
-                            }
-
+                        <Card.Text as="div" className="border-top border-secondary my-1 pt-1 pb-0">
+                            <h6 className="fs_book_title my-0">{props.title}</h6>
+                            <div className="fs_book_description my-1">
+                                <p className="text-capitalize fs_book_language my-0 py-0">{props.language}</p>
+                                <strong style={{ "color": "#9b1c31", "fontSize": "1.2rem" }} className="text-right fs_book_price">&#8377; {Math.ceil(props.price - props.price * props.discount / 100)}
+                                    {props.discount ?
+                                        <small className="mx-1 text-secondary" style={{ "font-size": "0.8rem" }} ><strike>{props.price}</strike></small> :
+                                        null
+                                    }
+                                </strong>
+                            </div>
                         </Card.Text>
                     </Link>
-                    <ButtonGroup>
-                        <Link to={"/viewBook/" + props.bookId}><Button color="primary" variant="filled">View <NearMeIcon fontSize="small" /> </Button></Link>
+                    <ButtonGroup className="justify-content-between my-0 px-0">
+                        <Link to={"/viewBook/" + props.bookId} className="my-0 py-0 px-0"><Button color="primary" variant="filled">View <NearMeIcon fontSize="small" /> </Button></Link>
                         {
                             props.qty == 0 ?
                                 <Button color="primary" variant="filled" onClick={() => { AddToCart(props) }}>Add <AddShoppingCartIcon fontSize="small" /></Button>
                                 :
                                 <ButtonGroup>
-                                    <Button variant="outlined" color="primary" onClick={() => {
+                                    <Button variant="filled" color="primary" onClick={() => {
                                         if (props.qty < props.max_stock) {
                                             ChangeQuantity(props.qty + 1, props.bookId);
                                         }
                                     }
                                     }>+</Button>
-                                    <h5>{props.qty}</h5>
-                                    <Button variant="outlined" color="primary" disabled={(props.qty) < 0} onClick={() => {
+                                    <h5 className="mx-1">{props.qty}</h5>
+                                    <Button variant="filled" color="primary" disabled={(props.qty) < 0} onClick={() => {
                                         if (props.qty - 1 >= 0) {
                                             ChangeQuantity(props.qty - 1, props.bookId);
                                         }
@@ -182,7 +191,7 @@ const Book = (props) => {
 const BookContainer = (props) => {
     return (
         <Container fluid className="fs_book_wrapper pb-3">
-            <Row xs={1} md={2} className="g-0 justify-content-center">
+            <Row className="g-0 justify-content-center">
                 {(props.books.map((elem) => {
                     return (
                         <Book key={elem.id} qty={props.cartItems && props.cartItems[elem.book_id] ? props.cartItems[elem.book_id].stock : 0} max_stock={elem.max_stock} title={elem.title} language={elem.language} price={elem.price} discount={elem.discount} photo={elem.picture} weight={elem.weight} bookId={elem.book_id} delivery_factor={elem.delivery_factor} />

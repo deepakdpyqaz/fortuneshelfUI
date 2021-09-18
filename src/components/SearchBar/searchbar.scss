@@ -1,0 +1,111 @@
+@import "../../globals";
+.fs_search_full{
+    position: fixed;
+    z-index: 1000;
+    background-color: #000A;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+    .fs_input_box{
+        font-size: 2rem;
+        position: absolute;
+        top: 25%;
+        padding: 10px 30px;
+        outline: none;
+        border: none;
+        border-radius: 50px;
+        width: 60%;
+        background-color: $primary-col;
+        color: $tertiary-col;
+    }
+    .fs_make_search{
+        position: absolute;
+        top: 26%;
+        left: 80%;
+        color: $tertiary-col;
+        font-size: 3rem;
+        &:hover{
+            font-size: 3.2rem;
+            cursor: pointer;
+        }
+    }
+    .fs_search_close{
+        position: absolute;
+        top: 2%;
+        right: 2%;
+        border: none;
+        outline: none;
+        font-size: 3rem;
+        color: $tertiary-col;
+        background-color: transparent;
+        .fs_search_ico{
+            &:hover{
+                font-size: 3.2rem;
+            }
+        }
+    }
+    .fs_search_suggestions{
+        position: absolute;
+        top:40%;
+        width:60%;
+        padding: 10px;
+        h1,h3{
+            color: $tertiary-col;
+        }
+    }
+    .fs_search_suggestion{
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+        border-radius: 20px;
+        background-color: #000A;
+        color: #fff;
+        padding: 5px 20px;
+        img{
+            width: 50px;
+            height: 50px;
+        }
+        h6{
+            display: inline;
+            margin-left: 5px;
+        }
+        &:hover{
+            cursor: pointer;
+            box-shadow: 0px 0px 3px 1px #000;
+        }
+    }
+}
+
+@media screen and (max-width:600px) {
+    .fs_search_full{
+        .fs_input_box{
+            top: 15%;
+            left: 5%;
+            font-size: 1.2rem;
+            padding: 5px 10px;
+            width: 80%;
+        }
+        .fs_make_search{
+            position: absolute;
+            top: 16%;
+            left: 85%;
+            color: $tertiary-col;
+            font-size: 2rem;
+            &:hover{
+                font-size: 3.2rem;
+                cursor: pointer;
+            }
+        }
+        .fs_search_suggestions{
+            position: absolute;
+            width:80%;
+            top:25%;
+            padding: 5px;
+        }
+    }
+    
+}

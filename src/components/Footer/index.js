@@ -15,7 +15,7 @@ const Footer = () => {
         <div ref={footer} className="fs_footer">
             <Container fluid>
                 <Row>
-                    <Col className="fs_footer_cols" sm="4">
+                    <Col className="fs_footer_cols" sm="3">
                         <h3>Contact us</h3>
                         <li><EmailIcon/> <a href="mailTo:enquiry@fortuneshelf.com" target="_blank">enquiry@fortuneshelf.com</a> </li>
                         <li><CallIcon/> <a href="tel:6369292605" target="_blank">6369292605</a> </li>
@@ -27,6 +27,10 @@ const Footer = () => {
                         <Link to="/about/terms_and_conditions"><li>Terms and Conditions</li></Link>
                         <Link to="/about/shipping_policy"><li>Shipping Policy</li></Link>
                         <Link to="/about/cancellation_policy"><li>Cancellation and Refund Policy</li></Link>
+                    </Col>
+                    <Col className="fs_footer_cols" sm="3" xs="12">
+                        <h3>Order Books By SMS</h3>
+                        <li>Message or Whatsapp <strong>"MY GITA"</strong> on the number <strong>+91 6369 292 605</strong></li>
                     </Col>
                     <Col className="fs_footer_cols justify-content-end text-right" sm="3">
                        <Link to="/"><img src={image} height="200"/></Link>

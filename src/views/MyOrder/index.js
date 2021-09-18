@@ -37,13 +37,13 @@ const MyOrder = () => {
     }, [])
     return (
         <div className="view_page">
-            <Container fluid className="my-3 px-3">
+            <Container  className="my-3 px-3" style={{"maxWidth":"800px"}}>
                 <SectionTitle title="Order Summary" />
-                <Table bordered bordered-dark striped hover responsive>
+                <Table bordered bordered-dark striped hover responsive size="sm">
                     <thead>
                         <tr>
-                            <th>
-                                Serial Number
+                            <th className="text-center">
+                                Serial
                             </th>
                             <th>
                                 Order Id
@@ -60,14 +60,14 @@ const MyOrder = () => {
                         {(orderData).map((elem, index) => {
                             return (
                                 <tr key={elem.orderId}>
-                                    <td>
+                                    <td className="text-center">
                                         {index + 1}
                                     </td>
                                     <td>
                                         {elem.orderId}
                                     </td>
                                     <td>
-                                       <strong>{renderDate(elem.date)}</strong> 
+                                       {renderDate(elem.date)}
                                     </td>
                                     <td>
                                         <Link to={"/trackorder?orderId="+elem.orderId}><Button color="primary" variant="filled">Track</Button></Link>

@@ -1,7 +1,8 @@
 import "./utilities.scss";
 const Button = (props)=>{
     let classList = "fs_button"+" " + props.variant+" "+props.color;
-    if (props.disabled){
+    console.log(props.disabled)
+    if (props.disabled==true){
         classList+=" disabled"
     }
     return (

@@ -12,6 +12,7 @@ import { useHistory } from "react-router-dom";
 import { login } from "../../reducers/auth";
 import { useAlert } from "react-alert";
 import { reactLocalStorage } from "reactjs-localstorage";
+import { ApiLoader } from "../../components/Loaders";
 
 const Login = () => {
     const history = useHistory();
@@ -21,10 +22,12 @@ const Login = () => {
     }
     const alert = useAlert();
     const dispatch = useDispatch();
+    const [isLoading,setIsLoading] = useState(false);
     const [userDetails, setUserDetails] = useState({username:"",password:""});
     const [validation,setValidation] = useState({"username":false,"password":false})
     const handleSubmit = (e) => {
         e.preventDefault()
+        setIsLoading(true);
         axios.post("/user/login", userDetails).then((res) => {
             dispatch(login(res.data));
             reactLocalStorage.set("token",res.data.token);
@@ -37,6 +40,8 @@ const Login = () => {
             else {
                 alert.error(err.message);
             }
+        }).finally(()=>{
+            setIsLoading(false);
         })
     }
     const validate = (data) =>{
@@ -55,14 +60,14 @@ const Login = () => {
 
     return (
         <div className="view_page">
-
+            <ApiLoader loading={isLoading}/>
             <Container style={{"maxWidth":"600px"}} className="my-3 py-3" fluid="sm">
                 <SectionTitle title="Login to your account" />
                 <form onSubmit={handleSubmit}>
                     <Row>
                         <Col>
                             <Input error={validation.username} name="username" placeholder="Mobile or Email" fullWidth required value={userDetails.username} onChange={handleChange} />
-                            {validation.username?<span className="text-danger">Enter a valid 10 digit moibile number or a valid Email</span>:null}
+                            {validation.username?<span className="text-danger">Enter a valid 10 digit mobile number or a valid Email</span>:null}
                         </Col>
                     </Row>
                     <br />
@@ -81,7 +86,7 @@ const Login = () => {
                     <br />
                     <Row className="justify-content-center">
                         <Col className="justify-content-center text-center">
-                            <Button variant="filled" disabled={Boolean(validation.username || validation.password) && validation.username && validation.password} color="primary"><h3 className="py-0 my-0">Login</h3></Button>
+                            <Button variant="filled" disabled={Boolean(validation.username || validation.password)} color="primary"><h3 className="py-0 my-0">Login</h3></Button>
                         </Col>
                     </Row>
                 </form>

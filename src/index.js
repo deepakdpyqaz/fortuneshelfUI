@@ -13,9 +13,10 @@ import AlertTemplate from "react-alert-template-basic";
 const options = {
   timeout: 20000,
   position: positions.TOP_CENTER,
-  offset:"11vh",
+  offset:"4vh",
   containerStyle:{
-    justifyContent:"stretch"
+    justifyContent:"stretch",
+    zIndex:10000
   }
 };
 

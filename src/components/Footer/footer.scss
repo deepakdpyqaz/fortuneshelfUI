@@ -1,6 +1,6 @@
 @import "../../globals";
 .fs_footer{
-    background-color: #171717;
+    background:linear-gradient(60deg,#1A2238 0%,#3a559e 60%);
     color:$secondary-text-col;
     clear: both;
     position: relative;
@@ -9,8 +9,10 @@
     overflow: hidden;
     .fs_footer_cols{
         h3{
-            padding-left: 20px;
+            padding-left: 15px;
+            padding-right: 15px;
             border-bottom: 2px solid #fff;
+            display: inline-block;
             padding-bottom: 2px;
         }
         li{

@@ -9,16 +9,21 @@
     h2{
         padding: 5px 10px;
         border: 5px solid transparent;
-        border-top: 5px solid $secondary-col;
-        border-bottom: 5px solid $secondary-col;
+        border-top: 5px solid $primary-light;
+        border-bottom: 5px solid $primary-light;
         font-family: $secondary-font-family;
-        color:$primary-col;
+        color:transparent;
+        background: linear-gradient(45deg, $primary-col,$primary-light);
+        -webkit-background-clip: text;
         cursor: pointer;
+        font-weight: 600;
         transition-duration: 1s;
         &:hover{
             border: 5px solid transparent;
-            border-left: 5px solid $secondary-col;
-            border-right: 5px solid $secondary-col;
+            background: linear-gradient(225deg, $primary-col,$primary-light);
+            -webkit-background-clip: text;
+            border-left: 5px solid $primary-light;
+            border-right: 5px solid $primary-light;
         }
     }
 }

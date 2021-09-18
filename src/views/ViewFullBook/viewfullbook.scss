@@ -1,3 +1,4 @@
+@import "../../globals";
 .fs_full_book{
     .fs_book_image{
         cursor: pointer;
@@ -7,5 +8,9 @@
     .fs_book_image.fs_full_page{
         width: 95vw;
         height: 95vh;
+    }
+    .fs_full_book_description{
+        color:$primary-light;
+        text-transform: uppercase;
     }
 }

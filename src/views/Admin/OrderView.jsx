@@ -23,22 +23,30 @@ const OrderView = () => {
     const orderId = params["orderId"];
     const [data, setData] = useState({ details: {} });
     const [orderStatus, setOrderStatus] = useState(0);
-    const [show,setShow]=useState(false);
+    const [courierInfo,setCourierInfo] = useState({});
+    const [show, setShow] = useState(false);
     const alert = useAlert();
     const history = useHistory();
     const admin = useSelector((state) => state.admin.adminDetails);
-
-    if (!(admin && admin.id)) {
+    const [message,setMessage] = useState("");
+    if (!(admin && admin.id)) { 
         history.push("/admin/login")
     }
     const handleChange = (e) => {
         setOrderStatus(e.target.value);
     }
+
+    const handleCourierInfoChange = (e) => {
+        setCourierInfo((data)=>{
+            return {...data,[e.target.name]:e.target.value};
+        })
+    }
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        axios.post("/order/status/" + orderId,{"status":orderStatus}).then((res) => {
+        axios.post("/order/status/" + orderId, { "status": orderStatus,...courierInfo,"message":message }).then((res) => {
             alert.success("Updated Succesfully");
+            data.status=orderStatus;
         }).catch((err) => {
             if (err.response && err.response.data) {
                 alert.error(err.response.data.message);
@@ -46,7 +54,7 @@ const OrderView = () => {
             else {
                 alert.error("Error in updating book")
             }
-        }).finally(()=>{
+        }).finally(() => {
             setShow(false);
         })
     }
@@ -54,6 +62,7 @@ const OrderView = () => {
         axios.get("/order/order_by_id/" + orderId).then((res) => {
             if (res.data.status) {
                 setOrderStatus(res.data.status);
+                setCourierInfo({"courier_tracking_id":res.data.courier_tracking_id,"courier_tracking_url":res.data.courier_url,"courier_name":res.data.courier_name});
             }
             setData(res.data);
         }).catch((err) => {
@@ -68,28 +77,30 @@ const OrderView = () => {
     return (
         <>
             <Container className="py-3">
-            <Modal show={show} onHide={()=>{setShow(false)}} backdrop="static" keyboard={false} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Confirm Order Update</Modal.Title>
-                </Modal.Header>
+                <Modal show={show} onHide={() => { setShow(false) }} backdrop="static" keyboard={false} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Confirm Order Update</Modal.Title>
+                    </Modal.Header>
 
-                <Modal.Body>
-                    {
-                        (orderStatus<data.status?<p className="text-danger">You are degrading the order status. Please be sure to take the action</p>:null)
-                    }
-                    {
-                        (orderStatus==data.status?<p>No changes made in the order status</p>:null)
-                    }
-                    {
-                        (orderStatus>data.status?<p>Are you sure want to update</p>:null)
-                    }
-                    
-                </Modal.Body>
-                <Modal.Footer className="justify-content-around">
-                    <Button variant="filled" color="primary" onClick={()=>{setShow(false)}}>Cancel</Button>
-                    <Button variant="filled" color="primary" onClick={handleSubmit} disabled={orderStatus==data.status}>Update Status</Button>
-                </Modal.Footer>
-            </Modal>
+                    <Modal.Body>
+                        <Input fullWidth multiline placeholder={`Order update for orderId ${orderId} (Optional message..)`} rows={4} value={message} onChange={(e)=>{setMessage(e.target.value)}}/>
+                        <br/>
+                        {
+                            (orderStatus < data.status ? <p className="text-danger">You are degrading the order status. Please be sure to take the action</p> : null)
+                        }
+                        {
+                            (orderStatus == data.status ? <p>No changes made in the order status</p> : null)
+                        }
+                        {
+                            (orderStatus > data.status ? <p>Are you sure want to update</p> : null)
+                        }
+
+                    </Modal.Body>
+                    <Modal.Footer className="justify-content-around">
+                        <Button variant="filled" color="primary" onClick={() => { setShow(false) }}>Cancel</Button>
+                        <Button variant="filled" color="primary" onClick={handleSubmit} disabled={orderStatus == data.status}>Update Status</Button>
+                    </Modal.Footer>
+                </Modal>
                 <SectionTitle title={"Order ID: " + orderId} />
                 <Row>
                     <Col>
@@ -101,6 +112,7 @@ const OrderView = () => {
                     <Col md={12}>
                         <FormControl fullWidth>
                             <InputLabel id="order-status-label">Order Status</InputLabel>
+                            <br />
                             <Select
                                 labelId="order-status-label"
                                 id="order-status"
@@ -115,13 +127,35 @@ const OrderView = () => {
                                 <MenuItem value={3}>Delivered</MenuItem>
                                 <MenuItem value={-1}>Failed</MenuItem>
                             </Select>
+                        </FormControl>
+                            <br />
                             <br />
                             <Row>
                                 <Col>
-                                    <Button color="primary" variant="filled" onClick={()=>{setShow(true)}}>Update</Button>
+                                    <Label id="order-courier-name">Courier Name</Label>
+                                    <Input fullWidth name="courier_name" onChange={handleCourierInfoChange} value={courierInfo.courier_name} />
                                 </Col>
                             </Row>
-                        </FormControl>
+                            <br />
+                            <Row>
+                                <Col>
+                                    <Label id="order-tracking-url">Tracking URL</Label>
+                                    <Input fullWidth name="courier_url" onChange={handleCourierInfoChange} value={courierInfo.courier_tracking_url} />
+                                </Col>
+                            </Row>
+                            <br />
+                            <Row>
+                                <Col>
+                                    <Label id="order-tracking-id">Tracking Id</Label>
+                                    <Input fullWidth name="courier_tracking_id" onChange={handleCourierInfoChange} value={courierInfo.courier_tracking_id} />
+                                </Col>
+                            </Row>
+                            <br/>
+                            <Row>
+                                <Col>
+                                    <Button color="primary" variant="filled" onClick={() => { setShow(true) }}>Update</Button>
+                                </Col>
+                            </Row>
                     </Col>
                 </Row>
                 <br />
@@ -150,7 +184,7 @@ const OrderView = () => {
                     </Col>
                     <Col md={3} sm={6} xs={12} className="my-3">
                         <Label>Total amount (in &#8377;)</Label>
-                        <Input fullWidth readOnly value={data.delivery_charges+data.amount-data.discount} />
+                        <Input fullWidth readOnly value={data.delivery_charges + data.amount - data.discount} />
                     </Col>
                     <Col md={3} sm={6} xs={12} className="my-3">
                         <Label>Nimbus order number</Label>
@@ -186,6 +220,16 @@ const OrderView = () => {
                     </Col>
                 </Row>
                 <br />
+                <Row>
+                    <Col md={6} className="my-3"    >
+                        <Label>Weight</Label>
+                        <Input fullWidth value={data.weight} name="weight" readOnly onChange={handleChange} />
+                    </Col>
+                    <Col md={6} className="my-3">
+                        <Label>Dimension</Label>
+                        <Input fullWidth value={data.dimension} name="dimension" readOnly onChange={handleChange} />
+                    </Col>
+                </Row>
                 <Row>
                     <Col md={6} className="my-3"    >
                         <Label>First name</Label>

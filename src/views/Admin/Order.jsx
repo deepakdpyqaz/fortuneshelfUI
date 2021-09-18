@@ -102,6 +102,12 @@ const Order = () => {
                                 Payment Method
                             </th>
                             <th className="text-center">
+                                Weight
+                            </th>
+                            <th className="text-center">
+                                Amount
+                            </th>
+                            <th className="text-center">
                                 Status
                             </th>
                             <th className="text-center">
@@ -124,6 +130,12 @@ const Order = () => {
                                     </td>
                                     <td  className="text-center">
                                         {elem.paymentMethod}
+                                    </td>
+                                    <td  className="text-center">
+                                        {elem.weight} Grams
+                                    </td>
+                                    <td  className="text-center">
+                                        &#8377; {elem.amount}
                                     </td>
                                     <td  className="text-center">
                                         {elem.status}

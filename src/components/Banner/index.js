@@ -13,7 +13,7 @@ import banner10 from "../../images/banner/10.png";
 const Banner = () => {
     const [height,setHeight]=useState(450);
     useEffect(()=>{
-        setHeight(Math.min(Math.min(600,window.innerHeight),Math.max(window.innerWidth/1.5,350)));
+        setHeight(Math.min(Math.min(450,window.innerHeight),Math.max(window.innerWidth/2,250)));
     });
     const images = [banner1,banner2,banner3,banner4,banner5,banner6,banner7,banner8,banner9,banner10]
     return (

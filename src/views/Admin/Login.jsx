@@ -75,7 +75,7 @@ const Login = () => {
                     <Row>
                         <Col>
                             <Input error={validation.username} name="username" placeholder="Mobile or Email" fullWidth required value={userDetails.username} onChange={handleChange} />
-                            {validation.username?<span className="text-danger">Enter a valid 10 digit moibile number or a valid Email</span>:null}
+                            {validation.username?<span className="text-danger">Enter a valid 10 digit mobile number or a valid Email</span>:null}
                         </Col>
                     </Row>
                     <br />

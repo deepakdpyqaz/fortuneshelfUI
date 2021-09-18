@@ -11,17 +11,20 @@ import { useAlert } from "react-alert";
 import Modal from "react-bootstrap/Modal";
 import {useHistory} from "react-router-dom";
 import ResendOtp from "../../components/ResendOtp";
+import {ApiLoader} from "../../components/Loaders";
 const Signup = () => {
     const [userDetails, setUserDetails] = useState({});
     const alert = useAlert();
+    const [error,setError] = useState("");
     const [show, setShow] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [userVerificationDetails,setUserVerificationDetails] = useState({});
     const handleClose = () => setShow(false);
     const history = useHistory();
     const [validation,setValidation] = useState({});
+    const [isLoading,setIsLoading] = useState(false);
     const isUserFormDisabled = () => {
-        return Boolean(validation.first_name || validation.last_name || validation.mobile || validation.gender || validation.age || validation.gender)
+        return Boolean(validation.first_name || validation.last_name || validation.mobile || validation.email || validation.age || validation.gender)
     }
     const isVerificationDisabled = () => {
         return Boolean(validation.password || validation.confirm_password || validation.otp)
@@ -58,6 +61,7 @@ const Signup = () => {
     }
     const handleUserVerificationSubmit = (e)=>{
         e.preventDefault();
+        setIsLoading(true);
         axios.post("/user/reset_password",userVerificationDetails).then((res)=>{
             setShowModal(false);
             alert.success("Account Created Succesfully")
@@ -66,14 +70,17 @@ const Signup = () => {
         }).catch((err)=>{
             setShow(true);
             if (err.response && err.response.data && err.response.data.message) {
-                alert.error(err.response.data.message);
+                setError(err.response.data.message);
             }
             else {
-                alert.error(err.message)
+                setError(err.message)
             }
+        }).finally(()=>{
+            setIsLoading(false);
         })
     }
     const handleSubmit = (e) => {
+        setIsLoading(true);
         e.preventDefault()
         axios.post("/user/signup", userDetails).then((res) => {
             setUserVerificationDetails((prevData)=>{
@@ -87,6 +94,8 @@ const Signup = () => {
             else {
                 alert.error(err.message);
             }
+        }).finally(()=>{
+            setIsLoading(false);
         })
     }
     const handleChange = (e) => {
@@ -98,7 +107,7 @@ const Signup = () => {
     }
     return (
         <div className="view_page">
-
+            <ApiLoader loading={isLoading}/>
             <Modal show={showModal}>
                 <Modal.Header>
                     <Modal.Title>Generate Password</Modal.Title>
@@ -106,6 +115,11 @@ const Signup = () => {
                 <form onSubmit={handleUserVerificationSubmit}>
                 <Modal.Body>
                         <Container>
+                            <Row>
+                                <Col>
+                                    {error?<span className="text-danger">{error}</span>:""}
+                                </Col>
+                            </Row>
                             <Row>
                                 <Col>
                                     <Input type="password" error={validation.password} minLength="5" fullWidth placeholder="Password" name="password" onChange={handleUserVerificationChange} value={userVerificationDetails.password} required />
@@ -129,6 +143,7 @@ const Signup = () => {
                             <br/>
                             <Row className="my-1">
                                 <Col>
+                                    
                                     <ResendOtp email={userDetails.email} mobile={userDetails.mobile} isVerified={false}/>
                                 </Col>
                             </Row>
@@ -172,7 +187,7 @@ const Signup = () => {
                             {validation.age?<span className="text-danger">Enter a valid age</span>:null}
                         </Col>
                         <Col className="my-2">
-                            <Form.Select required placeholder="Gender" name="gender" onChange={handleChange} value={userDetails.gender} aria-label="Gender" style={{ "border": "none", "borderBottom": "1px solid black", "borderRadius": "0px" }}>
+                            <Form.Select required placeholder="Gender" name="gender" onChange={handleChange} value={userDetails.gender} aria-label="Gender" style={{ "border": "none", "borderBottom": "1px solid black", "background":"transparent","borderRadius": "0px" }}>
                                 <option value="">Gender</option>
                                 <option value="M">Male</option>
                                 <option value="F">Female</option>

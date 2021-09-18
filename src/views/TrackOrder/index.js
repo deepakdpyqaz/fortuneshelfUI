@@ -2,6 +2,8 @@ import SectionTitle from "../../components/SectionTitle";
 import { useLocation, useHistory } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import Input from "@material-ui/core/Input";
 import axios from "axios";
 import { useAlert } from "react-alert";
@@ -39,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 
 function OrderTimeline(props) {
   const classes = useStyles();
-  const status = ["pending", "packed", "shipped", "deliverd"]
+  const status = ["pending", "packed", "shipped", "delivered"]
   const colors = ["", "", "", ""];
   for (let i = 0; i < status.length; i++) {
     if (status[i] == props.status) {
@@ -125,10 +127,11 @@ const TrackOrder = () => {
   const history = useHistory();
   const [orderId, setOrderId] = useState("");
   const [loader, setLoader] = useState(0);
-  const [orderData,setOrderData] = useState({});
-  const [amount,setAmount] = useState({});
-  const [discount,setDiscount] = useState({});
-  const [deliveryCharges,setDeliveryCharges] = useState({});
+  const [orderData, setOrderData] = useState({});
+  const [amount, setAmount] = useState({});
+  const [discount, setDiscount] = useState({});
+  const [deliveryCharges, setDeliveryCharges] = useState({});
+  const [courierInfo,setCourierInfo] = useState({});
 
   const handleChange = (e) => {
     setOrderId(e.target.value);
@@ -144,6 +147,7 @@ const TrackOrder = () => {
       setAmount(res.data.amount);
       setDeliveryCharges(res.data.delivery_charges);
       setDiscount(res.data.discount);
+      setCourierInfo({"courier_tracking_id":res.data.courier_tracking_id,"courier_tracking_url":res.data.courier_url,"courier_name":res.data.courier_name});
     }).catch((err) => {
       if (err.response && err.response.data && err.response.data.message) {
         alert.error(err.response.data.message)
@@ -197,57 +201,81 @@ const TrackOrder = () => {
       {
         orderStatus && loader != 1 ?
           <>
-            <Container className="my-3 px-3">
+            <Container className="my-3 px-3" style={{ maxWidth: "800px" }}>
               <SectionTitle title="Order Details" />
-              <Table bordered bordered-dark striped hover responsive>
-                <thead>
-                  <tr>
-                    <th>
-                      Serial Number
-                    </th>
-                    <th>
-                      Title
-                    </th>
-                    <th>
-                      Quantity
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orderData.map((elem, index) => {
-                    return (
-                      <tr key={elem.bookId}>
-                        <td>
-                          {index + 1}
-                        </td>
-                        <td>
-                          {elem.title}
-                        </td>
-                        <td>
-                          {elem.qty}
-                        </td>
+                  <Table bordered bordered-dark striped hover size="sm" responsive >
+                    <thead>
+                      <tr>
+                        <th className="text-center">
+                          Serial
+                        </th>
+                        <th className="text-center">
+                          Title
+                        </th>
+                        <th className="text-center">
+                          Quantity
+                        </th>
                       </tr>
-                    )
-                  })}
-                  <br />
-                  <tr>
-                    <td>Price</td>
-                    <td colSpan="5">&#8377; {amount} /-</td>
-                  </tr>
-                  <tr>
-                    <td>Delivery Charges</td>
-                    <td colSpan="5">&#8377; {deliveryCharges} /-</td>
-                  </tr>
-                  <tr>
-                    <td>Discount</td>
-                    <td colSpan="5">&#8377; {discount} /-</td>
-                  </tr>
-                  <tr>
-                    <td>Total Amount</td>
-                    <td colSpan="5">&#8377; {deliveryCharges + amount - discount} /-</td>
-                  </tr>
-                </tbody>
-              </Table>
+                    </thead>
+                    <tbody>
+                      {orderData.map((elem, index) => {
+                        return (
+                          <tr key={elem.bookId}>
+                            <td className="text-center">
+                              {index + 1}
+                            </td>
+                            <td className="text-center">
+                              {elem.title}
+                            </td>
+                            <td className="text-center">
+                              {elem.qty}
+                            </td>
+                          </tr>
+                        )
+                      })}
+                      <br />
+                      <tr>
+                        <td>Price</td>
+                        <td colSpan="5">&#8377; {amount} /-</td>
+                      </tr>
+                      <tr>
+                        <td>Delivery Charges</td>
+                        <td colSpan="5">&#8377; {deliveryCharges} /-</td>
+                      </tr>
+                      <tr>
+                        <td>Discount</td>
+                        <td colSpan="5">&#8377; {discount} /-</td>
+                      </tr>
+                      <tr>
+                        <td>Total Amount</td>
+                        <td colSpan="5">&#8377; {deliveryCharges + amount - discount} /-</td>
+                      </tr>
+                      {
+                        courierInfo.courier_name?
+                        <tr>
+                          <td>Courier Service name</td>
+                          <td colSpan="5">{courierInfo.courier_name}</td>
+                        </tr>
+                        :null
+                      }
+                      {
+                        courierInfo.courier_tracking_url?
+                        <tr>
+                          <td>Tracking Url</td>
+                          <td colSpan="5">{courierInfo.courier_tracking_url}</td>
+                        </tr>
+                        :null
+                      }
+                      {
+                        courierInfo.courier_tracking_id?
+                        <tr>
+                          <td>Tracking Id</td>
+                          <td colSpan="5">{courierInfo.courier_tracking_id}</td>
+                        </tr>
+                        :null
+                      }
+                    </tbody>
+                  </Table>
             </Container>
 
 

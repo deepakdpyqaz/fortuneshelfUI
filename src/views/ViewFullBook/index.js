@@ -15,6 +15,7 @@ import { setCartItems } from "../../reducers/cart";
 import Backdrop from '@material-ui/core/Backdrop';
 import { makeStyles } from '@material-ui/core/styles';
 import ButtonGroup from "react-bootstrap/ButtonGroup";
+import HorizontalSlider from "../../components/HorizontalSlider";
 
 import "./viewfullbook.scss";
 
@@ -31,6 +32,7 @@ const ViewFullBook = (props) => {
     const [bookData, setBookData] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const dispatch = useDispatch();
+    const [similarBooks,setSimilarBooks] = useState([]);
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
     const handleClose = () => {
@@ -80,6 +82,11 @@ const ViewFullBook = (props) => {
         }).finally(() => {
             setIsLoading(false);
         })
+        axios.get("/book/get_similar",{params:{id:bookId}}).then((res)=>{
+            setSimilarBooks(res.data);
+        }).catch((err)=>{
+            setSimilarBooks([]);
+        });
     }, [])
     return (
         <div className="view_page fs_full_book">
@@ -87,7 +94,7 @@ const ViewFullBook = (props) => {
                 bookData.picture ?
                     <Backdrop className={classes.backdrop} open={open} onClick={handleClose}>
                         <object data={bookData.picture} type="image/jpg" width="250px" onClick={handleToggle} className="fs_book_image fs_full_page">
-                            <img src="https://fortuneshelfimages.s3.ap-south-1.amazonaws.com/media/books/default.jpg" width="250px" alt={bookData.tilte} onMouseEnter={handleToggle} className="fs_book_image fs_full_page" />
+                            <img src="https://fortuneshelfimages.s3.ap-south-1.amazonaws.com/media/books/default.png" width="250px" alt={bookData.tilte} onMouseEnter={handleToggle} className="fs_book_image fs_full_page" />
                         </object>
                     </Backdrop> : null
             }
@@ -97,6 +104,7 @@ const ViewFullBook = (props) => {
                     bookData.found && bookData.found == false
                         ? "Book Not found"
                         :
+                        <>
                         <Container className="my-3 py-3">
                             <Row>
                                 <SectionTitle title={bookData.title} />
@@ -104,7 +112,7 @@ const ViewFullBook = (props) => {
                             <Row className="align-items-center">
                                 <Col className="text-center my-3 p-3">
                                     <object data={bookData.picture} type="image/jpg" width="250px" onMouseEnter={handleToggle} className="fs_book_image">
-                                        <img src="https://fortuneshelfimages.s3.ap-south-1.amazonaws.com/media/books/default.jpg" width="250px" alt={bookData.tilte} onMouseEnter={handleToggle} className="fs_book_image" />
+                                        <img src="https://fortuneshelfimages.s3.ap-south-1.amazonaws.com/media/books/default.png" width="250px" alt={bookData.tilte} onMouseEnter={handleToggle} className="fs_book_image" />
                                     </object>
 
                                 </Col>
@@ -117,7 +125,7 @@ const ViewFullBook = (props) => {
                                             </tr>
                                             <tr>
                                                 <td>Language</td>
-                                                <td>{bookData.language}</td>
+                                                <td className="text-capitalize">{bookData.language}</td>
                                             </tr>
                                             <tr>
                                                 <td>Price</td>
@@ -136,14 +144,14 @@ const ViewFullBook = (props) => {
                                                     {
                                                         props.cartItems && props.cartItems[bookId] && props.cartItems[bookId].stock > 0 ?
                                                             <ButtonGroup>
-                                                                <Button variant="outlined" color="primary" onClick={() => {
+                                                                <Button variant="filled" color="primary" onClick={() => {
                                                                     if (props.cartItems[bookId].stock < props.cartItems[bookId].max_stock) {
                                                                         ChangeQuantity(props.cartItems[bookId].stock + 1, bookData.bookId || bookData.book_id);
                                                                     }
                                                                 }
                                                                 }>+</Button>
-                                                                <h5>{props.cartItems[bookId].stock}</h5>
-                                                                <Button variant="outlined" color="primary" disabled={(props.cartItems[bookId].stock) < 0} onClick={() => {
+                                                                <h5 className="mx-1">{props.cartItems[bookId].stock}</h5>
+                                                                <Button variant="filled" color="primary" disabled={(props.cartItems[bookId].stock) < 0} onClick={() => {
                                                                     if (props.cartItems[bookId].stock - 1 >= 0) {
                                                                         ChangeQuantity(props.cartItems[bookId].stock - 1, bookData.bookId || bookData.book_id);
                                                                     }
@@ -161,12 +169,14 @@ const ViewFullBook = (props) => {
                                 </Col>
                             </Row>
                             <Row>
-                                <h2 className="text-center text-decoration-underline my-3" style={{ color: "#031F30" }}>Description</h2>
-                                <Col style={{ fontSize: "1.2rem" }} className="px-3">
+                                <SectionTitle title={"Description"}/>
+                                <Col style={{ fontSize: "1.2rem",fontWeight:"500" }} className="px-3">
                                     {bookData.description}
                                 </Col>
                             </Row>
                         </Container>
+                        {similarBooks.length? <HorizontalSlider title={"Similar to this"} cartItems={props.cartItems}  books={similarBooks} />:null}
+                        </>
                     : !open ? <ViewBookLoader /> : null
             }
         </div>

@@ -4,6 +4,7 @@
     box-sizing: border-box;
     margin: 0px;
     padding: 0px;
+    font-family: $font-family;
 }
 
 a {
@@ -21,17 +22,21 @@ a.link{
 }
 
 body {
-    background: $background;
+    background: $background !important;
     background-repeat: no-repeat;
     background-size: cover;
     color: $primary-text-col;
     font-family: $font-family;
     overflow-x: hidden;
     max-width: 100vw;
+    min-width: 100vw;
     min-height: 100vh;
 }
 h1,h2,h3,h4{
     font-family: $secondary-font-family;
+}
+h5,h6{
+    font-family: $font-family;
 }
 ::-webkit-scrollbar {
     width: 10px;
@@ -42,21 +47,21 @@ h1,h2,h3,h4{
 }
 
 ::-webkit-scrollbar-thumb {
-    background: $secondary-col;
+    background: $tertiary-col;
 }
 
 ::-moz-selection {
-    color: $secondary-text-col;
+    color: $tertiary-col;
     background: $primary-col;
 }
 
 ::selection {
-    color: $secondary-col;
+    color: $tertiary-col;
     background: $primary-col;
 }
 
 .view_page{
-    padding-top: 10vh;
+    // padding-top: 10vh;
     min-height: 90vh;
     position: relative;
 }

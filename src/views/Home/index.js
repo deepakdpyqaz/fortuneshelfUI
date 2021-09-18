@@ -6,8 +6,9 @@ import axios from "axios";
 import { TextContainer } from "../../components/Utilities";
 import { useAlert } from "react-alert";
 import Slide from 'react-reveal/Slide';
-
-const Home = () => {
+import HorizontalSlider from "../../components/HorizontalSlider";
+import { connect } from "react-redux";
+const Home = (props) => {
   const [books, setBooks] = useState([]);
   const alert = useAlert();
   useEffect(() => {
@@ -29,13 +30,17 @@ const Home = () => {
           Fortune Shelf is a small contribution towards this bigger cause by delivering amazing spiritual enlightening books to every house across every corner of India. To every villages and towns.
           If you wish to help our cause kindly support by donating any amount as per below details :
         </TextContainer>
-        <SectionTitle title="Top Selling Books" />
       </Slide>
       <Slide left>
-        <BookContainer books={books} />
+        <HorizontalSlider title={"Top Selling Books"} cartItems={props.cartItems}  books={books} />
       </Slide>
     </div>
 
   )
 }
-export default Home;
+
+function mapStateToProps(state) {
+  const { cart} = state;
+  return { cartItems: cart.cartItems}
+}
+export default connect(mapStateToProps)(Home);

@@ -1,11 +1,14 @@
 import SectionTitle from "../../components/SectionTitle";
 import { TextContainer } from "../../components/Utilities";
+import author from "../../images/author.jpeg";
+
 const AboutAuthor = () => {
     return (
         <div className="view_page">
             <SectionTitle title="About Author" />
             <TextContainer>
-                <p>  When His Divine Grace A.C. Bhaktivedanta Swami Srila Prabhupada entered the port of New York City on September 17, 1965 few Americans took notice — but he was not merely another immigrant. He was on a mission to introduce the ancient teachings of Vedic India into mainstream America.  Before Srila Prabhupada passed away on November 14, 1977 at the age of 81, his mission proved successful. He had founded the International Society for Krishna Consciousness (ISKCON) and saw it grow into a worldwide confederation of more than 100 temples, ashrams and cultural centers.</p>
+                <img src={author} style={{float:"left",margin:"10px",width:"50vw",maxWidth:"300px",aspectRatio:1}} />
+                <p>  When His Divine Grace <strong style={{"color":"#1A2238"}}> A.C. Bhaktivedanta Swami Srila Prabhupada </strong> entered the port of New York City on September 17, 1965 few Americans took notice — but he was not merely another immigrant. He was on a mission to introduce the ancient teachings of Vedic India into mainstream America.  Before Srila Prabhupada passed away on November 14, 1977 at the age of 81, his mission proved successful. He had founded the International Society for Krishna Consciousness (ISKCON) and saw it grow into a worldwide confederation of more than 100 temples, ashrams and cultural centers.</p>
 
                 <p> Srila Prabhupada was born Abhay Charan De on September 1, 1896 to a pious Hindu family in Calcutta. As a youth growing up in British-controlled India, Abhay became involved with Mahatma Gandhi’s civil disobedience movement to secure independence for his nation. It was, however, a 1922 meeting with a prominent scholar and religious leader, Srila Bhaktisiddhanta Sarasvati, which proved most influential on Abhay’s future calling. Srila Bhaktisiddhanta was a leader in the Gaudiya Vaishnava denomination, a monotheistic tradition within the broad Hindu culture, and asked Abhay to bring the teachings of Lord Krishna to the English-speaking world. Abhay became a disciple of Srila Bhaktisiddhanta in 1933, and resolved to carry out his mentor’s request. Abhay, later known by the honorific A.C. Bhaktivedanta Swami Prabhupada, spent the next 32 years preparing for his journey west.</p>
 
