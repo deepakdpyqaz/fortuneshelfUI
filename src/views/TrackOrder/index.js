@@ -201,7 +201,7 @@ const TrackOrder = () => {
       {
         orderStatus && loader != 1 ?
           <>
-            <Container className="my-3 px-3" style={{ maxWidth: "800px" }}>
+            <Container>
               <SectionTitle title="Order Details" />
                   <Table bordered bordered-dark striped hover size="sm" responsive >
                     <thead>

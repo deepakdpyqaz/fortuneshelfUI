@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from 'react-router-dom';
+import { useParams,useHistory } from 'react-router-dom';
 import axios from "axios";
 import { ViewBookLoader } from "../../components/Loaders";
 import Container from "react-bootstrap/Container";
@@ -35,6 +35,7 @@ const ViewFullBook = (props) => {
     const [similarBooks,setSimilarBooks] = useState([]);
     const classes = useStyles();
     const [open, setOpen] = React.useState(false);
+    const history = useHistory();
     const handleClose = () => {
         setOpen(false);
     };
@@ -79,6 +80,7 @@ const ViewFullBook = (props) => {
             if (err.response && err.response.status == 404) {
                 setBookData({ "found": false });
             }
+            history.push("/");
         }).finally(() => {
             setIsLoading(false);
         })

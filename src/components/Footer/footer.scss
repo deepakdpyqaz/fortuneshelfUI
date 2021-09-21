@@ -8,21 +8,21 @@
     max-width: 100vw;
     overflow: hidden;
     .fs_footer_cols{
+        // align-items: center;
         h3{
-            padding-left: 15px;
-            padding-right: 15px;
             border-bottom: 2px solid #fff;
-            display: inline-block;
+            // display: inline-block;
             padding-bottom: 2px;
         }
         li{
             list-style: none;
             cursor: pointer;
+            text-align: left;
         }
         img{
             aspect-ratio: 1;
         }
-        margin:3px 10px;
+        margin:10px;
 
     }
 }

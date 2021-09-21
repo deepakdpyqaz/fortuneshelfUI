@@ -22,12 +22,12 @@ import Label from "@material-ui/core/FormLabel";
 
 
 const Checkout = (props) => {
-    const [shippingDetails, setShippingDetails] = useState({});
+    const [shippingDetails, setShippingDetails] = useState({state:"",district:""});
     const dispatch = useDispatch();
     const history = useHistory();
     const alert = useAlert();
     const [billingProfiles, setBillingProfiles] = useState([]);
-    const [validation, setValidation] = useState({ first_name: false, last_name: false, mobile: false, email: false, pincode: false });
+    const [validation, setValidation] = useState({ first_name: false, last_name: false, mobile: false, email: false, pincode: false,state:false,district:false });
     const [coupon,setCoupon] = useState({});
     const [couponState,setCouponState]=useState("apply");
     const validate = (data) => {
@@ -40,7 +40,9 @@ const Checkout = (props) => {
             last_name: !(nameRe.test(data.last_name)) && Boolean(data.last_name),
             mobile: !phoneRe.test(data.mobile) && Boolean(data.mobile),
             email: !(emailRe.test(data.email)) && Boolean(data.email),
-            pincode: !(pincodeRe.test(data.pincode) && Boolean(data.pincode))
+            pincode: !(pincodeRe.test(data.pincode) && Boolean(data.pincode)),
+            state: !(data.state && data.state.length>0),
+            district: !(data.district && data.district.length>0)
         })
 
     }
@@ -51,13 +53,38 @@ const Checkout = (props) => {
             validate(newData);
             return newData;
         })
+        if(e.target.name=="pincode" && e.target.value.length=="6" && !isNaN(Number(e.target.value))){
+            setShippingDetails((prevData)=>{
+                return {...prevData,"state":"","district":""};
+            })
+            axios.get("https://api.postalpincode.in/pincode/"+e.target.value).then((res)=>{
+                res.data=res.data[0];
+                if(res.data && res.data.Status=="Success"){
+                    if(res.data.PostOffice && res.data.PostOffice.length>0){
+                        let state = res.data.PostOffice[0].State;
+                        let district = res.data.PostOffice[0].District;
+                        setShippingDetails((prevData)=>{
+                            return {...prevData,"state":state,"district":district};
+                        })
+                    }
+                }else{
+                    setValidation((prevData)=>{
+                        return {...prevData,"pincode":true}
+                    })
+                }
+            })
+        }
     }
     const disableSubmit = ()=>{
-        return Boolean(validation.first_name || validation.last_name || validation.email || validation.mobile || validation.pincode)
+        return Boolean(validation.first_name || validation.last_name || validation.email || validation.mobile || validation.pincode || shippingDetails.state.length==0 || shippingDetails.district.length==0)
+    }
+
+    const submitOrder = () => {
+        
     }
     const handleSubmit = (e) => {
         e.preventDefault();
-        if(validation.first_name || validation.last_name || validation.email || validation.mobile || validation.pincode){
+        if(validation.first_name || validation.last_name || validation.email || validation.mobile || validation.pincode || validation.state || validation.district){
             alert.error("Please fill the details correctly");
             return;
         }
@@ -151,7 +178,7 @@ const Checkout = (props) => {
     return (
         <div className="view_page">
                 
-            <Container fluid className="my-3 px-3">
+            <Container className="my-3 px-3">
                 <SectionTitle title="Order Summary" />
                 <Table bordered bordered-dark striped hover responsive>
                     <thead>
@@ -284,12 +311,17 @@ const Checkout = (props) => {
                         <Col md="3" sm="6">
                             <Input fullWidth name="city" placeholder="City" required value={shippingDetails.city} onChange={handleChange} />
                         </Col>
-                        <Col md="3" sm="6">
-                            <Input fullWidth name="district" placeholder="District" required value={shippingDetails.district} onChange={handleChange} />
-                        </Col>
-                        <Col md="3" sm="6">
-                            <Input fullWidth name="state" placeholder="State" required value={shippingDetails.state} onChange={handleChange} />
-                        </Col>
+                        {
+                            shippingDetails.pincode && shippingDetails.pincode.length==6 && !isNaN(Number(shippingDetails.pincode)) && !validation.pincode?
+                            <>
+                            <Col md="3" sm="6">
+                                <Input fullWidth name="district" placeholder="District" required value={shippingDetails.district} onChange={(e)=>{e.preventDefault()}} disabled={!Boolean(shippingDetails.district)} readOnly/>
+                            </Col>
+                            <Col md="3" sm="6">
+                                <Input fullWidth name="state" placeholder="State" required value={shippingDetails.state} onChange={(e)=>{e.preventDefault()}} disabled={!Boolean(shippingDetails.state)} readOnly/>
+                            </Col>
+                            </>:null
+                        }
                     </Row>
                     <br/>
                     <Row>
@@ -299,7 +331,7 @@ const Checkout = (props) => {
                         <Col>
                                 {
                                     couponState=="apply"?
-                                    <Button variant="filled" color="primary" type="button" onClick={applyCoupon}>Apply</Button>
+                                    <Button variant="filled" color="primary" type="button" onClick={applyCoupon} disabled={!Boolean(coupon.coupon)}>Apply</Button>
                                     :null
                                 }
                                 {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { BookContainer } from "../../components/ViewBook";
 import axios from "axios";
 import InfiniteScroll from 'react-infinite-scroller';
@@ -14,13 +14,16 @@ import { useLocation } from "react-router";
 import { Button } from "../../components/Utilities";
 import FilterListIcon from '@material-ui/icons/FilterList';
 import SortIcon from '@material-ui/icons/Sort';
-import Modal from "react-bootstrap/Modal"
+import Modal from "react-bootstrap/Modal";
+import { useSelector } from "react-redux";
 const ViewBook = (props) => {
     const [books, setBooks] = useState([]);
     const [pageNo, setPageNo] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const location = useLocation();
+    const [perPage,setPerPage] = useState(24);
     const [showModal, setShowModal] = useState(false);
+    const languages = useSelector((state)=>state.filter.languages);
     const handelShowModal = () => {
         setShowModal(true);
     }
@@ -32,7 +35,8 @@ const ViewBook = (props) => {
             "category": location.state && location.state.category ? location.state.category : "",
             "language": location.state && location.state.language ? location.state.language : "",
             "order_by": "",
-            "isDescending": ""
+            "isDescending": "",
+            "delivery_free":location.state && location.state.delivery_free?location.state.delivery_free:false
         }
     );
     const alert = useAlert();
@@ -41,7 +45,7 @@ const ViewBook = (props) => {
         if (loading) return;
         if (!pageNo || !data) return;
         setLoading(true);
-        axios.get("/book", { params: { page_number: (reset ? 1 : pageNo), per_page: 25, ...data } }).then((res) => {
+        axios.get("/book", { params: { page_number: (reset ? 1 : pageNo), per_page: perPage, ...data } }).then((res) => {
             if (res.data.length == 0) {
                 setHasMore(false);
                 return;
@@ -83,6 +87,11 @@ const ViewBook = (props) => {
         });
 
     }
+    useEffect(()=>{
+        let width = window.innerWidth;
+        let row_size = parseInt(width/(15*16));
+        setPerPage(Math.max(row_size*4,10));
+    },[])
     return (
         <div className="viewbook view_page">
             <Modal show={showModal} backdrop={true} scrollable={true} onHide={handleCloseModal}>
@@ -92,11 +101,12 @@ const ViewBook = (props) => {
                         <Col>
                             <Form.Select aria-label="Language" value={queryParams.language} onChange={handleChange} name="language">
                                 <option value="">Language</option>
-                                <option value="english">English</option>
-                                <option value="bengali">Bengali</option>
-                                <option value="marathi">Marathi</option>
-                                <option value="hindi">Hindi</option>
-                                <option value="urdu">Urdu</option>
+                                {
+                                    languages?languages.map((item)=>{
+                                        return <option key={item} value={item} className={"text-capitalize"}>{item}</option>
+                                    }):null
+                                }
+
                             </Form.Select>
                         </Col>
                     </Row>

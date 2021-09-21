@@ -11,13 +11,27 @@ import { connect } from "react-redux";
 const Home = (props) => {
   const [books, setBooks] = useState([]);
   const alert = useAlert();
+  const [categoryBooks, setCategoryBooks] = useState([]);
   useEffect(() => {
-    axios.get("top_selling").then((res) => {
+    axios.get("/top_selling").then((res) => {
       setBooks(res.data);
     }).catch(err => {
       alert.error(err.message);
-    })
-  }, [])
+    });
+    if (props.categories) {
+      props.categories.map((category) => {
+        axios.get("/book/categories/" + category).then((res) => {
+          if (res.data && res.data.books && res.data.books.length > 5) {
+            setCategoryBooks((prevData) => {
+              return [...prevData, { "title": category, "books": res.data.books }];
+            })
+          }
+        }).catch(() => {
+
+        })
+      })
+    }
+  }, [props.categories])
   return (
     <div>
       <Banner />
@@ -32,15 +46,24 @@ const Home = (props) => {
         </TextContainer>
       </Slide>
       <Slide left>
-        <HorizontalSlider title={"Top Selling Books"} cartItems={props.cartItems}  books={books} />
+        <HorizontalSlider title={"Top Selling Books"} cartItems={props.cartItems} books={books} />
       </Slide>
+      {
+        categoryBooks.map((data) => {
+          return (
+            <Slide left key={data.title}>
+              <HorizontalSlider title={`Popular in ${data.title}`} cartItems={props.cartItems} books={data.books} />
+            </Slide>
+          )
+        })
+      }
     </div>
 
   )
 }
 
 function mapStateToProps(state) {
-  const { cart} = state;
-  return { cartItems: cart.cartItems}
+  const { cart, filter } = state;
+  return { cartItems: cart.cartItems, categories: filter.categories }
 }
 export default connect(mapStateToProps)(Home);

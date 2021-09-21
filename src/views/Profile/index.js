@@ -9,13 +9,14 @@ import Form from "react-bootstrap/Form";
 import { useAlert } from "react-alert";
 import { Button } from "../../components/Utilities";
 import { useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
+import { useHistory,useLocation } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios";
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
 import BillingCard from "../../components/BillingCard";
+import AddCircleIcon from '@material-ui/icons/AddCircle';
 const useStyles = makeStyles((theme) => ({
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
@@ -36,6 +37,7 @@ const Profile = () => {
     const [billingProfiles, setBillingProfiles] = useState([]);
     const classes = useStyles();
     const [openBackdrop,setOpenBackdrop] = useState(false);
+    const location = useLocation();
     const resetPassword = () =>{
         history.push("/reset_password")
     }
@@ -123,7 +125,7 @@ const Profile = () => {
                 setBillingProfiles(res.data)
             }).catch((err) => {
                 if (err.status == 401) {
-                    history.push("/");
+                    history.push("/",{state:{"pathname":location.pathname}});
                 }
                 else if (err.response && err.response.data) {
                     alert.error(err.response.data.message);
@@ -134,7 +136,7 @@ const Profile = () => {
             })
         }
         else {
-            history.push("/");
+            history.push({pathname:"/",state:{"pathname":location.pathname}});
         }
     }, [])
     return (
@@ -220,7 +222,7 @@ const Profile = () => {
                     </form>
                 </Modal.Body>
             </Modal>
-            <Container>
+            <Container className="mb-3 pb-3">
                 <SectionTitle title={"Welcome " + userDetails.first_name} />
                 <form onSubmit={handleSubmit}>
                     <Row className="my-2">
@@ -248,8 +250,8 @@ const Profile = () => {
                         </Col>
                         <Col className="my-2">
                             <Label>Gender</Label>
-                            <Form.Select required placeholder="Gender" name="gender" onChange={handleChange} value={userDetails.gender} aria-label="Gender" style={{ "border": "none", "borderBottom": "1px solid black", "borderRadius": "0px" }}>
-                                <option>Gender</option>
+                            <Form.Select required placeholder="Gender" name="gender" onChange={handleChange} value={userDetails.gender} aria-label="Gender" style={{ "border": "none", "borderBottom": "1px solid black", "borderRadius": "0px","background":"transparent" }}>
+                                <option></option>
                                 <option value="M">Male</option>
                                 <option value="F">Female</option>
                                 <option value="O">Other</option>
@@ -258,38 +260,39 @@ const Profile = () => {
                     </Row>
                     <Row>
                         <Col>
-                            <Label><h5>Password: </h5></Label>
                             <Button onClick={resetPassword} variant="filled" color="primary">Reset Password</Button>
                         </Col>
                     </Row>
                     <br />
-                    <br />
                     <Row className="justify-content-center">
                         <Col className="justify-content-center text-center">
-                            <Button variant="filled" color="primary"><h4>Save Profile </h4></Button>
+                            <Button variant="filled" color="primary"><h4 className="py-0 my-0">Save Profile </h4></Button>
                         </Col>
                     </Row>
                 </form>
             </Container>
-            
+            <br/>
+            <br/>
             <Container className="my-3">
                 <SectionTitle title="Billing Profile" />
                 {
                     userData && billingProfiles.length ?
                         <Container>
+                            <Row className="text-center my-3">
+                                <Col>
+                                    <Button color="primary" variant="filled" onClick={() => setShow(true)}><h4 className="my-0"><AddCircleIcon/> Add another</h4></Button>
+                                </Col>
+                            </Row>
+                            <Row className="justify-content-start">
                             {billingProfiles.map((profile, ind) => {
                                 return (
                                     <BillingCard deleteBillingProfile={deleteBillingProfile} key={profile.id} id={profile.id} title={profile.title} index={ind+1} address={profile.address} district = {profile.district} state={profile.state} city={profile.city} pincode={profile.pincode} />
                                 )
                             })}
-                            <Row className="text-center my-3">
-                                <Col>
-                                    <Button color="primary" variant="filled" onClick={() => setShow(true)}>Add another billing Profile</Button>
-                                </Col>
                             </Row>
                         </Container>
                         : <Container className="text-center my-3">
-                            <Button color="primary" variant="filled" onClick={() => setShow(true)}>Create a billing Profile</Button>
+                            <Button color="primary" variant="filled" onClick={() => setShow(true)}> <h4 className="my-0"> Create a billing Profile</h4></Button>
                         </Container>
                 }
             </Container>

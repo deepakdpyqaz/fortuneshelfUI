@@ -82,8 +82,11 @@
 
 @media screen and (max-width:600px) {
     .fs_search_full{
+        .fs_search_close{
+            top:1%;
+        }
         .fs_input_box{
-            top: 15%;
+            top: 19%;
             left: 5%;
             font-size: 1.2rem;
             padding: 5px 10px;
@@ -91,7 +94,7 @@
         }
         .fs_make_search{
             position: absolute;
-            top: 16%;
+            top: 20%;
             left: 85%;
             color: $tertiary-col;
             font-size: 2rem;
@@ -103,7 +106,7 @@
         .fs_search_suggestions{
             position: absolute;
             width:80%;
-            top:25%;
+            top:26%;
             padding: 5px;
         }
     }

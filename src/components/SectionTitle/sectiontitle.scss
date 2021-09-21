@@ -12,6 +12,7 @@
         border-top: 5px solid $primary-light;
         border-bottom: 5px solid $primary-light;
         font-family: $secondary-font-family;
+        text-transform: capitalize;
         color:transparent;
         background: linear-gradient(45deg, $primary-col,$primary-light);
         -webkit-background-clip: text;

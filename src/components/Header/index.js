@@ -11,6 +11,7 @@ import ShoppingCart from "@material-ui/icons/ShoppingCart";
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import Offcanvas from "react-bootstrap/Offcanvas";
+import Badge from '@material-ui/core/Badge';
 import Nav from "react-bootstrap/Nav";
 import { reactLocalStorage } from 'reactjs-localstorage';
 import { CartBook } from "../ViewBook";
@@ -19,22 +20,39 @@ import { Link, useLocation, useHistory } from "react-router-dom";
 import { setCartItems } from "../../reducers/cart";
 import { logout } from "../../reducers/auth";
 import { Button } from "../Utilities";
-import Overlay from "react-bootstrap/Overlay";
-import Tooltip from "react-bootstrap/Tooltip";
-import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import "./header.scss";
 import axios from "axios";
 import { useAlert } from "react-alert";
 import SearchBar from "../SearchBar";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Popover from "react-bootstrap/Popover";
+import { setLanguages,setCategories } from "../../reducers/filter";
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import { makeStyles } from '@material-ui/core/styles';
+const useStyles = makeStyles((theme) => ({
+    root: {
+        position: 'relative',
+    },
+    dropdown: {
+        position: 'absolute',
+        top: 28,
+        left: 0,
+        zIndex: 1000,
+        boxShadow: "0px 0px 3px 1px #000",
+        color: "#000",
+        borderRadius: "5px",
+        transitionDuration: "2s",
+        backgroundColor: theme.palette.background.paper,
+    },
+}));
 const Header = (props) => {
+    const classes = useStyles();
     const [show, setShow] = useState(false);
     const [showSearchBar, setShowSearchBar] = useState(false);
     const [submenu, setSubmenu] = useState(false);
+    const languages = useSelector((state)=>state.filter.languages);
+    const categories = useSelector((state)=>state.filter.categories);
     const [cartVisibility, setCartVisibility] = useState(false);
-    const [filterType,setFilterType] = useState();
+    const [filterType, setFilterType] = useState();
     const showCart = () => setCartVisibility(true);
     const hideCart = () => setCartVisibility(false);
     const handleClose = () => setShow(false);
@@ -49,25 +67,25 @@ const Header = (props) => {
     const [userMenu, setUserMenu] = useState(false);
     const location = useLocation();
     const showFilter = (data) => {
-        setFilterType((prev)=>{
-            if(data==prev){
+        setFilterType((prev) => {
+            if (data == prev) {
                 return "";
             }
-            else{
+            else {
                 return data;
             }
         });
     }
-    const toggleSubmenu = ()=>{
-        setSubmenu((data)=>{
+    const toggleSubmenu = () => {
+        setSubmenu((data) => {
             return !data;
         })
     }
     const handleUserClose = (event) => {
         setUserMenu(false);
     };
-    const handleUserClick = ()=>{
-        setUserMenu((prev=>{
+    const handleUserClick = () => {
+        setUserMenu((prev => {
             return !prev;
         }));
     }
@@ -85,10 +103,11 @@ const Header = (props) => {
 
     }
     const sticky_disabled = ["/login", "/signup"]
+    const [isMobile, setIsMobile] = useState(false);
     window.addEventListener("scroll", function (e) {
         if (headerRef.current && !sticky_disabled.includes(location.pathname)) {
             let height = headerRef.current.getBoundingClientRect().height;
-            if (window.scrollY >= height/2+2) {
+            if (window.scrollY >= height / 2 + 2) {
                 headerRef.current.classList.add("fs_header_sticky");
             }
             else {
@@ -110,40 +129,34 @@ const Header = (props) => {
         history.push("/search?searchQuery=" + searchQuery);
     }
     useEffect(() => {
-        if(sticky_disabled.includes(location.pathname)){
+        if (window.innerWidth <= 960) {
+            setIsMobile(true);
+        }
+        if (sticky_disabled.includes(location.pathname)) {
             headerRef.current.classList.remove("fs_header_sticky");
 
         }
+        axios.get("/filters").then((res) => {
+            dispatch(setLanguages(res.data.languages));
+            dispatch(setCategories(res.data.categories))
+        }).catch((err) => {
+            console.log(err);
+            alert.error(err.message);
+        })
         const items = reactLocalStorage.getObject('cart');
         dispatch(setCartItems(items));
     }, [location.key])
-    const popover = (
-        <Popover id="popover-basic">
-            <Popover.Body className="my-0 py-0 mx-0 px-2">
-                    {
-                        props.userDetails && props.userDetails.id != null ?
-                            <MenuItem onClick={() => { handleUserClose(); logoutUser(); }}>Logout</MenuItem> :
-                            [
-                                <Link key="1" to="/login"><MenuItem onClick={handleUserClose}>Login</MenuItem></Link>,
-                                <Link key="2" to="/signup"><MenuItem onClick={handleUserClose}>Sign Up</MenuItem></Link>
-                            ]
-                    }
-            </Popover.Body>
-        </Popover>
-    );
     return (
         <>
             <SearchBar show={showSearchBar} handleClose={() => { setShowSearchBar(false) }} />
-            <Container fluid className="fs_header py-0 pb-1 pr-1 px-0">
-                <Row className="align-items-center justify-content-between px-2 gx-0 fs-r-1">
-                    <Col className="text-center align-items-center my-1 fs_logo_wrapper gx-0">
-                        <Link to="/" className="d-flex align-items-center justify-content-center"> <img className="fs_logo" src={logo} alt="FortuneShelf" height="60" width="60" />
+            <Container ref={isMobile ? null : headerRef} fluid className="fs_header py-0 pb-1 px-0 px-0">
+                <Row className="align-items-center justify-content-between px-0 gx-0">
+                    <Col lg={2} xl={3} md={12} sm={12} xs={12} className="justify-content-center align-items-center my-1 fs_logo_wrapper gx-0">
+                        <Link to="/" className="d-flex align-items-center justify-content-center fs_logo_link"> <img className="fs_logo" src={logo} alt="FortuneShelf" height="60" width="60" />
                             <span className="fs_logo_text ml-3">FortuneShelf</span>
                         </Link>
                     </Col>
-                </Row>
-                <Row  ref={headerRef} className="align-items-center justify-content-between px-1 gx-0 fs-r-2">
-                    <Col className="fs_menu text-right px-0 gx-0 justify-content-center">
+                    <Col className="fs_menu px-0 gx-0 justify-content-start">
                         <div className="fs_navbar">
                             <div>
                                 <Link to="/">
@@ -152,55 +165,59 @@ const Header = (props) => {
                                     </div>
                                 </Link>
                             </div>
-                                <div className="fs_dropdown">
-                                    View Books
-                                    <ul className="fs_dropdown_list">
-                                        <li onClick={(e)=>{showFilter("category")}} className="fs_main_list">Category{filterType=="category"?<ArrowDropUpIcon/>:<ArrowDropDownIcon/>}</li>
-                                        {
-                                            filterType=="category"?
+                            <div className="fs_dropdown">
+                                View Books
+                                <ul className="fs_dropdown_list">
+                                    <li onClick={(e) => { showFilter("category") }} className="fs_main_list">Category{filterType == "category" ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}</li>
+                                    {
+                                        filterType == "category" ?
                                             <>
-                                                <Link to={{ pathname: "/viewBook", state: { "category": "" } }}><li>All Books</li></Link>
-                                                <Link to={{ pathname: "/viewBook", state: { "category": "gita" } }}><li>Bhagavad Gita</li></Link>
-                                                <Link to={{ pathname: "/viewBook", state: { "category": "bhagavatam" } }}><li>Bhagavatam</li></Link>
-                                                <Link to={{ pathname: "/viewBook", state: { "category": "set" } }}><li>Sets</li></Link>
+                                                <Link key={-1} to={{ pathname: "/viewBook", state: { "category": "","delivery_free":false,"language":"" } }}><li className="text-capitalize">All Books</li></Link>
+                                                {
+                                                    categories.map((item, ind) => {
+                                                        return <Link key={ind} to={{ pathname: "/viewBook", state: { "category": item,"delivery_free":false,"language":""  } }}><li className="text-capitalize">{item}</li></Link>
+                                                    })
+                                                }
                                             </>
-                                            :null
-                                        }
-                                        <li onClick={(e)=>{showFilter("language")}} className="fs_main_list">Language{filterType=="language"?<ArrowDropUpIcon/>:<ArrowDropDownIcon/>}</li>
-                                        {
-                                            filterType=="language"?<>
-                                            <Link to={{ pathname: "/viewBook", state: { "language": "" } }}><li>All Books</li></Link>
-                                            <Link to={{ pathname: "/viewBook", state: { "language": "hindi" } }}><li>Hindi</li></Link>
-                                            <Link to={{ pathname: "/viewBook", state: { "language": "english" } }}><li>English</li></Link>
-                                            <Link to={{ pathname: "/viewBook", state: { "language": "tamil" } }}><li>Tamil</li></Link>
-                                            <Link to={{ pathname: "/viewBook", state: { "language": "telugu" } }}><li>Telugu</li></Link>
-                                            </>:null
-                                        }
-                                    </ul>
-                                </div>
+                                            : null
+                                    }
+                                    <li onClick={(e) => { showFilter("language") }} className="fs_main_list">Language{filterType == "language" ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}</li>
+                                    {
+                                        filterType == "language" ?
+                                            <>
+                                                <Link key={-1} to={{ pathname: "/viewBook", state: { "language": "","delivery_free":false,"category":""  } }}><li className="text-capitalize">All Books</li></Link>
+                                                {
+                                                    languages.map((item, ind) => {
+                                                        return <Link key={ind} to={{ pathname: "/viewBook", state: { "language": item,"delivery_free":false,"category":"" } }}><li className="text-capitalize">{item}</li></Link>
+                                                    })
+                                                }
+                                            </>
+                                            : null
+                                    }
+                                    <Link to={{ pathname: "/viewBook", state: { "delivery_free": true ,"language":"","category":"" } }}><li className="text-capitalize">Delivery Free</li></Link>
+                                </ul>
+                            </div>
                             <div>
-
-                            <Link to="/trackorder">
-                                <div>
-                                    Track Order
-                                </div>
-                            </Link>
+                                <Link to="/trackorder">
+                                    <div>
+                                        Track Order
+                                    </div>
+                                </Link>
+                            </div>
+                            <div>
+                                <Link to="/contact">
+                                    <div>
+                                        Contact Us
+                                    </div>
+                                </Link>
                             </div>
                             <div>
 
-                            <Link to="/trackorder">
-                                <div>
-                                    About Us
-                                </div>
-                            </Link>
-                            </div>
-                            <div>
-
-                            <Link to="/about_author">
-                                <div>
-                                    About Author
-                                </div>
-                            </Link>
+                                <Link to="/about_author">
+                                    <div>
+                                        About Author
+                                    </div>
+                                </Link>
                             </div>
                             {
                                 (
@@ -216,27 +233,45 @@ const Header = (props) => {
                             }
                         </div>
                     </Col>
-                    <Col xs={2} className="fs_menu_btn text-center">
+                    <Col ref={isMobile ? headerRef : null} md={2} sm={12} xs={12} className="d-flex fs_icon_holder justify-content-center align-items-center">
                         <Avatar className="fs_menu_avatar">
                             <MenuIcon onClick={handleShow} />
                         </Avatar>
-                    </Col>
-                    <Col md={2} xl={4} sm={6} xs={6} className="fs_search justify-content-start">
-                        <SearchIcon ref={target} className="fs_search_btn" onClick={() => { setShowSearchBar(true) }} />
-                        <input type="text" placeholder="Search your book..." value={searchQuery} onClick={() => { setShowSearchBar(true) }} onKeyUp={() => { setShowSearchBar(true) }} onChange={handleSearchQueryChange} />
-                    </Col>
-                    <Col md={2} sm={3} xs={4} className="d-flex justify-content-center align-items-center">
-
-                        <OverlayTrigger trigger="click" placement="bottom" show={userMenu} overlay={popover}>
-                            <Avatar className="fs_avatar" onClick={handleUserClick}>
-                                {props.userDetails && props.userDetails.id != null ?
-                                    props.userDetails.first_name[0] : <Person />
-                                }
-                            </Avatar>
-                        </OverlayTrigger>
                         <Avatar className="fs_avatar">
-                            <ShoppingCart onClick={showCart} />
+                            <SearchIcon ref={target} className="fs_search_btn" onClick={() => { setShowSearchBar(true) }} />
                         </Avatar>
+                        <ClickAwayListener
+                            mouseEvent="onMouseDown"
+                            touchEvent="onTouchStart"
+                            onClickAway={handleUserClose}
+                        >
+                            <div className={classes.root}>
+                                <Avatar className="fs_avatar" onClick={handleUserClick}>
+                                    {props.userDetails && props.userDetails.id != null ?
+                                        props.userDetails.first_name[0] : <Person />
+                                    }
+                                </Avatar>
+                                {userMenu ? (
+                                    <div className={classes.dropdown}>
+                                        {
+                                            props.userDetails && props.userDetails.id != null ?
+                                                <MenuItem onClick={() => { handleUserClose(); logoutUser(); }}>Logout</MenuItem> :
+                                                [
+                                                    <Link key="1" to="/login"><MenuItem onClick={handleUserClose}>Login</MenuItem></Link>,
+                                                    <Link key="2" to="/signup"><MenuItem onClick={handleUserClose}>Sign Up</MenuItem></Link>
+                                                ]
+                                        }
+                                    </div>
+
+                                ) : null}
+                            </div>
+                        </ClickAwayListener>
+                        <Badge badgeContent={Object.keys(props.cartItems).length || 0} color="secondary" overlap="circular" max={99} anchorOrigin={{ vertical: 'bottom', horizontal: "right" }}>
+                            <Avatar className="fs_avatar">
+                                <ShoppingCart onClick={showCart} />
+
+                            </Avatar>
+                        </Badge>
                     </Col>
                 </Row>
             </Container>
@@ -249,33 +284,42 @@ const Header = (props) => {
                         <Link onClick={handleClose} className="fs_sidebar_nav_item" to="/">Home</Link>
                         <Link onClick={toggleSubmenu} className="fs_sidebar_nav_item" to="#">View Books</Link>
                         {
-                            submenu?
-                            <>
-                            <li onClick={(e)=>{showFilter("category")}} className="fs_main_list">Category{filterType=="category"?<ArrowDropUpIcon/>:<ArrowDropDownIcon/>}</li>
-                            {
-                                filterType=="category"?
+                            submenu ?
                                 <>
-                                    <Link onClick={handleClose}  to={{ pathname: "/viewBook", state: { "category": "" } }}><li>All Books</li></Link>
-                                    <Link onClick={handleClose}  to={{ pathname: "/viewBook", state: { "category": "gita" } }}><li>Bhagavad Gita</li></Link>
-                                    <Link onClick={handleClose}  to={{ pathname: "/viewBook", state: { "category": "bhagavatam" } }}><li>Bhagavatam</li></Link>
-                                    <Link onClick={handleClose}  to={{ pathname: "/viewBook", state: { "category": "set" } }}><li>Sets</li></Link>
+                                    <li onClick={(e) => { showFilter("category") }} className="fs_main_list">Category{filterType == "category" ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}</li>
+                                    {
+                                        filterType == "category" ?
+                                        <>
+                                        <Link key={-1} to={{ pathname: "/viewBook", state: { "category": "","language":"","delivery_free":false  } }}><li className="text-capitalize">All Books</li></Link>
+                                        {
+                                            categories.map((item, ind) => {
+                                                return <Link key={ind} to={{ pathname: "/viewBook", state: { "category": item ,"language":"","delivery_free":false } }}><li className="text-capitalize">{item}</li></Link>
+                                            })
+                                        }
+                                    </>
+                                            : null
+                                    }
+                                    <li onClick={(e) => { showFilter("language") }} className="fs_main_list">Language{filterType == "language" ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}</li>
+                                    {
+                                        filterType == "language" ?
+                                            <>
+                                                <Link key={-1} onClick={handleClose} to={{ pathname: "/viewBook", state: { "language": "","category":"","delivery_free":false } }}><li className="text-capitalize">All Books</li></Link>
+                                                {
+                                                    languages.map((item, ind) => {
+                                                        return <Link onClick={handleClose} key={ind} to={{ pathname: "/viewBook", state: { "language": item ,"category":"","delivery_free":false } }}><li className="text-capitalize">{item}</li></Link>
+                                                    })
+                                                }
+                                            </>
+
+                                            : null
+                                    }
+                                    <Link to={{ pathname: "/viewBook", state: { "delivery_free": true ,"language":"","category":"" } }}><li className="text-capitalize">Delivery Free</li></Link>
+
                                 </>
-                                :null
-                            }
-                            <li onClick={(e)=>{showFilter("language")}} className="fs_main_list">Language{filterType=="language"?<ArrowDropUpIcon/>:<ArrowDropDownIcon/>}</li>
-                            {
-                                filterType=="language"?<>
-                                <Link onClick={handleClose} to={{ pathname: "/viewBook", state: { "language": "" } }}><li>All Books</li></Link>
-                                <Link onClick={handleClose} to={{ pathname: "/viewBook", state: { "language": "hindi" } }}><li>Hindi</li></Link>
-                                <Link onClick={handleClose} to={{ pathname: "/viewBook", state: { "language": "english" } }}><li>English</li></Link>
-                                <Link onClick={handleClose} to={{ pathname: "/viewBook", state: { "language": "tamil" } }}><li>Tamil</li></Link>
-                                <Link onClick={handleClose} to={{ pathname: "/viewBook", state: { "language": "telugu" } }}><li>Telugu</li></Link>
-                                </>:null
-                            }
-                            </>
-                            :null
+                                : null
                         }
                         <Link onClick={handleClose} className="fs_sidebar_nav_item" to="/trackorder">Track Order</Link>
+                        <Link onClick={handleClose} className="fs_sidebar_nav_item" to="/contact">Contact us</Link>
                         <Link onClick={handleClose} className="fs_sidebar_nav_item" to="/about_author">About Author</Link>
                         {
                             props.userDetails && props.userDetails.id ?
@@ -296,11 +340,11 @@ const Header = (props) => {
                 <Offcanvas.Body>
                     <Offcanvas.Title className="text-center">{Object.keys(props.cartItems).length == 0 ? "No" : Object.keys(props.cartItems).length} {Object.keys(props.cartItems).length == 1 ? "Item" : "Items"} Added</Offcanvas.Title>
                     {(Object.entries(props.cartItems != null ? props.cartItems : {})).map(elem => {
-                        return <CartBook key={elem[1].bookId} max_stock={elem[1].max_stock} bookId={Number(elem[1].bookId)} title={elem[1].title} language={elem[1].language} price={elem[1].price} photo={elem[1].photo||elem[1].picture} discount={elem[1].discount} qty={elem[1].stock} />;
+                        return <CartBook key={elem[1].bookId} max_stock={elem[1].max_stock} bookId={Number(elem[1].bookId)} title={elem[1].title} language={elem[1].language} price={elem[1].price} photo={elem[1].photo || elem[1].picture} discount={elem[1].discount} qty={elem[1].stock} />;
                     })}
                     <Container className="justify-content-center text-center">
                         <h3>Total: {props.totalPrice}</h3>
-                        <Link to={props.totalPrice ? "/checkout" : "#"}><Button variant="filled" color="primary" disabled={!(props.totalPrice)}>Proceed &gt;&gt;</Button></Link>
+                        <Link to={props.totalPrice ? "/checkout" : "#"} onClick={hideCart}><Button variant="filled" color="primary" disabled={!(props.totalPrice)}>Proceed &gt;&gt;</Button></Link>
                     </Container>
                 </Offcanvas.Body>
             </Offcanvas>

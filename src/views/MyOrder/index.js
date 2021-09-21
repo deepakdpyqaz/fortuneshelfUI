@@ -1,6 +1,6 @@
 import React,{ useEffect,useState } from "react";
 import { useSelector } from "react-redux";
-import {Link, useHistory } from "react-router-dom";
+import {Link, useHistory, useLocation } from "react-router-dom";
 import axios from "axios";
 import { useAlert } from "react-alert";
 import Table from "react-bootstrap/Table";
@@ -15,12 +15,13 @@ const renderDate = (date) =>{
 }
 const MyOrder = () => {
     const history = useHistory();
+    const location = useLocation();
     const alert = useAlert();
     const userDetails = useSelector((state) => state.auth.userDetails);
     const [orderData,setOrderData] = useState([]);
     useEffect(() => {
         if (!(userDetails && userDetails.id)) {
-            history.push("/");
+            history.push({pathname:"/",state:{"pathname":location.pathname}});
         }
         axios.get("/order/get_orders").then((res) => {
             setOrderData(res.data);

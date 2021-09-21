@@ -1,5 +1,5 @@
 import React, { useEffect, Suspense } from "react";
-import { BrowserRouter as Router, Switch, Route, useLocation,Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, useLocation,Redirect,useHistory } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import FallbackLoader from "./components/FallBackLoader";
@@ -30,12 +30,13 @@ const TrackOrder = React.lazy(() => import("./views/TrackOrder"));
 const Confirmation = React.lazy(()=>import("./views/Confirmation"));
 const OrderResponse = React.lazy(()=>import("./views/OrderResponse"));
 const AboutAuthor = React.lazy(()=>import("./views/AboutAuthor"));
-
+const Contact = React.lazy(()=>import("./views/Contact"));
 
 
 function UserApp() {
   const dispatch = useDispatch();
   let location = useLocation();
+  const history=useHistory();
   const alert = useAlert();
   useEffect(() => {
     let token = reactLocalStorage.get("token");
@@ -56,8 +57,11 @@ function UserApp() {
           dispatch(login(res.data));
           reactLocalStorage.set("token", res.data.token);
           axios.defaults.headers.authorization = res.data.token;
+          if(location.state && location.state.pathname){
+            history.push(location.state.pathname);
+          }
         }
-      }).catch(() => {
+      }).catch((err) => {
         reactLocalStorage.remove("token");
         dispatch(logout());
       })
@@ -121,6 +125,9 @@ function UserApp() {
               </Route>
               <Route path="/about_author">
                 <AboutAuthor/>
+              </Route>
+              <Route path="/Contact">
+                <Contact/>
               </Route>
               <Route path="*">
                 <Redirect to="/"></Redirect>
