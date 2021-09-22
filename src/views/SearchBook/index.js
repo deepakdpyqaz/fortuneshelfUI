@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { BookContainer } from "../../components/ViewBook";
 import axios from "axios";
+import { connect } from "react-redux";
 import {useLocation,useParams} from "react-router-dom";
 import {ViewBookLoader, viewBookLoader} from "../../components/Loaders";
 function useQuery() {
     return new URLSearchParams(useLocation().search);
   }
   
-const SearchBook = () => {
+const SearchBook = (props) => {
     const params = useParams();
     const location = useLocation();
     const [books, setBooks] = useState([]);
@@ -29,7 +30,7 @@ const SearchBook = () => {
             {(!isLoading?
                 (
                     books.length!=0?
-                        <BookContainer books={books}/>
+                        <BookContainer cartItems={props.cartItems} books={books}/>
                     : <h3 className="my-3 text-center">No Books found</h3>
                 ):
                 <ViewBookLoader/>
@@ -37,5 +38,8 @@ const SearchBook = () => {
         </div>
     )
 }
-
-export default SearchBook;
+function mapStateToProps(state) {
+    const { cart } = state;
+    return { cartItems: cart.cartItems }
+}
+export default connect(mapStateToProps)(SearchBook);

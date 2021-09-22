@@ -24,9 +24,9 @@ const useStyles = makeStyles((theme) => ({
 const ResetPassword = () => {
     const [verified,setVerified] = useState("");
     const alert = useAlert();
-    const [resetDetails,setResetDetails] = useState({});
-    const history = useHistory();
     const user = useSelector((state)=>state.auth.userDetails);
+    const [resetDetails,setResetDetails] = useState({"username":user&&user.id?user.email:""});
+    const history = useHistory();
     const [openBackdrop,setOpenBackdrop] = useState(false);
     const handleChange = (e) => {
         setResetDetails((prevData)=>{
@@ -77,11 +77,15 @@ const ResetPassword = () => {
                 <CircularProgress color="primary" />
             </Backdrop>
             <SectionTitle title="Reset Password"/>
-            <Container>
+            <Container style={{maxWidth:"800px"}}>
                 <Form onSubmit={handleSubmit}>
                     <Row>
                         <Col className="my-3">
-                            <Input fullWidth name="username" placeholder="Email or Mobile" required value={resetDetails.username} onChange={handleChange}/>
+                            {
+                                user && user.id?
+                                <Input fullWidth name="username" placeholder="Email or Mobile" required value={resetDetails.username} readOnly/>
+                                :<Input fullWidth name="username" placeholder="Email or Mobile" required value={resetDetails.username} onChange={handleChange}/>
+                            }
                         </Col>
                     </Row>
                     {

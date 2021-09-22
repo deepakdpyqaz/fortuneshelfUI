@@ -29,7 +29,6 @@
         color:$secondary-text-col;
         background-color: $secondary-col;
         background:linear-gradient(45deg,#9b1c31,#df3b56);
-        // border: 2px solid $secondary-col;
         box-shadow: 0px 0px 1px 1px $secondary-col;
     }
 }
@@ -47,11 +46,12 @@
 .fs_button.secondary.filled{
     background-color: $secondary-col;
     color:$secondary-text-col;
+    background:linear-gradient(45deg,#9b1c31,#df3b56);
     box-shadow: 0px 0px 1px 1px $secondary-col;
     &:hover{
-        color:$secondary-col;
+        box-shadow: 0px 0px 1px 1px $primary-col;
         background-color: transparent;
-        border: 2px solid $secondary-col;
+        color: $tertiary-col;
     }
 }
 .fs_button.secondary.outlined{

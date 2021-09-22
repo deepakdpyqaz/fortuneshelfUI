@@ -11,7 +11,7 @@ import { connect } from "react-redux";
 const Home = (props) => {
   const [books, setBooks] = useState([]);
   const alert = useAlert();
-  const [categoryBooks, setCategoryBooks] = useState([]);
+  const [categoryBooks, setCategoryBooks] = useState({});
   useEffect(() => {
     axios.get("/top_selling").then((res) => {
       setBooks(res.data);
@@ -22,9 +22,9 @@ const Home = (props) => {
       props.categories.map((category) => {
         axios.get("/book/categories/" + category).then((res) => {
           if (res.data && res.data.books && res.data.books.length > 5) {
-            setCategoryBooks((prevData) => {
-              return [...prevData, { "title": category, "books": res.data.books }];
-            })
+              setCategoryBooks((prevData) => {
+                return {...prevData,[category]:res.data.books}
+              })
           }
         }).catch(() => {
 
@@ -49,10 +49,10 @@ const Home = (props) => {
         <HorizontalSlider title={"Top Selling Books"} cartItems={props.cartItems} books={books} />
       </Slide>
       {
-        categoryBooks.map((data) => {
+        Object.entries(categoryBooks).map((data) => {
           return (
-            <Slide left key={data.title}>
-              <HorizontalSlider title={`Popular in ${data.title}`} cartItems={props.cartItems} books={data.books} />
+            <Slide left key={data[0]}>
+              <HorizontalSlider title={`Popular in ${data[0]}`} cartItems={props.cartItems} books={data[1]} />
             </Slide>
           )
         })

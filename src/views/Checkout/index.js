@@ -18,7 +18,7 @@ import Fade from '@material-ui/core/Fade';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useAlert } from "react-alert";
 import Label from "@material-ui/core/FormLabel";
-
+import {ApiLoader} from "../../components/Loaders";
 
 
 const Checkout = (props) => {
@@ -46,32 +46,34 @@ const Checkout = (props) => {
         })
 
     }
-
+    const [isLoading,setIsLoading] = useState(false);
     const handleChange = (e) => {
         setShippingDetails((prevData) => {
             let newData = { ...prevData, [e.target.name]: e.target.value };
             validate(newData);
             return newData;
         })
-        if(e.target.name=="pincode" && e.target.value.length=="6" && !isNaN(Number(e.target.value))){
+        if(e.target.name=="pincode" && e.target.value.length==6 && !isNaN(Number(e.target.value))){
             setShippingDetails((prevData)=>{
                 return {...prevData,"state":"","district":""};
             })
-            axios.get("https://api.postalpincode.in/pincode/"+e.target.value).then((res)=>{
-                res.data=res.data[0];
-                if(res.data && res.data.Status=="Success"){
-                    if(res.data.PostOffice && res.data.PostOffice.length>0){
-                        let state = res.data.PostOffice[0].State;
-                        let district = res.data.PostOffice[0].District;
-                        setShippingDetails((prevData)=>{
-                            return {...prevData,"state":state,"district":district};
-                        })
-                    }
+            setIsLoading(true);
+            axios.get("/pincode/"+e.target.value).then((res)=>{
+                if(res.data && res.data.status=="success"){
+                    let state = res.data.state;
+                    let district = res.data.district;
+                    setShippingDetails((prevData)=>{
+                        return {...prevData,"state":state,"district":district};
+                    })
                 }else{
                     setValidation((prevData)=>{
                         return {...prevData,"pincode":true}
                     })
                 }
+            }).catch((err)=>{
+                alert.error(err.message);
+            }).finally(()=>{
+                setIsLoading(false);
             })
         }
     }
@@ -177,7 +179,7 @@ const Checkout = (props) => {
     }, [])
     return (
         <div className="view_page">
-                
+            <ApiLoader loading={isLoading}/>
             <Container className="my-3 px-3">
                 <SectionTitle title="Order Summary" />
                 <Table bordered bordered-dark striped hover responsive>
@@ -312,7 +314,7 @@ const Checkout = (props) => {
                             <Input fullWidth name="city" placeholder="City" required value={shippingDetails.city} onChange={handleChange} />
                         </Col>
                         {
-                            shippingDetails.pincode && shippingDetails.pincode.length==6 && !isNaN(Number(shippingDetails.pincode)) && !validation.pincode?
+                            shippingDetails.pincode && shippingDetails.pincode.length==6 && !isNaN(Number(shippingDetails.pincode)) && !validation.pincode && shippingDetails.state && shippingDetails.district?
                             <>
                             <Col md="3" sm="6">
                                 <Input fullWidth name="district" placeholder="District" required value={shippingDetails.district} onChange={(e)=>{e.preventDefault()}} disabled={!Boolean(shippingDetails.district)} readOnly/>

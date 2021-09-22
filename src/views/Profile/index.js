@@ -9,7 +9,7 @@ import Form from "react-bootstrap/Form";
 import { useAlert } from "react-alert";
 import { Button } from "../../components/Utilities";
 import { useSelector } from "react-redux";
-import { useHistory,useLocation } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios";
 import Backdrop from '@material-ui/core/Backdrop';
@@ -19,11 +19,11 @@ import BillingCard from "../../components/BillingCard";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 const useStyles = makeStyles((theme) => ({
     backdrop: {
-      zIndex: theme.zIndex.drawer + 1,
-      color: '#fff',
+        zIndex: theme.zIndex.drawer + 1,
+        color: '#fff',
     },
-  }));
-  
+}));
+
 const Profile = () => {
     const [userDetails, setUserDetails] = useState("");
     const userData = useSelector((state) => state.auth.userDetails);
@@ -33,12 +33,14 @@ const Profile = () => {
     const handleClose = () => { setShow(false) }
     const [billingProfile, setBillingProfile] = useState({});
     const [isEdit, setIsEdit] = useState(false);
+    const [update, setUpdate] = useState(true);
     const [idSelected, setIdSelected] = useState(false);
     const [billingProfiles, setBillingProfiles] = useState([]);
     const classes = useStyles();
-    const [openBackdrop,setOpenBackdrop] = useState(false);
+    const [openBackdrop, setOpenBackdrop] = useState(false);
     const location = useLocation();
-    const resetPassword = () =>{
+    const [error,setError] = useState(false);
+    const resetPassword = () => {
         history.push("/reset_password")
     }
     const handleChange = (e) => {
@@ -49,23 +51,23 @@ const Profile = () => {
 
     const deleteBillingProfile = (id) => {
         setOpenBackdrop(true);
-        axios.delete("/user/billing_profile/"+id).then((res)=>{
+        axios.delete("/user/billing_profile/" + id).then((res) => {
             alert.success("Profile Deleted Succesfully");
-            let newProfiles=[];
-            for(let profile of billingProfiles){
-                if(profile.id!=id){
+            let newProfiles = [];
+            for (let profile of billingProfiles) {
+                if (profile.id != id) {
                     newProfiles.push(profile);
                 }
             }
             setBillingProfiles(newProfiles);
-        }).catch((err)=>{
+        }).catch((err) => {
             if (err.response && err.response.data && err.response.data.message) {
                 alert.error(err.response.data.message);
             }
             else {
                 alert.error(err.message);
             }
-        }).finally(()=>{
+        }).finally(() => {
             setOpenBackdrop(false);
         })
     }
@@ -77,7 +79,7 @@ const Profile = () => {
             alert.success("Updated Succesfully");
         }).catch((err) => {
             alert.error("Error occured in updating profile");
-        }).finally(()=>{
+        }).finally(() => {
             setOpenBackdrop(false);
         })
     };
@@ -85,14 +87,43 @@ const Profile = () => {
         setBillingProfile((prevData) => {
             return { ...prevData, [e.target.name]: e.target.value }
         })
+        if(e.target.name=="pincode" && e.target.value.length==6 && !isNaN(Number(e.target.value))){
+            setBillingProfile((prevData)=>{
+                return {...prevData,"state":"","district":""};
+            })
+            setOpenBackdrop(true);
+            axios.get("/pincode/"+e.target.value).then((res)=>{
+                if(res.data && res.data.status=="success"){
+                    let state = res.data.state;
+                    let district = res.data.district;
+                    setBillingProfile((prevData)=>{
+                        return {...prevData,"state":state,"district":district};
+                    })
+                }else{
+                    setError(true);
+                }
+            }).catch((err)=>{
+                alert.error(err.message);
+            }).finally(()=>{
+                setOpenBackdrop(false);
+            })
+        }
+
     }
     const handleBillingSubmit = (e) => {
         e.preventDefault();
         setOpenBackdrop(true);
-        axios.put("/user/billing_profile", billingProfile).then((res) => {
-            alert.success("Profile Added Succesfully");
+        axios({ "method": update ? "post" : "put", "url": update ? "/user/billing_profile/" + idSelected : "/user/billing_profile", data: billingProfile }).then((res) => {
+            alert.success(update ? "Profile Added Succesfully" : "Profile Updated Succesfully");
+            if (update) {
+                setBillingProfiles((prevData) => {
+                    return prevData.filter((elem) => {
+                        return elem.id != idSelected;
+                    })
+                })
+            }
             setBillingProfiles((prevData) => {
-                return [...prevData, { ...billingProfile, "id": res.data.profile_id }]
+                return [...prevData, { ...billingProfile, "id": res.data.profile_id }].sort((a, b) => { if (a.title < b.title) return -1; else return 1; });
             })
             handleClose();
         }).catch((err) => {
@@ -104,11 +135,29 @@ const Profile = () => {
                 alert.error(err.message);
                 handleClose();
             }
-        }).finally(()=>{
+        }).finally(() => {
             setBillingProfile({})
             setOpenBackdrop(false);
         })
 
+    }
+    const editBillingProfile = (id) => {
+        setIdSelected(id);
+        for (let pr of billingProfiles) {
+            if (pr.id == id) {
+                setBillingProfile({
+                    "address": pr.address,
+                    "pincode": pr.pincode,
+                    "title": pr.title,
+                    "state": pr.state,
+                    "district": pr.district,
+                    "city": pr.city,
+                })
+                setShow(true);
+                setUpdate(true);
+                break;
+            }
+        }
     }
     useEffect(() => {
         if (userData && userData.id) {
@@ -122,10 +171,10 @@ const Profile = () => {
                     gender: userData.gender
                 })
             axios.get("/user/billing_profile").then((res) => {
-                setBillingProfiles(res.data)
+                setBillingProfiles(res.data.sort((a, b) => { if (a.title < b.title) return -1; else return 1; }));
             }).catch((err) => {
                 if (err.status == 401) {
-                    history.push("/",{state:{"pathname":location.pathname}});
+                    history.push("/", { state: { "pathname": location.pathname } });
                 }
                 else if (err.response && err.response.data) {
                     alert.error(err.response.data.message);
@@ -136,7 +185,7 @@ const Profile = () => {
             })
         }
         else {
-            history.push({pathname:"/",state:{"pathname":location.pathname}});
+            history.push({ pathname: "/", state: { "pathname": location.pathname } });
         }
     }, [])
     return (
@@ -180,19 +229,8 @@ const Profile = () => {
                                     value={billingProfile.pincode}
                                     onChange={handleBillingChange}
                                 />
+                                {error||(billingProfile.pincode && (billingProfile.pincode.length != 6 || isNaN(billingProfile.pincode))) ? <span className="text-danger">Enter a valid pincode </span> : null}
                             </Col>
-                            <Col md="6" sm="6" className="my-3">
-                                <Label>District</Label>
-                                <Input fullWidth
-                                    placeholder="District"
-                                    required
-                                    name="district"
-                                    onChange={handleBillingChange}
-                                    value={billingProfile.district}
-                                />
-                            </Col>
-                        </Row>
-                        <Row>
                             <Col md="6" sm="6" className="my-3">
                                 <Label>City</Label>
                                 <Input fullWidth
@@ -203,13 +241,25 @@ const Profile = () => {
                                     value={billingProfile.city}
                                 />
                             </Col>
+                        </Row>
+                        <Row>
+                            <Col md="6" sm="6" className="my-3">
+                                <Label>District</Label>
+                                <Input fullWidth
+                                    placeholder="District"
+                                    required
+                                    name="district"
+                                    readOnly
+                                    value={billingProfile.district}
+                                />
+                            </Col>
                             <Col md="6" sm="6" className="my-3">
                                 <Label>State</Label>
                                 <Input fullWidth
-                                    placeholder="Pincode"
+                                    placeholder="State"
                                     required
                                     name="state"
-                                    onChange={handleBillingChange}
+                                    readOnly
                                     value={billingProfile.state}
                                 />
                             </Col>
@@ -250,7 +300,7 @@ const Profile = () => {
                         </Col>
                         <Col className="my-2">
                             <Label>Gender</Label>
-                            <Form.Select required placeholder="Gender" name="gender" onChange={handleChange} value={userDetails.gender} aria-label="Gender" style={{ "border": "none", "borderBottom": "1px solid black", "borderRadius": "0px","background":"transparent" }}>
+                            <Form.Select required placeholder="Gender" name="gender" onChange={handleChange} value={userDetails.gender} aria-label="Gender" style={{ "border": "none", "borderBottom": "1px solid black", "borderRadius": "0px", "background": "transparent" }}>
                                 <option></option>
                                 <option value="M">Male</option>
                                 <option value="F">Female</option>
@@ -271,8 +321,8 @@ const Profile = () => {
                     </Row>
                 </form>
             </Container>
-            <br/>
-            <br/>
+            <br />
+            <br />
             <Container className="my-3">
                 <SectionTitle title="Billing Profile" />
                 {
@@ -280,15 +330,15 @@ const Profile = () => {
                         <Container>
                             <Row className="text-center my-3">
                                 <Col>
-                                    <Button color="primary" variant="filled" onClick={() => setShow(true)}><h4 className="my-0"><AddCircleIcon/> Add another</h4></Button>
+                                    <Button color="primary" variant="filled" onClick={() => {setUpdate(false);setShow(true)}}><h4 className="my-0"><AddCircleIcon /> Add another</h4></Button>
                                 </Col>
                             </Row>
                             <Row className="justify-content-start">
-                            {billingProfiles.map((profile, ind) => {
-                                return (
-                                    <BillingCard deleteBillingProfile={deleteBillingProfile} key={profile.id} id={profile.id} title={profile.title} index={ind+1} address={profile.address} district = {profile.district} state={profile.state} city={profile.city} pincode={profile.pincode} />
-                                )
-                            })}
+                                {billingProfiles.map((profile, ind) => {
+                                    return (
+                                        <BillingCard deleteBillingProfile={deleteBillingProfile} editBillingProfile={editBillingProfile} key={profile.id} id={profile.id} title={profile.title} index={ind + 1} address={profile.address} district={profile.district} state={profile.state} city={profile.city} pincode={profile.pincode} />
+                                    )
+                                })}
                             </Row>
                         </Container>
                         : <Container className="text-center my-3">

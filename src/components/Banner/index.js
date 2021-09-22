@@ -8,14 +8,13 @@ import banner5 from "../../images/banner/5.png";
 import banner6 from "../../images/banner/6.png";
 import banner7 from "../../images/banner/7.png";
 import banner8 from "../../images/banner/8.png";
-import banner9 from "../../images/banner/9.png";
-import banner10 from "../../images/banner/10.png";
+import banner9 from "../../images/banner/0.png";
 const Banner = () => {
     const [height, setHeight] = useState(0);
     useEffect(() => {
         setHeight(Math.min(Math.min(450, window.innerHeight), Math.max(window.innerWidth / 2, 250)));
     },[]);
-    const images = [banner1, banner2, banner3, banner4, banner5, banner6, banner7, banner8, banner9, banner10]
+    const images = [banner1, banner2, banner3, banner4, banner5, banner6, banner7, banner8, banner9]
     return (
         <Carousel fade>
             {

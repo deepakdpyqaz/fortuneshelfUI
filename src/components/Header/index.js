@@ -128,6 +128,10 @@ const Header = (props) => {
         setSearchQuery("");
         history.push("/search?searchQuery=" + searchQuery);
     }
+    const sortCart = (a,b) =>{
+        if(a[1].title.toUpperCase()<b[1].title.toUpperCase()) return -1;
+        return 1;
+    }
     useEffect(() => {
         if (window.innerWidth <= 960) {
             setIsMobile(true);
@@ -152,7 +156,7 @@ const Header = (props) => {
             <Container ref={isMobile ? null : headerRef} fluid className="fs_header py-0 pb-1 px-0 px-0">
                 <Row className="align-items-center justify-content-between px-0 gx-0">
                     <Col lg={2} xl={3} md={12} sm={12} xs={12} className="justify-content-center align-items-center my-1 fs_logo_wrapper gx-0">
-                        <Link to="/" className="d-flex align-items-center justify-content-center fs_logo_link"> <img className="fs_logo" src={logo} alt="FortuneShelf" height="60" width="60" />
+                        <Link to="/" className="d-flex align-items-center justify-content-center fs_logo_link"> <img className="fs_logo" src={logo} alt="FortuneShelf" height="60" width="70" />
                             <span className="fs_logo_text ml-3">FortuneShelf</span>
                         </Link>
                     </Col>
@@ -339,7 +343,7 @@ const Header = (props) => {
                 </Offcanvas.Header>
                 <Offcanvas.Body>
                     <Offcanvas.Title className="text-center">{Object.keys(props.cartItems).length == 0 ? "No" : Object.keys(props.cartItems).length} {Object.keys(props.cartItems).length == 1 ? "Item" : "Items"} Added</Offcanvas.Title>
-                    {(Object.entries(props.cartItems != null ? props.cartItems : {})).map(elem => {
+                    {(Object.entries(props.cartItems != null ? props.cartItems : {})).sort(sortCart).map(elem => {
                         return <CartBook key={elem[1].bookId} max_stock={elem[1].max_stock} bookId={Number(elem[1].bookId)} title={elem[1].title} language={elem[1].language} price={elem[1].price} photo={elem[1].photo || elem[1].picture} discount={elem[1].discount} qty={elem[1].stock} />;
                     })}
                     <Container className="justify-content-center text-center">
