@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -14,6 +14,7 @@ import TextField from "@material-ui/core/TextField";
 
 const Order = () => {
     const history = useHistory();
+    const location = useLocation();
     const admin = useSelector((state) => state.admin.adminDetails);
     const alert = useAlert();
     const today = new Date();
@@ -22,7 +23,7 @@ const Order = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [OrderData, setOrderData] = useState([]);
     const [allOrders, setAllOrders] = useState([]);
-    
+    const [noOrders,setNoOrders]=useState(false);
     const handleSearchQueryChange = (e) => {
         setSearchQuery(e.target.value);
         setOrderData(() => {
@@ -32,16 +33,20 @@ const Order = () => {
         })
     }
     if (!(admin && admin.id)) {
-        history.push("/admin/login")
+        history.push({pathname:"/admin/login",state:{pathname:location.pathname}});
     }
-
     const getOrders = ()=>{
-        axios.get('/order/get_all_orders',{params:{"start":startDate,"end":endDate}}).then((res)=>{
-            setAllOrders(res.data.data);
-            setOrderData(res.data.data);
-        }).catch((err)=>{
-            alert.error("Internal Server Error");
-        })
+        if(admin && admin.id){
+            axios.get('/order/get_all_orders',{params:{"start":startDate,"end":endDate}}).then((res)=>{
+                setAllOrders(res.data.data);
+                setOrderData(res.data.data);
+                if(res.data.count==0){
+                    setNoOrders(true);
+                }
+            }).catch((err)=>{
+                alert.error("Internal Server Error");
+            })
+        }
     }
     return (
         <div>
@@ -99,6 +104,9 @@ const Order = () => {
                                 Phone
                             </th>
                             <th className="text-center">
+                                Address
+                            </th>
+                            <th className="text-center">
                                 Payment Method
                             </th>
                             <th className="text-center">
@@ -108,7 +116,10 @@ const Order = () => {
                                 Amount
                             </th>
                             <th className="text-center">
-                                Status
+                                Order Status
+                            </th>
+                            <th className="text-center">
+                                Payment Status
                             </th>
                             <th className="text-center">
                                 View
@@ -129,6 +140,9 @@ const Order = () => {
                                         {elem.mobile}
                                     </td>
                                     <td  className="text-center">
+                                        {elem.address}
+                                    </td>
+                                    <td  className="text-center">
                                         {elem.paymentMethod}
                                     </td>
                                     <td  className="text-center">
@@ -140,6 +154,9 @@ const Order = () => {
                                     <td  className="text-center">
                                         {elem.status}
                                     </td>
+                                    <td  className="text-center">
+                                        {elem.paymentStatus}
+                                    </td>
                                     <td className="text-center">
                                         <Link to={"/admin/order/" + elem.orderId}><Button variant="filled" color="primary" >View</Button></Link>
                                     </td>
@@ -148,6 +165,7 @@ const Order = () => {
                         })}
                     </tbody>
                 </Table>
+                    {noOrders?<h4 className="text-center">No orders Found</h4>:null}
             </Container>
 
         </div>

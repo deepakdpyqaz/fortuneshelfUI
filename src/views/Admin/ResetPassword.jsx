@@ -58,6 +58,11 @@ const ResetPassword = () => {
             })
         }
         else{
+            if(resetDetails.password.length<6){
+                alert.error("Week Password")
+                setOpenBackdrop(false);
+                return;
+            }
             axios.post("/manager/reset_password",resetDetails).then((res)=>{
                 alert.success("Password Reset Succesfull")
                 history.push("/admin/login");

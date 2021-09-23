@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import Container from "react-bootstrap/Row";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -18,12 +18,13 @@ const Profile = () => {
     const alert = useAlert();
     const params = useParams();
     const history = useHistory();
+    const location = useLocation();
     const managerId = params["id"];
     const [data, setData] = useState({});
     const [access, setAccess] = useState(false);
     const admin = useSelector((state) => state.admin.adminDetails);
     if (!(admin && admin.id)) {
-        history.push("/admin/login")
+        history.push({pathname:"/admin/login",state:{pathname:location.pathname}});
     }
     const handleChangeCheck = (e) => {
         setData((prevData) => {

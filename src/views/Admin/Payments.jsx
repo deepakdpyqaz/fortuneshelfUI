@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useHistory } from "react-router";
+import { useHistory,useLocation } from "react-router";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -18,6 +18,7 @@ const getTime = (date)=>{
 }
 const Order = () => {
     const history = useHistory();
+    const location = useLocation();
     const admin = useSelector((state) => state.admin.adminDetails);
     const alert = useAlert();
     const today = new Date();
@@ -26,6 +27,7 @@ const Order = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [TransactionData, setTransactionData] = useState([]);
     const [allTransactions, setAllTransactions] = useState([]);
+    const [noPayments,setNoPayments] = useState(false);
     const handleSearchQueryChange = (e) => {
         setSearchQuery(e.target.value);
         setTransactionData(() => {
@@ -35,16 +37,22 @@ const Order = () => {
         })
     }
     if (!(admin && admin.id)) {
-        history.push("/admin/login")
+        history.push({pathname:"/admin/login",state:{pathname:location.pathname}});
     }
 
     const getPayments = ()=>{
-        axios.get('/payment/all',{params:{"start":startDate,"end":endDate}}).then((res)=>{
-            setAllTransactions(res.data.data);
-            setTransactionData(res.data.data);
-        }).catch((err)=>{
-            alert.error("Internal Server Error");
-        })
+        if(admin && admin.id){
+
+            axios.get('/payment/all',{params:{"start":startDate,"end":endDate}}).then((res)=>{
+                setAllTransactions(res.data.data);
+                setTransactionData(res.data.data);
+                if(res.data.count==0){
+                    setNoPayments(true);
+                }
+            }).catch((err)=>{
+                alert.error("Internal Server Error");
+            })
+        }
     }
     return (
         <div>
@@ -139,6 +147,7 @@ const Order = () => {
                         })}
                     </tbody>
                 </Table>
+                {noPayments?<h4 className="text-center">No payments found</h4>:null}
             </Container>
 
         </div>

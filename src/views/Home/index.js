@@ -20,15 +20,17 @@ const Home = (props) => {
     });
     if (props.categories) {
       props.categories.map((category) => {
-        axios.get("/book/categories/" + category).then((res) => {
-          if (res.data && res.data.books && res.data.books.length > 5) {
-              setCategoryBooks((prevData) => {
-                return {...prevData,[category]:res.data.books}
-              })
-          }
-        }).catch(() => {
-
-        })
+        if(category!=null){
+            axios.get("/book/categories/" + category).then((res) => {
+              if (res.data && res.data.books && res.data.books.length > 5) {
+                setCategoryBooks((prevData) => {
+                  return {...prevData,[category]:res.data.books}
+                })
+              }
+          }).catch(() => {
+            alert.error("Internal Server Error")
+          })
+        }
       })
     }
   }, [props.categories])
@@ -38,11 +40,7 @@ const Home = (props) => {
       <Slide right>
         <SectionTitle title="About Us" />
         <TextContainer textCenter={true}>
-          Every country has something unique to offer to the whole world. What does India has?
-          It is the Knowledge of Spirituality which India can offer to the whole world to become a true Vishva Guru and lead the world towards the highest goal of humanity.
-
-          Fortune Shelf is a small contribution towards this bigger cause by delivering amazing spiritual enlightening books to every house across every corner of India. To every villages and towns.
-          If you wish to help our cause kindly support by donating any amount as per below details :
+        Every country has something unique to offer to the whole world. What does India has? It is the Knowledge of Spirituality which India can offer to the whole world to become a true Vishva Guru and lead the world towards the highest goal of humanity. Fortune Shelf is a small contribution towards this bigger cause by delivering amazing spiritual enlightening books to every house across every corner of India. To every villages and towns.
         </TextContainer>
       </Slide>
       <Slide left>

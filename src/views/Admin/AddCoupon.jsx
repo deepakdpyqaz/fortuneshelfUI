@@ -10,17 +10,18 @@ import axios from "axios";
 import Label from "@material-ui/core/FormLabel";
 import Checkbox from '@material-ui/core/Checkbox';
 import { Button } from "../../components/Utilities";
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import { useSelector } from "react-redux";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 const AddCoupon = () => {
     const alert = useAlert();
     const history = useHistory();
+    const location = useLocation();
     const [data, setData] = useState({});
     const admin = useSelector((state) => state.admin.adminDetails);
     if (!(admin && admin.id)) {
-        history.push("/admin/login")
+        history.push({pathname:"/admin/login",state:{pathname:location.pathname}});
     }
     const handleChange = ((e) => {
         setData((prevData) => {

@@ -18,18 +18,37 @@ import Fade from '@material-ui/core/Fade';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useAlert } from "react-alert";
 import Label from "@material-ui/core/FormLabel";
-import {ApiLoader} from "../../components/Loaders";
+import { ApiLoader } from "../../components/Loaders";
 
-
+function getModalStyle() {
+    const top = 50;
+    const left = 50;
+  
+    return {
+      top: `${top}%`,
+      left: `${left}%`,
+      transform: `translate(-${top}%, -${left}%)`,
+    };
+  }
+  const useStyles = makeStyles((theme) => ({
+    paper: {
+      position: 'absolute',
+      width: 400,
+      backgroundColor: theme.palette.background.paper,
+      boxShadow: "0px 0px 3px 1px #EBA83A",
+      padding: theme.spacing(2, 4, 3),
+    },
+  }));  
 const Checkout = (props) => {
-    const [shippingDetails, setShippingDetails] = useState({state:"",district:""});
+    const [shippingDetails, setShippingDetails] = useState({ state: "", district: "" });
     const dispatch = useDispatch();
     const history = useHistory();
     const alert = useAlert();
+    const [deliveryCharge, setDeliveryCharge] = useState(70);
     const [billingProfiles, setBillingProfiles] = useState([]);
-    const [validation, setValidation] = useState({ first_name: false, last_name: false, mobile: false, email: false, pincode: false,state:false,district:false });
-    const [coupon,setCoupon] = useState({});
-    const [couponState,setCouponState]=useState("apply");
+    const [validation, setValidation] = useState({ first_name: false, last_name: false, mobile: false, email: false, pincode: false, state: false, district: false });
+    const [coupon, setCoupon] = useState({});
+    const [couponState, setCouponState] = useState("apply");
     const validate = (data) => {
         const nameRe = /[a-zA-z]{2,45}/;
         const phoneRe = /^[0-9]{10}$/;
@@ -41,55 +60,52 @@ const Checkout = (props) => {
             mobile: !phoneRe.test(data.mobile) && Boolean(data.mobile),
             email: !(emailRe.test(data.email)) && Boolean(data.email),
             pincode: !(pincodeRe.test(data.pincode) && Boolean(data.pincode)),
-            state: !(data.state && data.state.length>0),
-            district: !(data.district && data.district.length>0)
+            state: !(data.state && data.state.length > 0),
+            district: !(data.district && data.district.length > 0)
         })
 
     }
-    const [isLoading,setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const handleChange = (e) => {
         setShippingDetails((prevData) => {
             let newData = { ...prevData, [e.target.name]: e.target.value };
             validate(newData);
             return newData;
         })
-        if(e.target.name=="pincode" && e.target.value.length==6 && !isNaN(Number(e.target.value))){
-            setShippingDetails((prevData)=>{
-                return {...prevData,"state":"","district":""};
+        if (e.target.name == "pincode" && e.target.value.length == 6 && !isNaN(Number(e.target.value))) {
+            setShippingDetails((prevData) => {
+                return { ...prevData, "state": "", "district": "" };
             })
             setIsLoading(true);
-            axios.get("/pincode/"+e.target.value).then((res)=>{
-                if(res.data && res.data.status=="success"){
+            axios.get("/pincode/" + e.target.value).then((res) => {
+                if (res.data && res.data.status == "success") {
                     let state = res.data.state;
                     let district = res.data.district;
-                    setShippingDetails((prevData)=>{
-                        return {...prevData,"state":state,"district":district};
+                    setShippingDetails((prevData) => {
+                        return { ...prevData, "state": state, "district": district };
                     })
-                }else{
-                    setValidation((prevData)=>{
-                        return {...prevData,"pincode":true}
+                } else {
+                    setValidation((prevData) => {
+                        return { ...prevData, "pincode": true }
                     })
                 }
-            }).catch((err)=>{
+            }).catch((err) => {
                 alert.error(err.message);
-            }).finally(()=>{
+            }).finally(() => {
                 setIsLoading(false);
             })
         }
     }
-    const disableSubmit = ()=>{
-        return Boolean(validation.first_name || validation.last_name || validation.email || validation.mobile || validation.pincode || shippingDetails.state.length==0 || shippingDetails.district.length==0)
+    const disableSubmit = () => {
+        return Boolean(validation.first_name || validation.last_name || validation.email || validation.mobile || validation.pincode || shippingDetails.state.length == 0 || shippingDetails.district.length == 0)
     }
-
+    const classes = useStyles();
+    const [modalStyle] = React.useState(getModalStyle);
+    const [openModal,setOpenModal] = useState(false);
+    const handleModalClose = ()=>{
+        setOpenModal(false);
+    }
     const submitOrder = () => {
-        
-    }
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if(validation.first_name || validation.last_name || validation.email || validation.mobile || validation.pincode || validation.state || validation.district){
-            alert.error("Please fill the details correctly");
-            return;
-        }
         const books = {};
         (Object.entries(props.cartItems != null ? props.cartItems : {})).map((elem) => {
             books[elem[0]] = elem[1].stock;
@@ -98,23 +114,23 @@ const Checkout = (props) => {
             alert.error("No book added");
             return;
         }
-        axios.put("/order/make_order", { ...shippingDetails, details: books, amount: props.totalPrice, delivery_charges: props.deliveryCharge,couponId:(coupon.coupon_id?coupon.coupon_id:null)}).then((res) => {
-            if(shippingDetails.paymentMode=='C'){
+        axios.put("/order/make_order", { ...shippingDetails, details: books, amount: props.totalPrice, delivery_charges: props.weight * deliveryCharge, couponId: (coupon.coupon_id ? coupon.coupon_id : null) }).then((res) => {
+            if (shippingDetails.paymentMode == 'C') {
                 reactLocalStorage.setObject("cart", {});
                 dispatch(setCartItems({}));
-                setShippingDetails({});
+                setShippingDetails({"state":"","district":""});
                 history.push(`/order/status?orderId=${res.data.orderId}`);
             }
-            else{
-                history.push("/confirm_order",{...shippingDetails,orderId:res.data.orderId,details:books,amount:props.totalPrice,delivery_charges:props.deliveryCharge,discount:(coupon.discount?Number(coupon.discount):0)})
+            else {
+                history.push("/confirm_order", { ...shippingDetails, orderId: res.data.orderId, details: books, amount: props.totalPrice, delivery_charges: props.weight * deliveryCharge, discount: (coupon.discount ? Number(coupon.discount) : 0) })
             }
         }).catch((err) => {
-            if(err.response && err.response.status==409){
+            if (err.response && err.response.status == 409) {
                 alert.error("Your cart data has been outdated refreshing the cart");
-                axios.post("/validate_cart",{cart:props.cartItems}).then((res)=>{
-                    reactLocalStorage.setObject("cart",res.data.cart);
+                axios.post("/validate_cart", { cart: props.cartItems }).then((res) => {
+                    reactLocalStorage.setObject("cart", res.data.cart);
                     dispatch(setCartItems(res.data.cart));
-                }).catch((err)=>{
+                }).catch((err) => {
                     alert.error("Error in validating cart")
                 })
             }
@@ -125,6 +141,16 @@ const Checkout = (props) => {
                 alert.error(err.message);
             }
         })
+    }
+    const handleSubmit = (e) => {
+        console.log("clicked");
+        e.preventDefault();
+        if (validation.first_name || validation.last_name || validation.email || validation.mobile || validation.pincode || validation.state || validation.district) {
+            console.log(validation)
+            alert.error("Please fill the details correctly");
+            return;
+        }
+        setOpenModal(true);
     }
     const handleProfileChange = (profile) => {
         if (profile) {
@@ -140,20 +166,20 @@ const Checkout = (props) => {
             })
         }
     }
-    const applyCoupon = (e)=>{
+    const applyCoupon = (e) => {
         e.preventDefault();
         setCouponState("loading");
-        axios.get("/payment/apply_coupon/"+coupon.coupon).then((res)=>{
+        axios.get("/payment/apply_coupon/" + coupon.coupon).then((res) => {
             setCoupon(res.data);
             setCouponState("remove");
-        }).catch((err)=>{
+        }).catch((err) => {
             alert.error("Error in applying coupon");
             setCouponState("apply");
         })
     }
-    const handleCouponChange = (e)=>{
-        setCoupon((prevData)=>{
-            return {...prevData,"coupon":e.target.value}
+    const handleCouponChange = (e) => {
+        setCoupon((prevData) => {
+            return { ...prevData, "coupon": e.target.value }
         })
     }
     useEffect(() => {
@@ -176,10 +202,35 @@ const Checkout = (props) => {
                 alert.error(err.message);
             })
         }
+        axios.get("/delivery_charges").then((res) => {
+            setDeliveryCharge(res.data.delivery_charges);
+        }).catch((err) => {
+            alert.error("Internal Server Error");
+        })
     }, [])
+    const body = (
+        <div style={modalStyle} className={classes.paper}>
+          <h2 id="simple-modal-title">Order Confirmation</h2>
+          <p id="simple-modal-description">
+            Your order is of &#8377;{props.weight * deliveryCharge + props.totalPrice - Math.floor((props.weight * deliveryCharge + props.totalPrice) * (coupon.discount ? Number(coupon.discount) : 0) / 100)} /-
+          </p>
+          <p id="simple-modal-description">
+            <Button variant="filled" color="primary" onClick={submitOrder}>Proceed</Button>
+          </p>
+        </div>
+      );
     return (
         <div className="view_page">
-            <ApiLoader loading={isLoading}/>
+            <ApiLoader loading={isLoading} />
+            <Modal
+                open={openModal}
+                onClose={handleModalClose}
+                aria-labelledby="order-confirmation"
+                aria-describedby="order-confirmation"
+                disableScrollLock={true}
+            >
+                {body}
+            </Modal>
             <Container className="my-3 px-3">
                 <SectionTitle title="Order Summary" />
                 <Table bordered bordered-dark striped hover responsive>
@@ -237,15 +288,15 @@ const Checkout = (props) => {
                         </tr>
                         <tr>
                             <td>Delivery Charges</td>
-                            <td colSpan="5">&#8377; {props.deliveryCharge} /-</td>
+                            <td colSpan="5">&#8377; {props.weight * deliveryCharge} /-</td>
                         </tr>
                         <tr>
                             <td>Discount</td>
-                            <td colSpan="5">&#8377; {Math.floor(props.deliveryCharge + props.totalPrice)*(coupon.discount?Number(coupon.discount):0)/100} /-</td>
+                            <td colSpan="5">&#8377; {Math.floor(props.weight * deliveryCharge + props.totalPrice) * (coupon.discount ? Number(coupon.discount) : 0) / 100} /-</td>
                         </tr>
                         <tr>
                             <td>Total Amount</td>
-                            <td colSpan="5">&#8377; {props.deliveryCharge + props.totalPrice-Math.floor((props.deliveryCharge + props.totalPrice)*(coupon.discount?Number(coupon.discount):0)/100)} /-</td>
+                            <td colSpan="5">&#8377; {props.weight * deliveryCharge + props.totalPrice - Math.floor((props.weight * deliveryCharge + props.totalPrice) * (coupon.discount ? Number(coupon.discount) : 0) / 100)} /-</td>
                         </tr>
                     </tbody>
                 </Table>
@@ -314,39 +365,39 @@ const Checkout = (props) => {
                             <Input fullWidth name="city" placeholder="City" required value={shippingDetails.city} onChange={handleChange} />
                         </Col>
                         {
-                            shippingDetails.pincode && shippingDetails.pincode.length==6 && !isNaN(Number(shippingDetails.pincode)) && !validation.pincode && shippingDetails.state && shippingDetails.district?
-                            <>
-                            <Col md="3" sm="6">
-                                <Input fullWidth name="district" placeholder="District" required value={shippingDetails.district} onChange={(e)=>{e.preventDefault()}} disabled={!Boolean(shippingDetails.district)} readOnly/>
-                            </Col>
-                            <Col md="3" sm="6">
-                                <Input fullWidth name="state" placeholder="State" required value={shippingDetails.state} onChange={(e)=>{e.preventDefault()}} disabled={!Boolean(shippingDetails.state)} readOnly/>
-                            </Col>
-                            </>:null
+                            shippingDetails.pincode && shippingDetails.pincode.length == 6 && !isNaN(Number(shippingDetails.pincode)) && !validation.pincode && shippingDetails.state && shippingDetails.district ?
+                                <>
+                                    <Col md="3" sm="6">
+                                        <Input fullWidth name="district" placeholder="District" required value={shippingDetails.district} onChange={(e) => { e.preventDefault() }} disabled={!Boolean(shippingDetails.district)} readOnly />
+                                    </Col>
+                                    <Col md="3" sm="6">
+                                        <Input fullWidth name="state" placeholder="State" required value={shippingDetails.state} onChange={(e) => { e.preventDefault() }} disabled={!Boolean(shippingDetails.state)} readOnly />
+                                    </Col>
+                                </> : null
                         }
                     </Row>
-                    <br/>
+                    <br />
                     <Row>
                         <Col>
-                                <Input fullWidth name="coupon" readOnly={couponState!="apply"} placeholder="COUPON" value={coupon.coupon} onChange={handleCouponChange}/>
+                            <Input fullWidth name="coupon" readOnly={couponState != "apply"} placeholder="COUPON" value={coupon.coupon} onChange={handleCouponChange} />
                         </Col>
                         <Col>
-                                {
-                                    couponState=="apply"?
+                            {
+                                couponState == "apply" ?
                                     <Button variant="filled" color="primary" type="button" onClick={applyCoupon} disabled={!Boolean(coupon.coupon)}>Apply</Button>
-                                    :null
-                                }
-                                {
-                                    couponState=="remove"?
-                                    <Button variant="filled" color="primary" onClick={(e)=>{e.preventDefault();setCoupon({"coupon":""});setCouponState("apply")}}>Remove</Button>
-                                    :null
-                                }
-                                {
-                                    coupon.message?coupon.message:null
-                                }
-                                {
-                                    coupon.discount?<strong><span className="text-success">{`${coupon.discount}% off`}</span></strong>:null
-                                }
+                                    : null
+                            }
+                            {
+                                couponState == "remove" ?
+                                    <Button variant="filled" color="primary" onClick={(e) => { e.preventDefault(); setCoupon({ "coupon": "" }); setCouponState("apply") }}>Remove</Button>
+                                    : null
+                            }
+                            {
+                                coupon.message ? coupon.message : null
+                            }
+                            {
+                                coupon.discount ? <strong><span className="text-success">{`${coupon.discount}% off`}</span></strong> : null
+                            }
                         </Col>
                     </Row>
                     <br />
@@ -379,8 +430,8 @@ function mapStateToProps(state) {
     let weight = 0;
     for (let i in cart.cartItems) {
         tempPrice += (Math.ceil(cart.cartItems[i].price - cart.cartItems[i].price * cart.cartItems[i].discount / 100)) * cart.cartItems[i].stock;
-        weight += cart.cartItems[i].weight * cart.cartItems[i].stock*cart.cartItems[i].delivery_factor;
+        weight += cart.cartItems[i].weight * cart.cartItems[i].stock * cart.cartItems[i].delivery_factor;
     }
-    return { cartItems: cart.cartItems, totalPrice: tempPrice, deliveryCharge: Math.ceil(weight / 1000) * 70, userDetails: auth.userDetails }
+    return { cartItems: cart.cartItems, totalPrice: tempPrice, weight: Math.ceil(weight / 1000), userDetails: auth.userDetails }
 }
 export default connect(mapStateToProps)(Checkout);

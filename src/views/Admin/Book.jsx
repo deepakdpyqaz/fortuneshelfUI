@@ -1,6 +1,6 @@
-import React,{ useRef, useState,useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -11,90 +11,103 @@ import Tooltip from "react-bootstrap/Tooltip";
 import SearchIcon from "@material-ui/icons/Search";
 import Table from "react-bootstrap/Table";
 import Input from "@material-ui/core/Input";
-import {Link} from "react-router-dom";
-import {Button} from "../../components/Utilities";
+import { Link } from "react-router-dom";
+import { Button } from "../../components/Utilities";
 import { useAlert } from "react-alert";
-
+import {ApiLoader} from "../../components/Loaders";
+import Modal from "react-bootstrap/Modal";
 const Book = () => {
     const history = useHistory();
+    const location = useLocation();
+    const [isLoading,setIsLoading] = useState(false);
     const admin = useSelector((state) => state.admin.adminDetails);
     const alert = useAlert();
     const [searchQuery, setSearchQuery] = useState("");
-    const [bookData,setBookData]=useState([]);
-    const [allBooks,setAllBooks] = useState([]);
+    const [bookData, setBookData] = useState([]);
+    const [allBooks, setAllBooks] = useState([]);
+    const [show, setShow] = useState(false);
+    const [deliveryCharges,setDeliveryCharges]=useState();
+    const handleDeliveryChargeChange = (e)=>{
+        setDeliveryCharges(e.target.value);
+    }
+    const handleDeliveryChargeSubmit = ()=>{
+        setIsLoading(true);
+        axios.post("/set_delivery_charges",{"delivery_charges":deliveryCharges}).then(()=>{
+            alert.success("Updated Succesfully");
+        }).catch((err)=>{
+            alert.error(err.message);
+        }).finally(()=>{
+            setIsLoading(false);
+            handleClose();
+        })
+    }
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
     const handleSearchQueryChange = (e) => {
         setSearchQuery(e.target.value);
-        setBookData(()=>{
-            return  allBooks.filter((book)=>{
-                return ((book.bookId+"").toLowerCase()).includes((e.target.value).toLowerCase())||(book.title.toLowerCase()).includes(e.target.value.toLowerCase())
+        setBookData(() => {
+            return allBooks.filter((book) => {
+                return ((book.bookId + "").toLowerCase()).includes((e.target.value).toLowerCase()) || (book.title.toLowerCase()).includes(e.target.value.toLowerCase())
             });
         })
     }
     if (!(admin && admin.id)) {
-        history.push("/admin/login")
+        history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
     }
-    // const [searchData,setSearchData] = useState({
-    //     "type":"",
-    //     "isDescending":"",
-    // })
-    // const handleChange = (e) => {
-    //     setSearchData((prevData)=>{
-    //         return {...prevData,[e.target.name]:e.target.value}
-    //     })
-    // };
-    useEffect(()=>{
-        axios.get("/book/all").then((res)=>{
-            setAllBooks(res.data.data);
-            setBookData(res.data.data);
-        }).catch((err)=>{
-            alert.error("Internal Server Error");
-        })
-    },[])
+
+    useEffect(() => {
+        if (admin.id && admin.id) {
+            setIsLoading(true);
+            axios.get("/book/all").then((res) => {
+                setAllBooks(res.data.data);
+                setBookData(res.data.data);
+            }).catch((err) => {
+                alert.error("Internal Server Error");
+            }).finally(()=>{
+                setIsLoading(false);
+            })
+            axios.get("/delivery_charges").then((res)=>{
+                setDeliveryCharges(res.data.delivery_charges)
+            })
+        }
+        
+    }, [])
     return (
         <div>
+            <ApiLoader loading={isLoading}/>
+            <Modal show={show} onHide={handleClose} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Update Delivery Charges</Modal.Title>
+                </Modal.Header>
+                <Modal.Body><Form.Control type="number" placeholder="Delivery Charges" value={deliveryCharges} onChange={handleDeliveryChargeChange} /></Modal.Body>
+                <Modal.Footer className="justify-content-around">
+                    <Button variant="filled" color="primary" className="mx-2" onClick={handleClose}>
+                        Close
+                    </Button>
+                    <Button variant="filled" color="primary" className="mx-2" onClick={handleDeliveryChargeSubmit}>
+                        Update
+                    </Button>
+                </Modal.Footer>
+            </Modal>
             <Container className="my-3 px-3">
+                <Row className="justify-content-center">
+                    <Col md={4} className="mx-2">
+
+                        <Link to="/admin/books/0"><Row><Button variant="filled" color="primary">Add a new book</Button></Row></Link>
+                    </Col>
+                    <Col md={4} className="mx-2">
+
+                        <Row><Button variant="filled" color="primary" onClick={handleShow}>Update Delivery Charge</Button></Row>
+                    </Col>
+                </Row>
+                <br />
                 <Row>
-                    {/* <Col className="my-2">
-                        <Form.Select aria-label="Search By:" onChange={handleChange} name="type">
-                            <option value="">Search By</option>
-                            <option value="bookId">Book Id</option>
-                            <option value="title">Title</option>
-                            <option value="keyword">Keyword</option>
-                        </Form.Select>
-                    </Col>
-                    
-                        {
-                            searchData.type=="title"?
-                    <Col md={4} sm={6} xs={12} className="my-2">
-                            <Form.Select aria-label="Sort Order" onChange={handleChange} name="isDescending">
-                                <option value="">Sort Order</option>
-                                <option value={false}>Ascending</option>
-                                <option value={true}>Descending</option>
-                            </Form.Select>
-                    </Col>
-                            :null
-                        } */}
                     <Col className="fs_search justify-content-stretch" className="my-2">
                         <Row className="align-items-center gx-1">
                             <Col>
-                                <Form.Control type="text" placeholder="Enter book id or title" value={searchQuery} onChange={handleSearchQueryChange} />
+                                <Form.Control type="text" placeholder="Search book by book id or title" value={searchQuery} onChange={handleSearchQueryChange} />
                             </Col>
-                            {/* <Col md={1} xs={1} sm={1} lg={1} className="align-items-center justify-content-start">
-                                <SearchIcon ref={target} className="fs_search_btn" onClick={makeSearch} />
-                                <Overlay target={target.current} show={showSearchTip} placement="bottom">
-                                    {(props) => (
-                                        <Tooltip id="overlay-example" {...props}>
-                                            Type atleast four words
-                                        </Tooltip>
-                                    )}
-                                </Overlay>
-                            </Col> */}
                         </Row>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                            <Link to="/admin/books/0"><Button variant="filled" color="primary">Add</Button></Link>
                     </Col>
                 </Row>
             </Container>
@@ -124,7 +137,7 @@ const Book = () => {
                                         {elem.title}
                                     </td>
                                     <td className="text-center">
-                                        <Link to={"/admin/books/"+elem.bookId}><Button variant="filled" color="primary" >View</Button></Link>
+                                        <Link to={"/admin/books/" + elem.bookId}><Button variant="filled" color="primary" >View</Button></Link>
                                     </td>
                                 </tr>
                             )

@@ -5,13 +5,15 @@ import Col from "react-bootstrap/Col";
 import axios from "axios";
 import Input from "@material-ui/core/Input";
 import Label from "@material-ui/core/FormLabel";
-import { useParams } from "react-router";
+import { useLocation, useParams } from "react-router";
 import { useAlert } from "react-alert";
 import SectionTitle from "../../components/SectionTitle";
 import { Button } from "../../components/Utilities";
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import { useHistory } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { ApiLoader } from "../../components/Loaders";
 const BookView = () => {
     const params = useParams();
     const bookId = params["bookId"];
@@ -19,6 +21,12 @@ const BookView = () => {
     const imageRef = useRef();
     const alert = useAlert();
     const history = useHistory();
+    const admin = useSelector((state) => state.admin.adminDetails);
+    const location = useLocation();
+    const [isLoading,setIsLoading] = useState(false);
+    if (!(admin && admin.id)) {
+        history.push({pathname:"/admin/login",state:{pathname:location.pathname}});
+    }
     const changeImage = (e) => {
         e.preventDefault();
         imageRef.current.click();
@@ -51,8 +59,11 @@ const BookView = () => {
             }
         }
         if(bookId!=0){
-
+            setIsLoading(true);
             axios.post("/book/" + bookId, formData).then((res) => {
+                if(res.data.created){
+                    history.push("/admin/books/"+res.data.bookId);
+                }
                 alert.success("Updated Succesfully");
             }).catch((err) => {
                 if (err.response && err.response.data) {
@@ -61,9 +72,12 @@ const BookView = () => {
                 else {
                     alert.error("Error in updating book")
                 }
+            }).finally(()=>{
+                setIsLoading(false);
             })
         }
         else{
+            setIsLoading(true);
             axios.put("/book/add",formData).then((res)=>{
                 alert.success("Book Added Successfully");
                 history.push("/admin/books/"+res.data.bookId);
@@ -72,13 +86,16 @@ const BookView = () => {
                     alert.error(err.response.data.message);
                 }
                 else {
-                    alert.error("Error in updating book")
+                    alert.error("Error in adding book")
                 }
+            }).finally(()=>{
+                setIsLoading(false);
             })
         }
     }
     useEffect(() => {
         if (bookId != 0) {
+            setIsLoading(true);
             axios.get("/book/book_by_id/" + bookId).then((res) => {
                 setData(res.data);
             }).catch((err) => {
@@ -88,11 +105,14 @@ const BookView = () => {
                 else {
                     alert.error("Internal Server Error");
                 }
+            }).finally(()=>{
+                setIsLoading(false);
             })
         }
     }, [])
     return (
         <Container style={{ "maxWidth": "800px" }} className="py-3">
+            <ApiLoader loading={isLoading}/>
             <SectionTitle title={bookId!=0?data.title:"Add New Book"} />
             <form onSubmit={handleSubmit}>
                 <Row>

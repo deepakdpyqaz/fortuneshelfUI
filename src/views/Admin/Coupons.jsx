@@ -5,10 +5,11 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Table from "react-bootstrap/Table";
 import { useSelector } from "react-redux";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import { Button } from "../../components/Utilities";
 import axios from "axios";
 import { useAlert } from "react-alert";
+import { ApiLoader } from "../../components/Loaders";
 const getTime = (date) => {
     let dt = new Date(date);
     return `${dt.getDate().toString().padStart(2, '0')}-${(dt.getMonth() + 1).toString().padStart(2, '0')}-${dt.getFullYear()}`
@@ -16,9 +17,12 @@ const getTime = (date) => {
 const Coupons = () => {
     const history = useHistory();
     const alert = useAlert();
+    const location = useLocation();
     const admin = useSelector((state) => state.admin.adminDetails);
     const [couponData, setCouponData] = useState([]);
+    const [isLoading,setIsLoading] = useState(false);
     const deleteCoupon = (couponId) => {
+        setIsLoading(true);
         axios.delete("/order/coupons/" + couponId).then((res) => {
             alert.success("Coupon Deleted succesfully");
             setCouponData((prevData) => {
@@ -28,22 +32,29 @@ const Coupons = () => {
             })
         }).catch((err) => {
             alert.error("Error in deleting coupon");
+        }).finally(()=>{
+            setIsLoading(false);
         })
     }
     if (!(admin && admin.id)) {
-        history.push("/admin/login")
+        history.push({pathname:"/admin/login",state:{pathname:location.pathname}});
     }
     useEffect(() => {
-        axios.get("/order/coupons/all").then((res) => {
-            setCouponData(res.data);
-        }).catch((err) => {
-            alert.error("Error in fetching coupons");
-        })
+        if(admin && admin.id){
+            setIsLoading(true);
+            axios.get("/order/coupons/all").then((res) => {
+                setCouponData(res.data);
+            }).catch((err) => {
+                alert.error("Error in fetching coupons");
+            }).finally(()=>{
+                setIsLoading(false);
+            })
+        }
     }, [])
     return (
         <>
             <SectionTitle title="Coupons" />
-
+            <ApiLoader loading={isLoading}/>
             <Container className="my-3 px-3">
                 <Row className="my-3">
                     <Col md={12}>

@@ -64,3 +64,47 @@
         color:$secondary-text-col;
     }
 }
+
+.fs_banner_button{
+    font-size: 3vw;
+    font-family: 'Pacifico', cursive;
+    outline: none;
+    border: none;
+    background-color: #171010AA;
+    border: 2px solid transparent;
+    padding: 4px 20px;
+    color: #fff;
+    text-transform: capitalize;
+    box-shadow: 0px 0px 2px 1px #171010AA;
+    transition-duration: 300ms;
+    border-radius: 5px;
+    .fs_banner_icon{
+        display: none;
+    }
+    &:hover{
+        box-shadow: 0px 0px 8px 2px #000;
+        font-size: 3.2rem;
+        color: $tertiary-col;
+    }
+    &:hover .fs_banner_icon{
+        display: inline;
+    }
+}
+.carousel-caption{
+    position: absolute;
+    top: 70% !important;
+    left: 50% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex-direction: column;
+    transform: translate(-50%,-50%);
+}
+
+@media screen and (max-width: 800px) {
+    .fs_banner_button{
+        font-size: 20px;
+        padding: 1px;
+    }
+}

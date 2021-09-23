@@ -5,8 +5,6 @@ import Col from "react-bootstrap/Col";
 import Input from "@material-ui/core/Input";
 import { Button } from "../../components/Utilities";
 import SectionTitle from "../../components/SectionTitle";
-import Form from "react-bootstrap/Form";
-import FloatingLabel from "react-bootstrap/FloatingLabel";
 import axios from "axios";
 import { useAlert } from "react-alert";
 import Modal from "react-bootstrap/Modal";
@@ -17,19 +15,27 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import Checkbox from '@material-ui/core/Checkbox';
+import { FormLabel } from "@material-ui/core";
 const Signup = () => {
     const [userDetails, setUserDetails] = useState({});
     const alert = useAlert();
     const [error, setError] = useState("");
     const [show, setShow] = useState(false);
+    const [agree,setAgree] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [userVerificationDetails, setUserVerificationDetails] = useState({});
     const handleClose = () => setShow(false);
     const history = useHistory();
     const [validation, setValidation] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+    const handleCheckChange = (e) => {
+        setAgree((data)=>{
+            return !data;
+        })
+    }
     const isUserFormDisabled = () => {
-        return Boolean(validation.first_name || validation.last_name || validation.mobile || validation.email || validation.age || validation.gender)
+        return Boolean(validation.first_name || validation.last_name || validation.mobile || validation.email || validation.age || validation.gender || !agree)
     }
     const isVerificationDisabled = () => {
         return Boolean(validation.password || validation.confirm_password || validation.otp)
@@ -192,8 +198,8 @@ const Signup = () => {
                             {validation.age ? <span className="text-danger">Enter a valid age</span> : null}
                         </Col>
                         <Col className="mb-2 mt-0 pt-0">
-                            <FormControl fullWidth className={userDetails.gender?"my-3":"py-0 my-0"}>
-                                {userDetails.gender?null:
+                            <FormControl fullWidth className={userDetails.gender ? "my-3" : "py-0 my-0"}>
+                                {userDetails.gender ? null :
                                     <InputLabel id="demo-simple-select-label" >Gender</InputLabel>
                                 }
                                 <Select
@@ -210,6 +216,18 @@ const Signup = () => {
                                 </Select>
                             </FormControl>
                             {validation.gender ? <span className="text-danger">Select a valid gender type</span> : null}
+                        </Col>
+                    </Row>
+                    <Row className="my-2">
+                        <Col>
+                                <Checkbox
+                                    checked={agree}
+                                    onChange={handleCheckChange}
+                                    inputProps={{ 'aria-label': 'primary checkbox','name':'agree' }}
+                                    color={"primary"}
+                                    required
+                                />
+                                <FormLabel htmlFor="agree">I agree to all the terms and conditions and policies of FortuneShelf</FormLabel>
                         </Col>
                     </Row>
                     <br />

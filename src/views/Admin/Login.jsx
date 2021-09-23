@@ -8,28 +8,31 @@ import axios from "axios";
 import { Button } from "../../components/Utilities";
 import {Link} from "react-router-dom";
 import { useSelector,useDispatch,connect } from "react-redux";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { login,logout } from "../../reducers/admin";
 import { useAlert } from "react-alert";
 import { reactLocalStorage } from "reactjs-localstorage";
-
+import {ApiLoader} from "../../components/Loaders";
 const Login = () => {
     const history = useHistory();
+    const location = useLocation();
     const user = useSelector((state)=>state.auth.userDetails);
     if(user && user.id){
-        history.push("/admin/books")
+        history.push(location.state&&location.state.pathname?location.state.pathname:"/admin/profile/"+user.id)
     }
     const alert = useAlert();
     const dispatch = useDispatch();
     const [userDetails, setUserDetails] = useState({username:"",password:""});
-    const [validation,setValidation] = useState({"username":false,"password":false})
+    const [validation,setValidation] = useState({"username":false,"password":false});
+    const [isLoading,setIsLoading] = useState(false);
     const handleSubmit = (e) => {
         e.preventDefault()
+        setIsLoading(true);
         axios.post("/manager/login", userDetails).then((res) => {
             dispatch(login(res.data));
             reactLocalStorage.set("admin_token",res.data.token);
             axios.defaults.headers.authorization = res.data.token;
-            history.push("/admin/profile");
+            history.push(location.state&&location.state.pathname?location.state.pathname:"/admin/profile/"+res.data.id);
         }).catch((err) => {
             if (err.response && err.response.data && err.response.data.message) {
                 alert.error(err.response.data.message);
@@ -37,6 +40,8 @@ const Login = () => {
             else {
                 alert.error(err.message);
             }
+        }).finally(()=>{
+            setIsLoading(false);
         })
     }
     const validate = (data) =>{
@@ -55,14 +60,17 @@ const Login = () => {
     useEffect(()=>{
         let token = reactLocalStorage.get("admin_token");
         if(token){
+            setIsLoading(true);
             axios.post("/manager/login_token",{token}).then((res)=>{
                 dispatch(login(res.data));
                 reactLocalStorage.set("admin_token",res.data.token);
                 axios.defaults.headers.authorization = res.data.token;
-                history.push("/admin/profile/"+res.data.id);
+                history.push(location.state&&location.state.pathname?location.state.pathname:"/admin/profile/"+res.data.id);
             }).catch((err)=>{
                 reactLocalStorage.remove("admin_token");
                 dispatch(logout());
+            }).finally(()=>{
+                setIsLoading(false);
             })
         }
     },[])
@@ -70,6 +78,7 @@ const Login = () => {
         <div>
 
             <Container style={{"maxWidth":"600px"}} className="my-3 py-3" fluid="sm">
+                <ApiLoader loading={isLoading}/>
                 <SectionTitle title="Administrator's Login" />
                 <form onSubmit={handleSubmit}>
                     <Row>

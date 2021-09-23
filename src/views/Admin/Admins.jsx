@@ -10,26 +10,31 @@ import { Link } from "react-router-dom";
 import { Button } from "../../components/Utilities";
 import { useAlert } from "react-alert";
 import SectionTitle from "../../components/SectionTitle";
+import { ApiLoader } from "../../components/Loaders";
 const Admin = () => {
     const history = useHistory();
     const admin = useSelector((state) => state.admin.adminDetails);
     const alert = useAlert();
     const [adminData, setAdminData] = useState([]);
-    
+    const [isLoading,setIsLoading] = useState(false);
     if (!(admin && admin.id)) {
         history.push("/admin/login")
     }
 
     useEffect(()=>{
+        setIsLoading(true);
         axios.get('/manager/all').then((res)=>{
             setAdminData(res.data);
         }).catch((err)=>{
             alert.error("Internal Server Error");
+        }).finally(()=>{
+            setIsLoading(false);
         })
     },[])
     return (
         <div>
             <Container className="my-3 px-3">
+                <ApiLoader loading={isLoading}/>
                 <SectionTitle title="Admins"/>
                 <Row className="my-3">
                     <Col md={12}>

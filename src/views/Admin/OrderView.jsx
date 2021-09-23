@@ -5,13 +5,13 @@ import Col from "react-bootstrap/Col";
 import axios from "axios";
 import Input from "@material-ui/core/Input";
 import Label from "@material-ui/core/FormLabel";
-import { useParams } from "react-router";
+import { useLocation, useParams } from "react-router";
 import { useAlert } from "react-alert";
 import SectionTitle from "../../components/SectionTitle";
 import { Button } from "../../components/Utilities";
 import Table from "react-bootstrap/Table";
 import InputLabel from '@material-ui/core/InputLabel';
-import { useHistory, Link } from "react-router-dom";
+import { useHistory, Link} from "react-router-dom";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -23,46 +23,48 @@ const OrderView = () => {
     const orderId = params["orderId"];
     const [data, setData] = useState({ details: {} });
     const [orderStatus, setOrderStatus] = useState(0);
-    const [courierInfo,setCourierInfo] = useState({});
+    const [courierInfo, setCourierInfo] = useState({});
     const [show, setShow] = useState(false);
     const alert = useAlert();
     const history = useHistory();
+    const location = useLocation();
     const admin = useSelector((state) => state.admin.adminDetails);
-    const [message,setMessage] = useState("");
-    if (!(admin && admin.id)) { 
-        history.push("/admin/login")
+    const [message, setMessage] = useState("");
+    if (!(admin && admin.id)) {
+        history.push({ pathname: "/admin/login", state: { pathname: location.state.pathname } });
     }
     const handleChange = (e) => {
         setOrderStatus(e.target.value);
     }
 
     const handleCourierInfoChange = (e) => {
-        setCourierInfo((data)=>{
-            return {...data,[e.target.name]:e.target.value};
+        setCourierInfo((data) => {
+            return { ...data, [e.target.name]: e.target.value };
         })
     }
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        axios.post("/order/status/" + orderId, { "status": orderStatus,...courierInfo,"message":message }).then((res) => {
-            alert.success("Updated Succesfully");
-            data.status=orderStatus;
-        }).catch((err) => {
-            if (err.response && err.response.data) {
-                alert.error(err.response.data.message);
-            }
-            else {
-                alert.error("Error in updating book")
-            }
-        }).finally(() => {
-            setShow(false);
-        })
+        if (admin && admin.id) {
+            axios.post("/order/status/" + orderId, { "status": orderStatus, ...courierInfo, "message": message }).then((res) => {
+                alert.success("Updated Succesfully");
+                data.status = orderStatus;
+            }).catch((err) => {
+                if (err.response && err.response.data) {
+                    alert.error(err.response.data.message);
+                }
+                else {
+                    alert.error("Error in updating book")
+                }
+            }).finally(() => {
+                setShow(false);
+            })
+        }
     }
     useEffect(() => {
         axios.get("/order/order_by_id/" + orderId).then((res) => {
             if (res.data.status) {
                 setOrderStatus(res.data.status);
-                setCourierInfo({"courier_tracking_id":res.data.courier_tracking_id,"courier_tracking_url":res.data.courier_url,"courier_name":res.data.courier_name});
+                setCourierInfo({ "courier_tracking_id": res.data.courier_tracking_id, "courier_tracking_url": res.data.courier_url, "courier_name": res.data.courier_name });
             }
             setData(res.data);
         }).catch((err) => {
@@ -83,8 +85,8 @@ const OrderView = () => {
                     </Modal.Header>
 
                     <Modal.Body>
-                        <Input fullWidth multiline placeholder={`Order update for orderId ${orderId} (Optional message..)`} rows={4} value={message} onChange={(e)=>{setMessage(e.target.value)}}/>
-                        <br/>
+                        <Input fullWidth multiline placeholder={`Order update for orderId ${orderId} (Optional message..)`} rows={4} value={message} onChange={(e) => { setMessage(e.target.value) }} />
+                        <br />
                         {
                             (orderStatus < data.status ? <p className="text-danger">You are degrading the order status. Please be sure to take the action</p> : null)
                         }
@@ -128,34 +130,34 @@ const OrderView = () => {
                                 <MenuItem value={-1}>Failed</MenuItem>
                             </Select>
                         </FormControl>
-                            <br />
-                            <br />
-                            <Row>
-                                <Col>
-                                    <Label id="order-courier-name">Courier Name</Label>
-                                    <Input fullWidth name="courier_name" onChange={handleCourierInfoChange} value={courierInfo.courier_name} />
-                                </Col>
-                            </Row>
-                            <br />
-                            <Row>
-                                <Col>
-                                    <Label id="order-tracking-url">Tracking URL</Label>
-                                    <Input fullWidth name="courier_url" onChange={handleCourierInfoChange} value={courierInfo.courier_tracking_url} />
-                                </Col>
-                            </Row>
-                            <br />
-                            <Row>
-                                <Col>
-                                    <Label id="order-tracking-id">Tracking Id</Label>
-                                    <Input fullWidth name="courier_tracking_id" onChange={handleCourierInfoChange} value={courierInfo.courier_tracking_id} />
-                                </Col>
-                            </Row>
-                            <br/>
-                            <Row>
-                                <Col>
-                                    <Button color="primary" variant="filled" onClick={() => { setShow(true) }}>Update</Button>
-                                </Col>
-                            </Row>
+                        <br />
+                        <br />
+                        <Row>
+                            <Col>
+                                <Label id="order-courier-name">Courier Name</Label>
+                                <Input fullWidth name="courier_name" onChange={handleCourierInfoChange} value={courierInfo.courier_name} />
+                            </Col>
+                        </Row>
+                        <br />
+                        <Row>
+                            <Col>
+                                <Label id="order-tracking-url">Tracking URL</Label>
+                                <Input fullWidth name="courier_url" onChange={handleCourierInfoChange} value={courierInfo.courier_tracking_url} />
+                            </Col>
+                        </Row>
+                        <br />
+                        <Row>
+                            <Col>
+                                <Label id="order-tracking-id">Tracking Id</Label>
+                                <Input fullWidth name="courier_tracking_id" onChange={handleCourierInfoChange} value={courierInfo.courier_tracking_id} />
+                            </Col>
+                        </Row>
+                        <br />
+                        <Row>
+                            <Col>
+                                <Button color="primary" variant="filled" onClick={() => { setShow(true) }}>Update</Button>
+                            </Col>
+                        </Row>
                     </Col>
                 </Row>
                 <br />
