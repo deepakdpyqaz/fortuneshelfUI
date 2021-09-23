@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import { Button } from "../../components/Utilities";
 import { useAlert } from "react-alert";
 import TextField from "@material-ui/core/TextField";
+import {ApiLoader} from "../../components/Loaders";
 
 const Order = () => {
     const history = useHistory();
@@ -24,6 +25,7 @@ const Order = () => {
     const [OrderData, setOrderData] = useState([]);
     const [allOrders, setAllOrders] = useState([]);
     const [noOrders,setNoOrders]=useState(false);
+    const [isLoading,setIsLoading] = useState(false);
     const handleSearchQueryChange = (e) => {
         setSearchQuery(e.target.value);
         setOrderData(() => {
@@ -37,20 +39,28 @@ const Order = () => {
     }
     const getOrders = ()=>{
         if(admin && admin.id){
+            setNoOrders(false);
+            setIsLoading(true);
             axios.get('/order/get_all_orders',{params:{"start":startDate,"end":endDate}}).then((res)=>{
                 setAllOrders(res.data.data);
                 setOrderData(res.data.data);
                 if(res.data.count==0){
                     setNoOrders(true);
                 }
+                else{
+                    setNoOrders(false);
+                }
             }).catch((err)=>{
                 alert.error("Internal Server Error");
+            }).finally(()=>{
+                setIsLoading(false);
             })
         }
     }
     return (
         <div>
             <Container className="my-3 px-3">
+                <ApiLoader loading={isLoading}/>
                 <Row>
                     <Col className="fs_search justify-content-stretch" className="my-2">
                         <Row className="align-items-center gx-1">

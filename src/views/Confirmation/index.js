@@ -37,7 +37,7 @@ const Confirmation = (props) => {
         })
     }
     return (
-        <div className="view_page" onContextMenu={(e)=>e.preventDefault()}>
+        <div className="view_page" onContextMenu={(e)=>e.preventDefault()} onKeyDown={(e)=>{e.preventDefault()}}>
             <SectionTitle title="Order Confirmation" />
             <Container className="my-3 py-3">
                 <form ref={form} method="post" action='https://test.payu.in/_payment' content-type="application/x-www-form-urlencoded" accept="application/json">
