@@ -85,3 +85,9 @@ h5,h6{
     opacity: 0;
     transition: opacity 1000ms;
   }
+
+// Modifying react-alert
+#__react-alert__ div span{
+    text-transform: capitalize !important;
+    font-family: $font-family;
+}

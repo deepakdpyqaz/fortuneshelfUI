@@ -46,12 +46,12 @@
 .fs_button.secondary.filled{
     background-color: $secondary-col;
     color:$secondary-text-col;
+    border: 2px solid transparent;
     background:linear-gradient(45deg,#9b1c31,#df3b56);
     box-shadow: 0px 0px 1px 1px $secondary-col;
     &:hover{
         box-shadow: 0px 0px 1px 1px $primary-col;
-        background-color: transparent;
-        color: $tertiary-col;
+        background:linear-gradient(45deg,#1A2238,#4662af);
     }
 }
 .fs_button.secondary.outlined{
@@ -71,11 +71,11 @@
     outline: none;
     border: none;
     background-color: #171010AA;
-    border: 2px solid transparent;
-    padding: 4px 20px;
+    border: 3px solid #171010DD;
+    padding: 4px 10px;
     color: #fff;
     text-transform: capitalize;
-    box-shadow: 0px 0px 2px 1px #171010AA;
+    box-shadow: 0px 0px 5px 2px #171010AA;
     transition-duration: 300ms;
     border-radius: 5px;
     .fs_banner_icon{
@@ -100,6 +100,10 @@
     color: #fff;
     flex-direction: column;
     transform: translate(-50%,-50%);
+}
+
+.carousel-indicators button{
+    background-color: $primary-col !important;
 }
 
 @media screen and (max-width: 800px) {

@@ -147,7 +147,7 @@ const Book = (props) => {
                             <img src="https://fortuneshelfimages.s3.ap-south-1.amazonaws.com/media/books/default.png" height="200" style={{"objectFit":"contain","maxWidth":"10rem"}} alt={props.tilte} />
                         </object>
                         <Card.Text as="div" className="border-top border-secondary my-1 pt-1 pb-0">
-                            <h6 className="fs_book_title my-0">{props.title}</h6>
+                            <h6 className="fs_book_title my-0">{props.title.replace(/\( /g,"(").replace(/ \)/g,")")}</h6>
                             <div className="fs_book_description my-1">
                                 <p className="text-capitalize fs_book_language my-0 py-0">{props.language}</p>
                                 <strong style={{ "color": "#9b1c31", "fontSize": "1.2rem" }} className="text-right fs_book_price">&#8377; {Math.ceil(props.price - props.price * props.discount / 100)}

@@ -9,29 +9,44 @@ import { Provider } from 'react-redux';
 import store from './store';
 import { positions, Provider as AlertProvider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
-
 const options = {
-  timeout: 5000,
+  timeout: 3000,
   position: positions.TOP_CENTER,
-  offset:"4vh",
+  offset:"2vh",
   containerStyle:{
     justifyContent:"stretch",
-    zIndex:10000
+    zIndex:10000,
+    textTransform:"capitalize"
   }
 };
 
 axios.defaults.baseURL=config.backendUrl;
-ReactDOM.render(
+// ReactDOM.render(
 
+//   <>
+//     <Provider store={store}>
+//       <AlertProvider template={AlertTemplate} {...options}>
+//         <App />
+//       </AlertProvider>
+//     </Provider>
+//   </>,
+//   document.getElementById('root')
+// );
+const AppElement = (
   <>
-    <Provider store={store}>
+      <Provider store={store}>
       <AlertProvider template={AlertTemplate} {...options}>
         <App />
       </AlertProvider>
     </Provider>
-  </>,
-  document.getElementById('root')
-);
+  </>
+)
+const rootElement = document.getElementById("root");
+if (rootElement.hasChildNodes()) {
+  ReactDOM.hydrate(AppElement, rootElement);
+} else {
+  ReactDOM.render(AppElement, rootElement);
+}
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

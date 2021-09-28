@@ -40,6 +40,7 @@ const Profile = () => {
     const [openBackdrop, setOpenBackdrop] = useState(false);
     const location = useLocation();
     const [error,setError] = useState(false);
+    const [disabled,setDisabled] = useState({"state":true,"district":true});
     const resetPassword = () => {
         history.push("/reset_password")
     }
@@ -92,6 +93,7 @@ const Profile = () => {
                 return {...prevData,"state":"","district":""};
             })
             setOpenBackdrop(true);
+            setDisabled({"state":true,"district":true});
             axios.get("/pincode/"+e.target.value).then((res)=>{
                 if(res.data && res.data.status=="success"){
                     let state = res.data.state;
@@ -100,7 +102,7 @@ const Profile = () => {
                         return {...prevData,"state":state,"district":district};
                     })
                 }else{
-                    setError(true);
+                    setDisabled({"state":false,"district":false});
                 }
             }).catch((err)=>{
                 alert.error(err.message);
@@ -114,7 +116,7 @@ const Profile = () => {
         e.preventDefault();
         setOpenBackdrop(true);
         axios({ "method": update ? "post" : "put", "url": update ? "/user/billing_profile/" + idSelected : "/user/billing_profile", data: billingProfile }).then((res) => {
-            alert.success(update ? "Profile Added Succesfully" : "Profile Updated Succesfully");
+            alert.success(update ? "Profile Updated Succesfully" : "Profile Added Succesfully");
             if (update) {
                 setBillingProfiles((prevData) => {
                     return prevData.filter((elem) => {
@@ -249,7 +251,8 @@ const Profile = () => {
                                     placeholder="District"
                                     required
                                     name="district"
-                                    readOnly
+                                    onChange={handleBillingChange}
+                                    readOnly={disabled.district}
                                     value={billingProfile.district}
                                 />
                             </Col>
@@ -259,7 +262,8 @@ const Profile = () => {
                                     placeholder="State"
                                     required
                                     name="state"
-                                    readOnly
+                                    onChange={handleBillingChange}
+                                    readOnly={disabled.state}
                                     value={billingProfile.state}
                                 />
                             </Col>
@@ -342,7 +346,7 @@ const Profile = () => {
                             </Row>
                         </Container>
                         : <Container className="text-center my-3">
-                            <Button color="primary" variant="filled" onClick={() => setShow(true)}> <h4 className="my-0"> Create a billing Profile</h4></Button>
+                            <Button color="primary" variant="filled" onClick={() => {setShow(true);setUpdate(false);}}> <h4 className="my-0"> Create a billing Profile</h4></Button>
                         </Container>
                 }
             </Container>

@@ -50,7 +50,7 @@ const Home = (props) => {
         Object.entries(categoryBooks).map((data) => {
           return (
             <Slide left key={data[0]}>
-              <HorizontalSlider title={`Popular in ${data[0]}`} cartItems={props.cartItems} books={data[1]} />
+              <HorizontalSlider title={data[0]!='gita'?`Popular in ${data[0]}`:"Your Own Gita"} cartItems={props.cartItems} books={data[1]} />
             </Slide>
           )
         })

@@ -66,6 +66,7 @@ const Checkout = (props) => {
 
     }
     const [isLoading, setIsLoading] = useState(false);
+    const [disabled,setDisabled] = useState({"state":true,"district":false});
     const handleChange = (e) => {
         setShippingDetails((prevData) => {
             let newData = { ...prevData, [e.target.name]: e.target.value };
@@ -77,6 +78,7 @@ const Checkout = (props) => {
                 return { ...prevData, "state": "", "district": "" };
             })
             setIsLoading(true);
+            setDisabled({"state":true,"district":true});
             axios.get("/pincode/" + e.target.value).then((res) => {
                 if (res.data && res.data.status == "success") {
                     let state = res.data.state;
@@ -84,10 +86,8 @@ const Checkout = (props) => {
                     setShippingDetails((prevData) => {
                         return { ...prevData, "state": state, "district": district };
                     })
-                } else {
-                    setValidation((prevData) => {
-                        return { ...prevData, "pincode": true }
-                    })
+                }else{
+                    setDisabled({'state':false,"district":false})
                 }
             }).catch((err) => {
                 alert.error(err.message);
@@ -106,6 +106,8 @@ const Checkout = (props) => {
         setOpenModal(false);
     }
     const submitOrder = () => {
+        setIsLoading(true);
+        setOpenModal(false);
         const books = {};
         (Object.entries(props.cartItems != null ? props.cartItems : {})).map((elem) => {
             books[elem[0]] = elem[1].stock;
@@ -140,13 +142,13 @@ const Checkout = (props) => {
             else {
                 alert.error(err.message);
             }
+        }).finally(()=>{
+            setIsLoading(false);
         })
     }
     const handleSubmit = (e) => {
-        console.log("clicked");
         e.preventDefault();
         if (validation.first_name || validation.last_name || validation.email || validation.mobile || validation.pincode || validation.state || validation.district) {
-            console.log(validation)
             alert.error("Please fill the details correctly");
             return;
         }
@@ -214,8 +216,9 @@ const Checkout = (props) => {
           <p id="simple-modal-description">
             Your order is of &#8377;{props.weight * deliveryCharge + props.totalPrice - Math.floor((props.weight * deliveryCharge + props.totalPrice) * (coupon.discount ? Number(coupon.discount) : 0) / 100)} /-
           </p>
-          <p id="simple-modal-description">
+          <p id="simple-modal-description" className="d-flex justify-content-around p-0">
             <Button variant="filled" color="primary" onClick={submitOrder}>Proceed</Button>
+            <Button variant="filled" color="secondary" onClick={handleModalClose}>Cancel</Button>
           </p>
         </div>
       );
@@ -292,7 +295,7 @@ const Checkout = (props) => {
                         </tr>
                         <tr>
                             <td>Discount</td>
-                            <td colSpan="5">&#8377; {Math.floor(props.weight * deliveryCharge + props.totalPrice) * (coupon.discount ? Number(coupon.discount) : 0) / 100} /-</td>
+                            <td colSpan="5">&#8377; {Math.floor((props.weight * deliveryCharge + props.totalPrice) * (coupon.discount ? Number(coupon.discount) : 0) / 100)} /-</td>
                         </tr>
                         <tr>
                             <td>Total Amount</td>
@@ -322,22 +325,22 @@ const Checkout = (props) => {
                         </Col>
                     </Row>
                     <Row>
-                        <Col md="6" sm="6">
+                        <Col md="6" sm="6" className="my-1">
                             <Input name="first_name" placeholder="First Name.." fullWidth required value={shippingDetails.first_name} onChange={handleChange} />
                             {validation && validation.first_name ? <span className="text-danger">Enter a valid first name</span> : null}
                         </Col>
-                        <Col md="6" sm="6">
+                        <Col md="6" sm="6" className="my-1">
                             <Input name="last_name" placeholder="Last Name.." fullWidth required value={shippingDetails.last_name} onChange={handleChange} />
                             {validation && validation.last_name ? <span className="text-danger">Enter a valid last name</span> : null}
                         </Col>
                     </Row>
                     <br />
                     <Row>
-                        <Col md="6" sm="6">
+                        <Col md="6" sm="6" className="my-1">
                             <Input placeholder="Mobile.." name="mobile" fullWidth required value={shippingDetails.mobile} onChange={handleChange} />
                             {validation.mobile ? <span className="text-danger">Enter a valid 10 digit mobile number</span> : null}
                         </Col>
-                        <Col md="6" sm="6">
+                        <Col md="6" sm="6" className="my-1">
                             <Input placeholder="Email.." name="email" type="email" fullWidth required value={shippingDetails.email} onChange={handleChange} />
                             {validation.email ? <span className="text-danger">Enter a valid email</span> : null}
                         </Col>
@@ -357,21 +360,21 @@ const Checkout = (props) => {
                     </Row>
                     <br />
                     <Row>
-                        <Col md="3" sm="6">
+                        <Col md="3" sm="6"  className="my-1">
                             <Input fullWidth placeholder="Pincode" name="pincode" value={shippingDetails.pincode} onChange={handleChange} required />
                             {validation.pincode ? <span className="text-danger">Enter a valid pincode</span> : null}
                         </Col>
-                        <Col md="3" sm="6">
+                        <Col md="3" sm="6" className="my-1">
                             <Input fullWidth name="city" placeholder="City" required value={shippingDetails.city} onChange={handleChange} />
                         </Col>
                         {
-                            shippingDetails.pincode && shippingDetails.pincode.length == 6 && !isNaN(Number(shippingDetails.pincode)) && !validation.pincode && shippingDetails.state && shippingDetails.district ?
+                            shippingDetails.pincode && shippingDetails.pincode.length == 6 && !isNaN(Number(shippingDetails.pincode)) && !validation.pincode?
                                 <>
-                                    <Col md="3" sm="6">
-                                        <Input fullWidth name="district" placeholder="District" required value={shippingDetails.district} onChange={(e) => { e.preventDefault() }} disabled={!Boolean(shippingDetails.district)} readOnly />
+                                    <Col md="3" sm="6" className="my-1">
+                                        <Input fullWidth name="district" placeholder="District" required value={shippingDetails.district} onChange={handleChange} readOnly={Boolean(disabled.district)}  />
                                     </Col>
-                                    <Col md="3" sm="6">
-                                        <Input fullWidth name="state" placeholder="State" required value={shippingDetails.state} onChange={(e) => { e.preventDefault() }} disabled={!Boolean(shippingDetails.state)} readOnly />
+                                    <Col md="3" sm="6" className="my-1">
+                                        <Input fullWidth name="state" placeholder="State" required value={shippingDetails.state} onChange={handleChange} readOnly={Boolean(disabled.state)}  />
                                     </Col>
                                 </> : null
                         }
@@ -393,10 +396,10 @@ const Checkout = (props) => {
                                     : null
                             }
                             {
-                                coupon.message ? coupon.message : null
+                                coupon.message ? <strong className="text-danger mx-1"> {coupon.message}</strong> : null
                             }
                             {
-                                coupon.discount ? <strong><span className="text-success">{`${coupon.discount}% off`}</span></strong> : null
+                                coupon.discount ? <strong><span className="text-success mx-1">{`${coupon.discount}% off`}</span></strong> : null
                             }
                         </Col>
                     </Row>

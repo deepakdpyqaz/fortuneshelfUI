@@ -12,14 +12,17 @@ import { useState } from "react";
 import sha512 from "js-sha512";
 import React,{ useEffect,useRef } from "react";
 import ReactDOM from 'react-dom';
+import { ApiLoader } from "../../components/Loaders";
 
 const Confirmation = (props) => {
     const location = useLocation();
     const alert = useAlert();
+    const [isLoading,setIsLoading] = useState(false);
     const [data, setData] = useState();
     const form = useRef();
     const getKey = (e)=>{
         e.preventDefault();
+        setIsLoading(true);
         axios.get("/payment/get_key",{ params: { orderId: location.state.orderId, mobile: location.state.mobile, email: location.state.email } }).then((res)=>{
             setData(res.data);
             const productinfo = React.createElement("input",{"hidden":true,"className":"d-none","readOnly":true,"name":"productinfo",value:res.data.productinfo});
@@ -34,13 +37,16 @@ const Confirmation = (props) => {
             form.current.submit()
         }).catch((err)=>{
             alert.error("Order cannot be placed");
+        }).finally(()=>{
+            setIsLoading(false);
         })
     }
     return (
         <div className="view_page" onContextMenu={(e)=>e.preventDefault()} onKeyDown={(e)=>{e.preventDefault()}}>
+            <ApiLoader loading={isLoading}/>
             <SectionTitle title="Order Confirmation" />
             <Container className="my-3 py-3">
-                <form ref={form} method="post" action='https://test.payu.in/_payment' content-type="application/x-www-form-urlencoded" accept="application/json">
+                <form ref={form} method="post" action='https://secure.payu.in/_payment' content-type="application/x-www-form-urlencoded" accept="application/json">
                     <Row>
                         <Col>
                             <Label>Order Id:</Label>

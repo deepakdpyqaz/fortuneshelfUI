@@ -23,8 +23,8 @@
         font-weight: 600 !important;
         display: -webkit-box;
         line-height: 20px; /* fallback */
-        max-height: 40px; /* fallback */
-        -webkit-line-clamp: 2; /* number of lines to show */
+        max-height: 60px; /* fallback */
+        -webkit-line-clamp: 3; /* number of lines to show */
         -webkit-box-orient: vertical;
         &:hover{
             color:$secondary-col

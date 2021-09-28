@@ -30,7 +30,7 @@ const Footer = () => {
                     </Col>
                     <Col className="fs_footer_cols" sm="3" xs="12">
                         <h3>Order Books By SMS</h3>
-                        <li>Message or Whatsapp <strong>"MY GITA"</strong> on the number <strong>+91 6369 292 605</strong></li>
+                        <li>Message or Whatsapp <strong>"Fortune Shelf"</strong> on the number <strong>+91 6369 292 605</strong></li>
                     </Col>
                     <Col className="fs_footer_cols justify-content-end text-center" sm="3">
                        <Link to="/"><img src={image} height="200"/></Link>

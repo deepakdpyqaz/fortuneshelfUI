@@ -37,9 +37,9 @@ const useStyles = makeStyles((theme) => ({
         top: 28,
         left: 0,
         zIndex: 1000,
-        boxShadow: "0px 0px 3px 1px #000",
+        boxShadow: "0px 0px 2px 1px #000A",
         color: "#000",
-        borderRadius: "5px",
+        borderRadius: "2px",
         transitionDuration: "2s",
         backgroundColor: theme.palette.background.paper,
     },
@@ -102,16 +102,22 @@ const Header = (props) => {
         dispatch(logout());
 
     }
-    const sticky_disabled = ["/login", "/signup"]
+    const sticky_disabled = []
     const [isMobile, setIsMobile] = useState(false);
     window.addEventListener("scroll", function (e) {
         if (headerRef.current && !sticky_disabled.includes(location.pathname)) {
             let height = headerRef.current.getBoundingClientRect().height;
             if (window.scrollY >= height / 2 + 2) {
                 headerRef.current.classList.add("fs_header_sticky");
+                if(headerRef.current && headerRef.current.nextSibling){
+                    headerRef.current.nextSibling.style.paddingTop=height+"px";
+                }
             }
             else {
                 headerRef.current.classList.remove("fs_header_sticky");
+                if(headerRef.current && headerRef.current.nextSibling){
+                    headerRef.current.nextSibling.style.paddingTop="0px";
+                }
             }
         }
     })
@@ -156,8 +162,8 @@ const Header = (props) => {
             <Container ref={isMobile ? null : headerRef} fluid className="fs_header py-0 pb-1 px-0 px-0">
                 <Row className="align-items-center justify-content-between px-0 gx-0">
                     <Col lg={2} xl={3} md={12} sm={12} xs={12} className="justify-content-center align-items-center my-1 fs_logo_wrapper gx-0">
-                        <Link to="/" className="d-flex align-items-center justify-content-center fs_logo_link"> <img className="fs_logo" src={logo} alt="FortuneShelf" height="60" width="70" />
-                            <span className="fs_logo_text ml-3">FortuneShelf</span>
+                        <Link to="/" className="d-flex align-items-center justify-content-center fs_logo_link"> <img className="fs_logo" src={logo} alt="Fortuneshelf" height="60" width="70" />
+                            <span className="fs_logo_text ml-3">Fortuneshelf</span>
                         </Link>
                     </Col>
                     <Col className="fs_menu px-0 gx-0 justify-content-start">
@@ -281,12 +287,12 @@ const Header = (props) => {
             </Container>
             <Offcanvas className="fs_sidebar_menu" show={show} scroll={true} onHide={handleClose}>
                 <Offcanvas.Header closeButton closeVariant="white">
-                    <Offcanvas.Title>FortuneShelf</Offcanvas.Title>
+                    <Offcanvas.Title>Fortuneshelf</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
                     <Nav defaultActiveKey="/" className="fs_sidebar_nav flex-column">
                         <Link onClick={handleClose} className="fs_sidebar_nav_item" to="/">Home</Link>
-                        <Link onClick={toggleSubmenu} className="fs_sidebar_nav_item" to="#">View Books</Link>
+                        <Link onClick={toggleSubmenu} disabled className="fs_sidebar_nav_item" to="#">View Books</Link>
                         {
                             submenu ?
                                 <>
@@ -294,10 +300,10 @@ const Header = (props) => {
                                     {
                                         filterType == "category" ?
                                         <>
-                                        <Link key={-1} to={{ pathname: "/viewBook", state: { "category": "","language":"","delivery_free":false  } }}><li className="text-capitalize">All Books</li></Link>
+                                        <Link key={-1} onClick={handleClose} to={{ pathname: "/viewBook", state: { "category": "","language":"","delivery_free":false  } }}><li onClick={handleClose} className="text-capitalize">All Books</li></Link>
                                         {
                                             categories.map((item, ind) => {
-                                                return <Link key={ind} to={{ pathname: "/viewBook", state: { "category": item ,"language":"","delivery_free":false } }}><li className="text-capitalize">{item}</li></Link>
+                                                return <Link onClick={handleClose} key={ind} to={{ pathname: "/viewBook", state: { "category": item ,"language":"","delivery_free":false } }}><li onClick={handleClose} className="text-capitalize">{item}</li></Link>
                                             })
                                         }
                                     </>
@@ -307,17 +313,17 @@ const Header = (props) => {
                                     {
                                         filterType == "language" ?
                                             <>
-                                                <Link key={-1} onClick={handleClose} to={{ pathname: "/viewBook", state: { "language": "","category":"","delivery_free":false } }}><li className="text-capitalize">All Books</li></Link>
+                                                <Link key={-1} onClick={handleClose} to={{ pathname: "/viewBook", state: { "language": "","category":"","delivery_free":false } }}><li onClick={handleClose} className="text-capitalize">All Books</li></Link>
                                                 {
                                                     languages.map((item, ind) => {
-                                                        return <Link onClick={handleClose} key={ind} to={{ pathname: "/viewBook", state: { "language": item ,"category":"","delivery_free":false } }}><li className="text-capitalize">{item}</li></Link>
+                                                        return <Link onClick={handleClose} key={ind} to={{ pathname: "/viewBook", state: { "language": item ,"category":"","delivery_free":false } }}><li onClick={handleClose} className="text-capitalize">{item}</li></Link>
                                                     })
                                                 }
                                             </>
 
                                             : null
                                     }
-                                    <Link to={{ pathname: "/viewBook", state: { "delivery_free": true ,"language":"","category":"" } }}><li className="text-capitalize">Delivery Free</li></Link>
+                                    <Link onClick={handleClose} to={{ pathname: "/viewBook", state: { "delivery_free": true ,"language":"","category":"" } }}><li onClick={handleClose} className="text-capitalize">Delivery Free</li></Link>
 
                                 </>
                                 : null

@@ -13,10 +13,10 @@ const BillingCard = (props) => {
             {" "}
             <Button color="primary" variant="filled" onClick={()=>{props.editBillingProfile(props.id)}}><EditIcon/></Button>
             </div>
-            <Col>
+            <Col onClick={()=>{props.editBillingProfile(props.id)}}>
                 <h4>{props.index}) {props.title}</h4>
                 <p>{props.address}</p>
-                <h5>{props.district} {props.city} {props.pincode} {props.state}</h5>
+                <h6>{props.district}, {props.city}-{props.pincode}, {props.state}</h6>
             </Col>
         </Col>
 

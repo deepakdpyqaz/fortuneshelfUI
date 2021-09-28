@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {BannerButton} from "../../components/Utilities";
 import Carousel from "react-bootstrap/Carousel";
+import Avatar from "@material-ui/core/Avatar";
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import { makeStyles } from "@material-ui/styles";
 import Roll from 'react-reveal/Roll';
 import banner0 from "../../images/banner/0.png";
 import banner1 from "../../images/banner/1.png";
@@ -12,11 +16,35 @@ import banner5 from "../../images/banner/5.png";
 import banner6 from "../../images/banner/6.png";
 import banner7 from "../../images/banner/7.png";
 import banner8 from "../../images/banner/8.png";
+
+const useStyles = makeStyles((theme)=>({
+    wrapper:{
+        backgroundColor:"#1A2238",
+        width:"3rem",
+        height:"3rem"
+    },
+    icon:{
+        color:"#EBA83A",
+        fontSize:"3rem"
+    }
+}))
+
 const Banner = () => {
     const [height, setHeight] = useState(0);
+    const classes = useStyles();
     useEffect(() => {
         setHeight(Math.min(Math.min(450, window.innerHeight), Math.max(window.innerWidth / 2, 250)));
     },[]);
+    const bannerLeft = (
+        <Avatar className={classes.wrapper}>
+        <ChevronLeftIcon className={classes.icon}/>
+    </Avatar>
+    )
+    const bannerRight = (
+        <Avatar className={classes.wrapper}>
+        <ChevronRightIcon className={classes.icon}/>
+    </Avatar>
+    )
     const images = [
         {"image":banner0},
         {
@@ -49,11 +77,11 @@ const Banner = () => {
         
     ]
     return (
-        <Carousel fade variant="dark">
+        <Carousel fade variant="dark" nextIcon={bannerRight} prevIcon={bannerLeft}>
             {
                 images.map((img, ind) => {
                     return (
-                        <Carousel.Item key={ind}>
+                        <Carousel.Item key={ind} interval={2000}>
                             {height ?
                                 <img
                                     className="d-block w-100"

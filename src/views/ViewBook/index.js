@@ -7,7 +7,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
-import Slide from 'react-reveal/Slide';
+import Fade from 'react-reveal/Fade';
 import { useAlert } from "react-alert";
 import { connect } from "react-redux";
 import { useLocation } from "react-router";
@@ -16,6 +16,7 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 import SortIcon from '@material-ui/icons/Sort';
 import Modal from "react-bootstrap/Modal";
 import { useSelector } from "react-redux";
+import { ApiLoader } from "../../components/Loaders";
 const ViewBook = (props) => {
     const [books, setBooks] = useState([]);
     const [pageNo, setPageNo] = useState(1);
@@ -24,6 +25,8 @@ const ViewBook = (props) => {
     const [perPage,setPerPage] = useState(24);
     const [showModal, setShowModal] = useState(false);
     const languages = useSelector((state)=>state.filter.languages);
+    const categories = useSelector((state)=>state.filter.categories);
+    const [fullLoading,setFullLoading] = useState(false);
     const handelShowModal = () => {
         setShowModal(true);
     }
@@ -35,7 +38,7 @@ const ViewBook = (props) => {
             "category": location.state && location.state.category ? location.state.category : "",
             "language": location.state && location.state.language ? location.state.language : "",
             "order_by": "",
-            "isDescending": "",
+            "isDescending": false,
             "delivery_free":location.state && location.state.delivery_free?location.state.delivery_free:false
         }
     );
@@ -48,7 +51,9 @@ const ViewBook = (props) => {
         axios.get("/book", { params: { page_number: (reset ? 1 : pageNo), per_page: perPage, ...data } }).then((res) => {
             if (res.data.length == 0) {
                 setHasMore(false);
-                return;
+            }
+            if(res.data.length<perPage){
+                setHasMore(false);
             }
             if (reset) {
                 setBooks([res.data]);
@@ -57,9 +62,6 @@ const ViewBook = (props) => {
                 setBooks((prevState) => {
                     return [...prevState, res.data]
                 });
-                if (res.data.length < 20) {
-                    setHasMore(false);
-                }
             }
         }).catch(err => {
             setHasMore(false);
@@ -72,13 +74,16 @@ const ViewBook = (props) => {
         }).finally(() => {
             setLoading(false);
             setPageNo((data)=>{return data+1});
+            setFullLoading(false);
         })
     }
     const handleSubmit = (e) => {
         setPageNo(1);
+        setFullLoading(true);
         getBooks(queryParams,true);
         setShowModal(false);
         setHasMore(true);
+        setPageNo(2);
     }
     const handleChange = (e) => {
         setQueryParams((prevData) => {
@@ -99,8 +104,8 @@ const ViewBook = (props) => {
                     <Modal.Title>Filter or Sort</Modal.Title>
                     <Row className="my-3">
                         <Col>
-                            <Form.Select aria-label="Language" value={queryParams.language} onChange={handleChange} name="language">
-                                <option value="">Language</option>
+                            <Form.Select aria-label="Language" value={queryParams.language} className="text-capitalize" onChange={handleChange} name="language">
+                                <option value="">All Languages</option>
                                 {
                                     languages?languages.map((item)=>{
                                         return <option key={item} value={item} className={"text-capitalize"}>{item}</option>
@@ -113,28 +118,33 @@ const ViewBook = (props) => {
                     <Row className="my-3">
                         <Col>
                             <Form.Select aria-label="Sort By" value={queryParams.order_by} onChange={handleChange} name="order_by">
-                                <option value="">Sort By</option>
+                                <option value="">No Sorting</option>
                                 <option value="price">Price</option>
                                 <option value="title">Name</option>
                             </Form.Select>
                         </Col>
                     </Row>
+                    {
+                        queryParams.order_by?
+                        <Row className="my-3">
+                            <Col>
+                                <Form.Select aria-label="Sort Order" value={queryParams.isDescending} onChange={handleChange} name="isDescending">
+                                    <option value={false}>Ascending</option>
+                                    <option value={true}>Descending</option>
+                                </Form.Select>
+                            </Col>
+                        </Row>
+                        :null
+                    }
                     <Row className="my-3">
                         <Col>
-                            <Form.Select aria-label="Sort Order" value={queryParams.isDescending} onChange={handleChange} name="isDescending">
-                                <option value="">Sort Order</option>
-                                <option value={false}>Ascending</option>
-                                <option value={true}>Descending</option>
-                            </Form.Select>
-                        </Col>
-                    </Row>
-                    <Row className="my-3">
-                        <Col>
-                            <Form.Select aria-label="Category" value={queryParams.category} onChange={handleChange} name="category">
-                                <option value="">Category</option>
-                                <option value="gita">Gita</option>
-                                <option value="set">Sets</option>
-                                <option value="bhagavatam">Bhagavatam</option>
+                            <Form.Select aria-label="Category" value={queryParams.category} className="text-capitalize" onChange={handleChange} name="category">
+                                <option value="">All Categories</option>
+                                {
+                                    categories?categories.map((item)=>{
+                                        return <option key={item} value={item} className={"text-capitalize"}>{item}</option>
+                                    }):null
+                                }
                             </Form.Select>
                         </Col>
                     </Row>
@@ -156,22 +166,23 @@ const ViewBook = (props) => {
                     </Col>
                 </Row>
             </Container>
+            <ApiLoader loading={fullLoading}/>
             <InfiniteScroll
                 pageStart={pageNo}
                 loadMore={() => { getBooks(queryParams) }}
                 hasMore={hasMore}
                 loader={<ViewBookLoader key={0} />}
+                
             >
                 {
                     books.map((elem, ind) => {
                         return (
-                            <Slide left>
-                                <BookContainer cartItems={props.cartItems} books={elem} key={ind} />
-                            </Slide>
+                            <BookContainer cartItems={props.cartItems} books={elem} key={ind} />
                         )
                     })
                 }
             </InfiniteScroll>
+            {(books.length==0 || (books[0]&&books[0].length==0)) && !loading?<h3 className="text-center">No books Found</h3>:null}
         </div>
     )
 }
