@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -17,8 +17,9 @@ const Admin = () => {
     const alert = useAlert();
     const [adminData, setAdminData] = useState([]);
     const [isLoading,setIsLoading] = useState(false);
+    const location = useLocation();
     if (!(admin && admin.id)) {
-        history.push("/admin/login")
+        history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
     }
 
     useEffect(()=>{
@@ -26,6 +27,9 @@ const Admin = () => {
         axios.get('/manager/all').then((res)=>{
             setAdminData(res.data);
         }).catch((err)=>{
+            if(err.response && err.response.status==401){
+                history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
+            }
             alert.error("Internal Server Error");
         }).finally(()=>{
             setIsLoading(false);

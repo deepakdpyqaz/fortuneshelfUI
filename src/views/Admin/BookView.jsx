@@ -66,6 +66,9 @@ const BookView = () => {
                 }
                 alert.success("Updated Succesfully");
             }).catch((err) => {
+                if(err.response && err.response.status==401){
+                    history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
+                }
                 if (err.response && err.response.data) {
                     alert.error(err.response.data.message);
                 }
@@ -82,6 +85,9 @@ const BookView = () => {
                 alert.success("Book Added Successfully");
                 history.push("/admin/books/"+res.data.bookId);
             }).catch((err)=>{
+                if(err.response && err.response.status==401){
+                    history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
+                }
                 if (err.response && err.response.data) {
                     alert.error(err.response.data.message);
                 }
@@ -99,6 +105,9 @@ const BookView = () => {
             axios.get("/book/book_by_id/" + bookId).then((res) => {
                 setData(res.data);
             }).catch((err) => {
+                if(err.response && err.response.status==401){
+                    history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
+                }
                 if (err.response && err.response.data) {
                     alert.error(err.response.data.message);
                 }

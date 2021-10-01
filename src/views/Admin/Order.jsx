@@ -51,6 +51,9 @@ const Order = () => {
                     setNoOrders(false);
                 }
             }).catch((err)=>{
+                if(err.response && err.response.status==401){
+                    history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
+                }
                 alert.error("Internal Server Error");
             }).finally(()=>{
                 setIsLoading(false);

@@ -46,7 +46,7 @@ const Confirmation = (props) => {
             <ApiLoader loading={isLoading}/>
             <SectionTitle title="Order Confirmation" />
             <Container className="my-3 py-3">
-                <form ref={form} method="post" action='https://secure.payu.in/_payment' content-type="application/x-www-form-urlencoded" accept="application/json">
+                <form ref={form} method="post" action={process.env.REACT_APP_PAYU_URL} content-type="application/x-www-form-urlencoded" accept="application/json">
                     <Row>
                         <Col>
                             <Label>Order Id:</Label>

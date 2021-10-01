@@ -130,6 +130,7 @@ const TrackOrder = () => {
   const [orderData, setOrderData] = useState({});
   const [amount, setAmount] = useState({});
   const [discount, setDiscount] = useState({});
+  const [codCharges,setCodCharges] = useState(0);
   const [deliveryCharges, setDeliveryCharges] = useState({});
   const [courierInfo,setCourierInfo] = useState({});
 
@@ -146,6 +147,7 @@ const TrackOrder = () => {
       setOrderData(res.data.details);
       setAmount(res.data.amount);
       setDeliveryCharges(res.data.delivery_charges);
+      setCodCharges(res.data.cod_charges)
       setDiscount(res.data.discount);
       setCourierInfo({"courier_tracking_id":res.data.courier_tracking_id,"courier_tracking_url":res.data.courier_url,"courier_name":res.data.courier_name});
     }).catch((err) => {
@@ -242,13 +244,20 @@ const TrackOrder = () => {
                         <td>Delivery Charges</td>
                         <td colSpan="5">&#8377; {deliveryCharges} /-</td>
                       </tr>
+                      {
+                        codCharges!=0?
+                        <tr>
+                          <td>COD Charges</td>
+                          <td colSpan="5">&#8377; {codCharges} /-</td>
+                        </tr>:null
+                      }
                       <tr>
                         <td>Discount</td>
                         <td colSpan="5">&#8377; {discount} /-</td>
                       </tr>
                       <tr>
                         <td>Total Amount</td>
-                        <td colSpan="5">&#8377; {deliveryCharges + amount - discount} /-</td>
+                        <td colSpan="5">&#8377; {deliveryCharges + amount - discount+codCharges} /-</td>
                       </tr>
                       {
                         courierInfo.courier_name?

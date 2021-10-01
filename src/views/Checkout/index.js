@@ -45,6 +45,16 @@ const Checkout = (props) => {
     const history = useHistory();
     const alert = useAlert();
     const [deliveryCharge, setDeliveryCharge] = useState(70);
+    const [codCharges,setCodCharges] = useState([{"min":0,"max":1000000,"price":50}]);
+    const calculateCODCharge = (amount)=>{
+        if(shippingDetails && shippingDetails.paymentMode && shippingDetails.paymentMode=="O") return 0;
+        for(let charges of codCharges){
+            if(amount>=parseFloat(charges.min) && amount<parseFloat(charges.max)){
+                return parseFloat(charges.price);
+            }
+        }
+        return 50;
+    }
     const [billingProfiles, setBillingProfiles] = useState([]);
     const [validation, setValidation] = useState({ first_name: false, last_name: false, mobile: false, email: false, pincode: false, state: false, district: false });
     const [coupon, setCoupon] = useState({});
@@ -116,7 +126,7 @@ const Checkout = (props) => {
             alert.error("No book added");
             return;
         }
-        axios.put("/order/make_order", { ...shippingDetails, details: books, amount: props.totalPrice, delivery_charges: props.weight * deliveryCharge, couponId: (coupon.coupon_id ? coupon.coupon_id : null) }).then((res) => {
+        axios.put("/order/make_order", { ...shippingDetails, details: books, amount: props.totalPrice ,delivery_charges: props.weight * deliveryCharge, cod_charges:calculateCODCharge(props.totalPrice) ,couponId: (coupon.coupon_id ? coupon.coupon_id : null) }).then((res) => {
             if (shippingDetails.paymentMode == 'C') {
                 reactLocalStorage.setObject("cart", {});
                 dispatch(setCartItems({}));
@@ -206,6 +216,7 @@ const Checkout = (props) => {
         }
         axios.get("/delivery_charges").then((res) => {
             setDeliveryCharge(res.data.delivery_charges);
+            setCodCharges(res.data.cod_charges);
         }).catch((err) => {
             alert.error("Internal Server Error");
         })
@@ -214,7 +225,7 @@ const Checkout = (props) => {
         <div style={modalStyle} className={classes.paper}>
           <h2 id="simple-modal-title">Order Confirmation</h2>
           <p id="simple-modal-description">
-            Your order is of &#8377;{props.weight * deliveryCharge + props.totalPrice - Math.floor((props.weight * deliveryCharge + props.totalPrice) * (coupon.discount ? Number(coupon.discount) : 0) / 100)} /-
+            Your order is of &#8377;{props.weight * deliveryCharge + calculateCODCharge(props.totalPrice) +props.totalPrice - Math.floor((props.weight * deliveryCharge + calculateCODCharge(props.totalPrice) + props.totalPrice) * (coupon.discount ? Number(coupon.discount) : 0) / 100)} /-
           </p>
           <p id="simple-modal-description" className="d-flex justify-content-around p-0">
             <Button variant="filled" color="primary" onClick={submitOrder}>Proceed</Button>
@@ -293,13 +304,20 @@ const Checkout = (props) => {
                             <td>Delivery Charges</td>
                             <td colSpan="5">&#8377; {props.weight * deliveryCharge} /-</td>
                         </tr>
+                        {
+                            shippingDetails.paymentMode=="C"?                            <tr>
+                                <td>COD Charges</td>
+                                <td colSpan="5">&#8377; {calculateCODCharge(props.totalPrice)} /-</td>
+                            </tr>
+                            :null
+                        }
                         <tr>
                             <td>Discount</td>
-                            <td colSpan="5">&#8377; {Math.floor((props.weight * deliveryCharge + props.totalPrice) * (coupon.discount ? Number(coupon.discount) : 0) / 100)} /-</td>
+                            <td colSpan="5">&#8377; {Math.floor((props.weight * deliveryCharge + props.totalPrice+calculateCODCharge(props.totalPrice)) * (coupon.discount ? Number(coupon.discount) : 0) / 100)} /-</td>
                         </tr>
                         <tr>
                             <td>Total Amount</td>
-                            <td colSpan="5">&#8377; {props.weight * deliveryCharge + props.totalPrice - Math.floor((props.weight * deliveryCharge + props.totalPrice) * (coupon.discount ? Number(coupon.discount) : 0) / 100)} /-</td>
+                            <td colSpan="5">&#8377; {props.weight * deliveryCharge + calculateCODCharge(props.totalPrice) +props.totalPrice - Math.floor((props.weight * deliveryCharge + calculateCODCharge(props.totalPrice) + props.totalPrice) * (coupon.discount ? Number(coupon.discount) : 0) / 100)} /-</td>
                         </tr>
                     </tbody>
                 </Table>
@@ -407,6 +425,14 @@ const Checkout = (props) => {
                     <Row>
                         <Col>
                             Payment Method: &nbsp;  COD <input required type="radio" disabled={!(props.userDetails && props.userDetails.id != null)} name="paymentMode" value={"C"} checked={shippingDetails.paymentMode == "C"} onChange={handleChange} />   &nbsp; Online <input required type="radio" checked={shippingDetails.paymentMode == "O"} value={"O"} onChange={handleChange} name="paymentMode" />
+                            <br />
+                            {
+                                shippingDetails.paymentMode=='C'?
+                                <>
+                                <small><strong>**COD Charges</strong> will apply separately </small>
+                                </>:
+                                <small><strong>{" "}</strong></small>
+                            }
                             <br />
                             <small><strong>**Cash On Delivery</strong> is available for registered users Only</small>
                         </Col>

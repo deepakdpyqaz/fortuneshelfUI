@@ -1,5 +1,5 @@
 import React, { useEffect, Suspense } from "react";
-import { BrowserRouter as Router, Switch, Route, useLocation,Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, useLocation,Redirect, useHistory } from "react-router-dom";
 import FallbackLoader from "./components/FallBackLoader";
 import Footer from "./components/Footer"
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -26,6 +26,15 @@ const AddCoupon = React.lazy(()=>import("./views/Admin/AddCoupon"));
 function AdminApp() {
     const dispatch = useDispatch();
     let location = useLocation();
+    const history = useHistory();
+
+
+    useEffect(()=>{
+        axios.get("/manager/").then((res)=>{
+        }).catch(()=>{
+            history.push("/");
+        })
+    },[])
     return (
 
         <div className="App">

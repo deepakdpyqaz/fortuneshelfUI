@@ -44,6 +44,9 @@ const Profile = () => {
                 setAccess(data.users);
                 history.push("/admin/login");
             }).catch((err) => {
+                if(err.response && err.response.status==401){
+                    history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
+                }
                 alert.error("Error in updating profile");
             })
         }
@@ -51,6 +54,9 @@ const Profile = () => {
             axios.post("/manager/add",data).then((res)=>{
                 alert.success("Succesfully Invited");
             }).catch((err)=>{
+                if(err.response && err.response.status==401){
+                    history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
+                }
                 alert.error("Error in inviting")
             })
         }
@@ -61,6 +67,9 @@ const Profile = () => {
                 setData(res.data);
                 setAccess(res.data.users);
             }).catch((err) => {
+                if(err.response && err.response.status==401){
+                    history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
+                }
                 if(err.response && err.response.data){
                     alert.error(err.response.data.message);
                 }

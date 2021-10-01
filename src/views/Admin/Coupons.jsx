@@ -31,6 +31,9 @@ const Coupons = () => {
                 })
             })
         }).catch((err) => {
+            if(err.response && err.response.status==401){
+                history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
+            }
             alert.error("Error in deleting coupon");
         }).finally(()=>{
             setIsLoading(false);
@@ -45,6 +48,9 @@ const Coupons = () => {
             axios.get("/order/coupons/all").then((res) => {
                 setCouponData(res.data);
             }).catch((err) => {
+                if(err.response && err.response.status==401){
+                    history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
+                }
                 alert.error("Error in fetching coupons");
             }).finally(()=>{
                 setIsLoading(false);

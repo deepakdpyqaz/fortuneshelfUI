@@ -62,6 +62,9 @@ const Book = () => {
                 setAllBooks(res.data.data);
                 setBookData(res.data.data);
             }).catch((err) => {
+                if(err.response && err.response.status==401){
+                    history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
+                }
                 alert.error("Internal Server Error");
             }).finally(()=>{
                 setIsLoading(false);

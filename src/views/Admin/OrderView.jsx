@@ -31,7 +31,7 @@ const OrderView = () => {
     const admin = useSelector((state) => state.admin.adminDetails);
     const [message, setMessage] = useState("");
     if (!(admin && admin.id)) {
-        history.push({ pathname: "/admin/login", state: { pathname: location.state.pathname } });
+        history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
     }
     const handleChange = (e) => {
         setOrderStatus(e.target.value);
@@ -49,6 +49,9 @@ const OrderView = () => {
                 alert.success("Updated Succesfully");
                 data.status = orderStatus;
             }).catch((err) => {
+                if(err.response && err.response.status==401){
+                    history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
+                }
                 if (err.response && err.response.data) {
                     alert.error(err.response.data.message);
                 }
@@ -62,12 +65,16 @@ const OrderView = () => {
     }
     useEffect(() => {
         axios.get("/order/order_by_id/" + orderId).then((res) => {
+            console.log(data);
             if (res.data.status) {
                 setOrderStatus(res.data.status);
                 setCourierInfo({ "courier_tracking_id": res.data.courier_tracking_id, "courier_tracking_url": res.data.courier_url, "courier_name": res.data.courier_name });
             }
             setData(res.data);
         }).catch((err) => {
+            if(err.response && err.response.status==401){
+                history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
+            }
             if (err.response && err.response.data) {
                 alert.error(err.response.data.message);
             }
@@ -181,12 +188,16 @@ const OrderView = () => {
                         <Input fullWidth readOnly value={data.delivery_charges} />
                     </Col>
                     <Col md={3} sm={6} xs={12} className="my-3">
+                        <Label>COD Charges (in &#8377;)</Label>
+                        <Input fullWidth readOnly value={data.cod_charges} />
+                    </Col>
+                    <Col md={3} sm={6} xs={12} className="my-3">
                         <Label>Discount (in &#8377;)</Label>
                         <Input fullWidth readOnly value={data.discount} />
                     </Col>
                     <Col md={3} sm={6} xs={12} className="my-3">
                         <Label>Total amount (in &#8377;)</Label>
-                        <Input fullWidth readOnly value={data.delivery_charges + data.amount - data.discount} />
+                        <Input fullWidth readOnly value={data.delivery_charges + data.amount - data.discount + data.cod_charges} />
                     </Col>
                     <Col md={3} sm={6} xs={12} className="my-3">
                         <Label>Nimbus order number</Label>
@@ -296,6 +307,12 @@ const OrderView = () => {
                                         Book Id
                                     </th>
                                     <th>
+                                        Title
+                                    </th>
+                                    <th>
+                                        Language
+                                    </th>
+                                    <th>
                                         Quantity
                                     </th>
                                     <th>
@@ -304,24 +321,30 @@ const OrderView = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {Object.entries(data.details).map((elem, index) => {
+                                {data.books?data.books.map((elem, index) => {
                                     return (
-                                        <tr>
+                                        <tr key={elem.bookId}>
                                             <td>
                                                 {index + 1}
                                             </td>
                                             <td>
-                                                {elem[0]}
+                                                {elem.bookId}
                                             </td>
                                             <td>
-                                                {elem[1]}
+                                                {elem.title}
                                             </td>
                                             <td>
-                                                <Link to={"/viewBook/" + elem[0]}><Button variant="filled" color="primary">View</Button></Link>
+                                                {elem.language}
+                                            </td>
+                                            <td>
+                                                {data.details[elem.bookId]}
+                                            </td>
+                                            <td>
+                                                <Link to={"/viewBook/" + elem.bookId} target="_blank"><Button variant="filled" color="primary">View</Button></Link>
                                             </td>
                                         </tr>
                                     )
-                                })}
+                                }):null}
                             </tbody>
                         </Table>
                     </Col>

@@ -33,6 +33,9 @@ const AddCoupon = () => {
             axios.post("/order/coupons/create", data).then((res) => {
                 alert.success("Coupon Added succesfully");
             }).catch((err) => {
+                if(err.response && err.response.status==401){
+                    history.push({ pathname: "/admin/login", state: { pathname: location.pathname } });
+                }
                 alert.error("Error in adding coupon");
             })
     }

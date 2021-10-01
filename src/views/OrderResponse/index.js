@@ -87,7 +87,7 @@ const OrderResponse = () => {
                 alert("Some error occured!!");
             }
         })
-    })
+    },[])
     return (
         <div className="view_page">
             {status == '' ? <Waiting /> : (status=='success'?<Success orderId={orderId} />:<Fail status={status}/>)}
