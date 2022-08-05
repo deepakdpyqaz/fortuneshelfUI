@@ -96,7 +96,7 @@ const ViewFullBook = (props) => {
                 bookData.picture ?
                     <Backdrop className={classes.backdrop} open={open} onClick={handleClose}>
                         <object data={bookData.picture} type="image/jpg" width="250px" onClick={handleToggle} className="fs_book_image fs_full_page">
-                            <img src="https://fortuneshelfimages.s3.ap-south-1.amazonaws.com/media/books/default.png" width="250px" alt={bookData.tilte} onMouseEnter={handleToggle} className="fs_book_image fs_full_page" />
+                            <img src="https://images-na.ssl-images-amazon.com/images/I/91n7e4ULsKL.jpg" width="250px" alt={bookData.tilte} onMouseEnter={handleToggle} className="fs_book_image fs_full_page" />
                         </object>
                     </Backdrop> : null
             }
@@ -114,7 +114,7 @@ const ViewFullBook = (props) => {
                             <Row className="align-items-center">
                                 <Col className="text-center my-3 p-3">
                                     <object data={bookData.picture} type="image/jpg" width="250px" onMouseEnter={handleToggle} className="fs_book_image">
-                                        <img src="https://fortuneshelfimages.s3.ap-south-1.amazonaws.com/media/books/default.png" width="250px" alt={bookData.tilte} onMouseEnter={handleToggle} className="fs_book_image" />
+                                        <img src="https://images-na.ssl-images-amazon.com/images/I/91n7e4ULsKL.jpg" width="250px" alt={bookData.tilte} onMouseEnter={handleToggle} className="fs_book_image" />
                                     </object>
 
                                 </Col>

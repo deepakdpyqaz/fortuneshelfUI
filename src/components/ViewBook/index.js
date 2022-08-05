@@ -48,7 +48,7 @@ const CartBook = (props) => {
             <CancelIcon style={{ position: "absolute", right: "2px", color: "#031F30" }} onClick={() => removeFromCart(props.bookId)} />
             <Card.Body className="text-center my-0 py-0">
                 <object data={props.photo?props.photo:props.picture} type="image/jpg" height="100" style={{"objectFit":"contain","maxWidth":"8rem"}}>
-                    <img src="https://fortuneshelfimages.s3.ap-south-1.amazonaws.com/media/books/default.png" height="100" alt={props.title} />
+                    <img src="https://images-na.ssl-images-amazon.com/images/I/91n7e4ULsKL.jpg" height="100" alt={props.title} />
                 </object>
                 <Card.Text as="div" className="border-top border-secondary mt-1 mb-0 pt-1 pb-0">
                     <h6 className="fs_book_title my-0">{props.title}</h6>
@@ -144,7 +144,7 @@ const Book = (props) => {
                 <Card.Body className="text-center d-flex pb-1 pt-0 flex-column justify-content-between">
                     <Link to={"/viewBook/" + props.bookId} className="pt-1 pb-0 my-0">
                         <object data={props.photo} type="image/png" height="200" style={{"objectFit":"contain","maxWidth":"10rem"}}>
-                            <img src="https://fortuneshelfimages.s3.ap-south-1.amazonaws.com/media/books/default.png" height="200" style={{"objectFit":"contain","maxWidth":"10rem"}} alt={props.tilte} />
+                            <img src="https://images-na.ssl-images-amazon.com/images/I/91n7e4ULsKL.jpg" height="200" style={{"objectFit":"contain","maxWidth":"10rem"}} alt={props.tilte} />
                         </object>
                         <Card.Text as="div" className="border-top border-secondary my-1 pt-1 pb-0">
                             <h6 className="fs_book_title my-0">{props.title.replace(/\( /g,"(").replace(/ \)/g,")")}</h6>

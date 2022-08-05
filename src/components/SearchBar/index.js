@@ -9,7 +9,7 @@ const SearchSuggestion = (props) => {
     return (
         <div className="fs_search_suggestion" onClick={props.onClick}>
             <object data={props.picture} type="image/jpg" height="50" width="50">
-                <img src="https://fortuneshelfimages.s3.ap-south-1.amazonaws.com/media/books/default.png" height="50" width="50" alt={props.title} />
+                <img src="https://images-na.ssl-images-amazon.com/images/I/91n7e4ULsKL.jpg" height="50" width="50" alt={props.title} />
             </object>
             <h6>{props.title}</h6>
         </div>
