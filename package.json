@@ -2,9 +2,9 @@
   "name": "fortuneshelf",
   "version": "0.1.0",
   "private": true,
-  "engines" : { 
-    "npm" : ">=6.x.x",
-    "node" : "==14.x.x"
+  "engines": {
+    "npm": ">=6.x.x",
+    "node": "==14.x.x"
   },
   "dependencies": {
     "@material-ui/core": "^4.12.3",
@@ -62,5 +62,12 @@
   },
   "devDependencies": {
     "react-snap": "^1.23.0"
+  },
+  "reactSnap": {
+    "puppeteerArgs": [
+      "--no-sandbox",
+      "--disable-setuid-sandbox"
+    ]
   }
+
 }
