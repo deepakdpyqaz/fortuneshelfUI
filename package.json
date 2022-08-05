@@ -39,8 +39,7 @@
     "winBuild": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build -prod -minifyjs -minifycss -optimizejs",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "serve": "serve -s build",
-    "postbuild": "react-snap -port=3000"
+    "serve": "serve -s build"
   },
   "eslintConfig": {
     "extends": [
